@@ -1,22 +1,20 @@
 <?php
-# TODO: rename plugin folder and main-plugin-file.php (we recommend you make them the same name)
-# TODO: Fill out details of this files header comment block
 /**
- * Plugin Name: Main Plugin
- * Plugin URI:
- * Description:
- * Author:
+ * Plugin Name: WP Trapper Keeper
+ * Plugin URI: https://github.com/WordPress-Phoenix/wordpress-trapper-keeper
+ * Description: Add image providers to the WordPress media modal.
+ * Author: justintucker
  * Version: 0.1.1
- * Author URI:
+ * Author URI: http://github.com/justintucker
  * License: GPL V2
- * Text Domain:
+ * Text Domain: trapper_keeper
  *
- * GitHub Plugin URI:
+ * GitHub Plugin URI: https://github.com/WordPress-Phoenix/wordpress-trapper-keeper
  * GitHub Branch: master
  *
- * @package my_wp_plugin
+ * @package  WP_Trapper_Keeper
  * @category plugin
- * @author
+ * @author justintucker
  * @internal Plugin derived from https://github.com/scarstens/worpress-plugin-boilerplate-redux
  */
 
@@ -27,8 +25,14 @@ if ( ! function_exists( 'add_filter' ) ) {
 	exit();
 }
 
-if ( ! class_exists( 'Main_Plugin' ) ) {
-	class Main_Plugin {
+if ( ! class_exists( 'Trapper_Keeper' ) ) {
+
+	define( 'TK_VERSION', '1.0.0' );
+	define( 'TK_URL', plugins_url( basename( __DIR__ ) ) );
+	define( 'TK_PATH', dirname( __FILE__ ) );
+	define( 'TK_INC', TK_PATH . '/includes' );
+
+	class Trapper_Keeper {
 
 		public $debug;
 		public $installed_dir;
@@ -48,6 +52,7 @@ if ( ! class_exists( 'Main_Plugin' ) ) {
 
 			// hook can be used by mu plugins to modify plugin behavior after plugin is setup
 			do_action( get_called_class() . '_preface', $this );
+			define( 'TRAPPER_URL', plugins_url( basename( __DIR__ ) ) );
 
 			//simplify getting site options with custom prefix with multisite compatibility
 			if ( ! function_exists( 'get_custom_option' ) ) {
@@ -97,18 +102,11 @@ if ( ! class_exists( 'Main_Plugin' ) ) {
 
 			do_action( get_called_class() . '_before_init' );
 
-			// Example of initializing a class that was in /includes/REST_User_Data_Utility.class.php
-			/*
-			if ( class_exists( 'REST_User_Data_Utility' ) ) {
-				REST_User_Data_Utility::api_endpoint_rewrite();
+			if ( class_exists( 'Getty_Image_Provider' ) ) {
+				new Getty_Image_Provider;
+				new USAToday_Image_Provider;
 			}
-			*/
 
-			// example of pulling in a site options builder
-			// https://github.com/WordPress-Phoenix/wordpress-options-builder-class
-			// 1. download the php file that includes the class library
-			// 2. move and rename the file to `lib/site-options-builder.class.php`
-			// 3. include bootstrap config file, or config inline like below
 //			if ( class_exists( 'sm_options_page' ) ) {
 //				// create admin site options page to allow gui configuration of plugin
 //				$plugin_options = new sm_options_page(array('theme_page' => TRUE, 'parent_id' => 'themes.php', 'page_title' => 'Configure Theme Customizations', 'menu_title' => 'Theme Options','id' => 'whitelabel-appearance-options'));
@@ -117,23 +115,6 @@ if ( ! class_exists( 'Main_Plugin' ) ) {
 //				$plugin_options->add_part($plugin_options_section_2 = new sm_section('section_2', array('title'=>'Page Meta')) );
 //				$plugin_options_section_2->add_part($genTag = new sm_checkbox('page_meta_generator', array('label'=>'Include Generator Meta Tag', 'value'=>'true', 'classes'=>array('onOffSwitch') )));
 //			}
-
-			/*
-			 * TODO create you plugins functionality in includes folder by creating you custom classes
-			 * Implementation examples are below
-			 */
-
-			// example of how you load a class you build in `includes/My_Class.class.php`
-			if ( class_exists( 'My_Class' ) ) {
-				$this->modules->FS_VIP_Shortcodes = new My_Class( $this );
-			}
-
-			// Example of creating custom KSES to enable custom script allowances in tinyMCE
-			if ( class_exists( 'Kses_Custom_Tag_Allowances' ) ) {
-				$this->modules->Kses_Custom_Tag_Allowances = new Kses_Custom_Tag_Allowances( $this );
-			}
-
-
 
 			do_action( get_called_class() . '_after_init' );
 		}
@@ -165,11 +146,7 @@ if ( ! class_exists( 'Main_Plugin' ) ) {
 		 */
 		public static function activate() {
 
-			/*
-			 * Create any site options defaults for the plugins, handle deprecated values on upgrades, etc
-			 */
-
-		} // END public static function activate
+		}
 
 		/**
 		 * Deactivate the plugin
@@ -179,12 +156,7 @@ if ( ! class_exists( 'Main_Plugin' ) ) {
 		 */
 		public static function deactivate() {
 
-			/*
-			 * Do not delete site options on deactivate. Usually only things in here will be related to
-			 * cache clearing like updating permalinks since some may no longer exist
-			 */
-
-		} // END public static function deactivate
+		}
 
 		/**
 		 * Loads PHP files in the includes folder
@@ -197,7 +169,7 @@ if ( ! class_exists( 'Main_Plugin' ) ) {
 			// load all files with the pattern *.class.php from the includes directory
 			foreach ( glob( dirname( __FILE__ ) . '/includes/*.class.php' ) as $class ) {
 				require_once $class;
-				$this->modules->count ++;
+				//$this->modules->count ++;
 			}
 		}
 
@@ -248,7 +220,9 @@ if ( ! class_exists( 'Main_Plugin' ) ) {
 		protected function configure_defaults() {
 			// Setup plugins global params
 			// TODO: customize with your plugins custom prefix (usually matches your text domain)
-			define( 'SITEOPTION_PREFIX', 'my_plugin_option_' );
+			if ( ! defined('SITEOPTION_PREFIX') ) {
+				define( 'SITEOPTION_PREFIX', 'trapper_keeper_option_' );
+			}
 			$this->modules        = new stdClass();
 			$this->modules->count = 0;
 			$this->installed_dir  = dirname( __FILE__ );
@@ -264,48 +238,18 @@ if ( ! class_exists( 'Main_Plugin' ) ) {
 			return (bool) ( stristr( WP_NETWORKURL, '.dev' ) || stristr( WP_NETWORKURL, '.wpengine' ) || stristr( WP_NETWORKURL, 'dev.' ) || stristr( WP_NETWORKURL, '.staging' ) );
 		}
 
-		// register custom widget
-		public static function register_custom_widget() {
-			// This class should be in the `includes/` directory and should extend WP_Widget to work properly
-			//register_widget( 'Custom_Widget' );
-		}
-
-		/**
-		 * Function remove_action_by_class
-		 * Used to remove notices and nags or other class actions added with class instances (unable to remove with remove_action)
-		 * This is a utility function useful for any plugin/theme that needs to remove hooks created by non-singleton classes
-		 *
-		 * @param     $hook_name
-		 * @param     $class_and_function_list
-		 * @param int $priority
-		 */
-		function remove_action_by_class( $hook_name, $class_and_function_list, $priority = 10 ) {
-			global $wp_filter;
-			// go through manually created class and function list
-			foreach ( $class_and_function_list as $class_search => $function_search ) {
-				//limit removals to matching action names (wildcard string matching)
-				foreach ( $wp_filter[ $hook_name ][ $priority ] as $instance => $action ) {
-					//limit removals again to matching class and function names (wildcard string matching)
-					if ( stristr( $instance, $function_search ) && stristr( get_class( $action['function'][0] ), $class_search ) ) {
-						//action found, removing action from filters
-						unset( $wp_filter[ $hook_name ][10][ $instance ] );
-					}
-				}
-			}
-		} // end remove_action_by_class
-
 	} // END class
 } // END if(!class_exists())
 
 /**
  * Build and initialize the plugin
  */
-if ( class_exists( 'Main_Plugin' ) ) {
+if ( class_exists( 'Trapper_Keeper' ) ) {
 	// Installation and un-installation hooks
-	register_activation_hook( __FILE__, array( 'Main_Plugin', 'activate' ) );
-	register_deactivation_hook( __FILE__, array( 'Main_Plugin', 'deactivate' ) );
+	register_activation_hook( __FILE__, 'activate' );
+	register_deactivation_hook( __FILE__, 'deactivate' );
 
 	// instantiate the plugin class, which should never be instantiated more then once
 	global $main_plugin;
-	$main_plugin = new Main_Plugin();
+	$main_plugin = new Trapper_Keeper();
 }
