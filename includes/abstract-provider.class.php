@@ -81,7 +81,13 @@ abstract class Image_Provider {
 	/**
 	 * @return string
 	 */
-	public function output_template() {}
+	public function output_template() {
+		?>
+		<script type="text/html" id="tmpl-api-image-search">
+			<h2><input type="text" /></h2>
+		</script>
+		<?php
+	}
 
 
 

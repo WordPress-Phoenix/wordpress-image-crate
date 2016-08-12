@@ -21,10 +21,10 @@
             sortable: false,
         }, Library.prototype.defaults),
 
-        // this is fired when 'Add Media' is pressed
+        // this starts the party when "Image Implementor" is clicked
         initialize: function () {
 
-            // console.log(this.get('router') );
+            //console.log(this.get('id') + ' has been added to the queue' );
 
             // If we haven't been provided a `library`, create a `Selection`.
             if (!this.get('library')) {
@@ -41,20 +41,40 @@
 
             activate: function() {
                 console.log( 'router on' );
+                //console.log(this.get('id') + ' is clicked');
+
                 var view = _.first(this.views.get('.media-frame-router')),
                     viewSettings = {};
 
-                // console.log('activated');
-
                 viewSettings.upload_getty = {text: 'Getty Images', priority: 20};
                 viewSettings.upload_usat = {text: 'USA Today', priority: 40};
+
+                // Intercept and clear all incoming uploads
+                wp.Uploader.queue.on('add', this.ImageImplementor.disableUpload, this);
+
+
+                // this.toolbar.set('dateFilterLabel', new wp.media.view.Label({
+                //     value: 'Freaking work',
+                //     attributes: {
+                //         'for': 'media-attachment-date-filters'
+                //     },
+                //     priority: -75
+                // }));
 
                 view.set(viewSettings);
                 this.content.mode('upload_getty');
             },
 
+            disableUpload: function ( attachment ) {
+                var uploader = this.uploader.uploader.uploader;
+                uploader.stop();
+                uploader.splice();
+                attachment.destroy();
+            },
+
             deactivate: function () {
                 console.log('router off');
+                wp.Uploader.queue.off('add', this.ImageImplementor.disableUpload);
             },
 
             createToolbar: function () {
@@ -71,13 +91,18 @@
                              * @fires wp.media.controller.State#reset
                              */
                             click: function () {
-                                var controller = this.controller,
-                                    state = controller.state(),
-                                    edit = controller.state('gallery-edit');
+                                var state = controller.state(),
+                                    selection = state.get('selection');
 
+                                controller.close();
+                                state.trigger('insert', selection).reset();
+                                // var controller = this.controller,
+                                //     state = controller.state(),
+                                //     edit = controller.state('edit-image');
+                                //
                                 // edit.get('library').add(state.get('selection').models);
                                 // state.trigger('reset');
-                                // controller.setState('gallery-edit');
+                                // controller.setState('edit-image');
                             }
                         }
                     }
@@ -89,12 +114,6 @@
             },
         }
     });
-
-    // media.view.MediaFrame.Select = Select.extend({
-    //     bindHandlers: function () {
-    //         Select.prototype.bindHandlers.apply(this, arguments);
-    //     }
-    // });
 
     media.view.MediaFrame.Post = Post.extend({
 
@@ -111,8 +130,10 @@
             this.on('router:deactivate:imageimplementor', this.ImageImplementor.deactivate, this);
 
             this.on('router:create:imageimplementor', this.createRouter, this);
-            this.on('toolbar:create:imageimplementor-toolbar', this.createToolbar, this);
-            this.on('content:render:upload_getty', this.loadGetty, this);
+            this.on('toolbar:create:imageimplementor-toolbar', this.ImageImplementor.createToolbar, this);
+            this.on('router:render:upload_getty', this.ImageImplementor, this);
+
+            // this.on('router:activate:upload_getty', this..activate, this);
         }
 
     });

@@ -20,13 +20,6 @@ class Getty_Image_Provider extends Image_Provider {
 
 	}
 
-	public function output_template() {
-		//include_once TK_PATH . '/views/media_templates.php';
-		?>
-		<script type="text/html" id="tmpl-site-getty">
-			<h2><?php _e( 'getty' ); ?></h2>
-		</script>
-		<?php
-	}
+	//public function output_template() {}
 
 }
