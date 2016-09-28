@@ -1,0 +1,23 @@
+{
+  "name": "trapper-keeper",
+  "title": "WordPress Trapper Keeper",
+  "version": "1.0.0",
+  "description": "A place for image api connection",
+  "main": "image-provider-admin.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WordPress-Phoenix/wordpress-trapper-keeper"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "gulp": "^3.9.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^2.0.0",
+    "jquery": "^3.1.1",
+    "pump": "^1.0.1",
+    "uniq": "^1.0.1",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "author": "Justin Tucker (Certain Strings)",
+  "license": "GPL-2.0"
+}

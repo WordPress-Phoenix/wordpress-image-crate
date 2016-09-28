@@ -65,15 +65,8 @@ if ( ! class_exists( 'Trapper_Keeper' ) ) {
 					}
 				}
 			}
-
-			// Always load libraries first
-			$this->load_libary();
-
 			// configure and setup the plugin class variables
 			$this->configure_defaults();
-
-			// define globals used by the plugin including bloginfo
-			$this->defines_and_globals();
 
 			// Load /includes/ folder php files
 			$this->load_classes();
@@ -102,19 +95,9 @@ if ( ! class_exists( 'Trapper_Keeper' ) ) {
 
 			do_action( get_called_class() . '_before_init' );
 
-			if ( class_exists( 'Getty_Image_Provider' ) ) {
-				new Getty_Image_Provider;
-				new USAToday_Image_Provider;
-			}
-
-//			if ( class_exists( 'sm_options_page' ) ) {
-//				// create admin site options page to allow gui configuration of plugin
-//				$plugin_options = new sm_options_page(array('theme_page' => TRUE, 'parent_id' => 'themes.php', 'page_title' => 'Configure Theme Customizations', 'menu_title' => 'Theme Options','id' => 'whitelabel-appearance-options'));
-//				$plugin_options->add_part($plugin_options_section_1 = new sm_section('section_1', array('title'=>'Section 1')) );
-//				$plugin_options_section_1->add_part($site_favicon = new sm_media_upload('website_favicon', array('label'=>'Favicon', 'description'=>'Website icon to be used for your website. Must be 16x16 or 32x32 and .ico format. Leaving this field blank will load the favicon.ico file from the themes folder or fallback to the generic favicon.ico file.')));
-//				$plugin_options->add_part($plugin_options_section_2 = new sm_section('section_2', array('title'=>'Page Meta')) );
-//				$plugin_options_section_2->add_part($genTag = new sm_checkbox('page_meta_generator', array('label'=>'Include Generator Meta Tag', 'value'=>'true', 'classes'=>array('onOffSwitch') )));
-//			}
+			new Image_Provider_Scripts();
+			$provider = new Image_Provider_Api();
+			new Image_Provider_Ajax( $provider );
 
 			do_action( get_called_class() . '_after_init' );
 		}
@@ -166,55 +149,11 @@ if ( ! class_exists( 'Trapper_Keeper' ) ) {
 		 * @return  void
 		 */
 		protected function load_classes() {
-			// load all files with the pattern *.class.php from the includes directory
-			foreach ( glob( dirname( __FILE__ ) . '/includes/*.class.php' ) as $class ) {
+			// load all files with the pattern class-filename.php from the includes directory
+			foreach ( glob( dirname( __FILE__ ) . '/includes/class-*.php' ) as $class ) {
 				require_once $class;
 				//$this->modules->count ++;
 			}
-		}
-
-		/**
-		 * Load all files from /lib/ that match extensions like filename.class.php
-		 * @TODO: Move to using spl_autoload_register
-		 *
-		 * @since   0.1
-		 * @return  void
-		 */
-		protected function load_libary() {
-			// load all files with the pattern *.php from the directory inc
-			foreach ( glob( dirname( __FILE__ ) . '/lib/*.class.php' ) as $class ) {
-				require_once $class;
-			}
-		}
-
-		protected function defines_and_globals() {
-			/*
-			 * Uncomment parts of this section to enable these features
-			 */
-
-			// confirm PHP_TAB exists for use in printing
-//			if ( ! defined( 'PHP_TAB' ) ) {
-//				define( 'PHP_TAB', "\t" );
-//			}
-
-			// extend current blog global variable with all blog details
-//			$GLOBALS['current_blog'] = new stdClass();
-//			if ( function_exists( 'get_blog_details' ) ) {
-//				$GLOBALS['current_blog']              = get_blog_details();
-//				$GLOBALS['current_blog']->description = get_bloginfo( 'description' );
-//			} else {
-//				$GLOBALS['current_blog']->domain = $_SERVER['SERVER_NAME'];
-//			}
-//
-//			$this->current_blog_globals = $GLOBALS['current_blog'];
-//
-//			// setup network url and fallback in case siteurl is not defined
-//			if ( ! defined( 'WP_NETWORKURL' ) && is_multisite() ) {
-//				define( 'WP_NETWORKURL', network_site_url() );
-//			} elseif ( ! defined( 'WP_NETWORKURL' ) ) {
-//				define( 'WP_NETWORKURL', get_site_url() );
-//			}
-//			$this->network = WP_NETWORKURL;
 		}
 
 		protected function configure_defaults() {
@@ -235,7 +174,7 @@ if ( ! class_exists( 'Trapper_Keeper' ) ) {
 		 */
 		public static function is_dev() {
 			// catches dev.mydomain.com, mydomain.dev, wpengine staging domains and mydomain.staging
-			return (bool) ( stristr( WP_NETWORKURL, '.dev' ) || stristr( WP_NETWORKURL, '.wpengine' ) || stristr( WP_NETWORKURL, 'dev.' ) || stristr( WP_NETWORKURL, '.staging' ) );
+			return (bool) ( stristr( WP_NETWORKURL, '.dev' ) || stristr( WP_NETWORKURL, 'dev.' ) || stristr( WP_NETWORKURL, '.staging' ) );
 		}
 
 	} // END class

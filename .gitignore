@@ -19,3 +19,5 @@ wp-content/plugins/hello.php
 .DS_Store
 
 .idea
+
+node_modules/
