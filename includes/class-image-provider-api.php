@@ -97,6 +97,7 @@ class Image_Provider_Api {
 		return array(
 			'id' => $attachment['imgId'],
 			'title' => $attachment['headline'],
+			'filename' => $attachment['headline'],
 			'caption' => $attachment['caption'],
 			'type' => 'image',
 			'sizes' => array(

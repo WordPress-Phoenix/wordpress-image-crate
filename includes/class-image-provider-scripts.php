@@ -17,6 +17,21 @@ class Image_Provider_Scripts {
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), PHP_INT_MAX );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), PHP_INT_MAX );
+		add_action( 'admin_print_styles', array( $this, 'alter_attachment_thumb_display'), PHP_INT_MAX);
+	}
+
+	public function alter_attachment_thumb_display () {
+		?>
+		<style>
+			.image-crate .attachment-details .thumbnail,
+			.image-crate .attachment-details .thumbnail img{
+				max-width: unset;
+				max-height: unset;
+				width: 100%;
+				height: auto;
+			}
+		</style>
+		<?php
 	}
 
 	public function enqueue_scripts() {

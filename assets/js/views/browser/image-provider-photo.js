@@ -11,8 +11,6 @@ var StockPhotoThumb = wp.media.view.Attachment.extend({
 
         wp.media.view.Attachment.prototype.initialize.apply(this, arguments);
 
-        var selection = this.options.selection;
-        console.log( selection );
        // this.listenTo(this.collection.StockPhotosProps, 'change:importing', this.toggleState);
 
     },

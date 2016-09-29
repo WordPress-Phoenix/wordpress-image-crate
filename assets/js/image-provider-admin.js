@@ -4,7 +4,7 @@ var ImageProviderController = wp.media.controller.Library.extend({
         id: 'ii',
         title: 'Image Source',
         multiple: false,
-        content: 'getty',
+        // content: 'getty',
         menu: 'default',
         router: 'ii',
         toolbar: 'ii-toolbar',
@@ -16,15 +16,14 @@ var ImageProviderController = wp.media.controller.Library.extend({
         contentUserSetting: true,
         syncSelection: false,
         priority: 800
-    }, wp.media.controller.Library.prototype.defaults),
+    }, wp.media.controller.Library.prototype.defaults ),
 
     initialize: function () {
         if (!this.get('library')) {
-            this.set('library', wp.media.query({ii: true}));
+            this.set('library', wp.media.query({ ii: true }) );
         }
-
         wp.media.controller.Library.prototype.initialize.apply(this, arguments);
-    },
+    }
 
 });
 
@@ -32,7 +31,7 @@ module.exports = ImageProviderController;
 },{}],2:[function(require,module,exports){
 
 var ImageProviderController = require('./controllers/image-provider-controller.js'),
-    StockPhotosModel = require('./models/image-provider-photos.js'),
+    StockPhotosModel = require('./models/image-provider-photo-model.js'),
     StockPhotosBrowser = require('./views/browser/image-provider-photos.js'),
     coreCreateStates = wp.media.view.MediaFrame.Post.prototype.createStates,
     coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers;
@@ -97,15 +96,24 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                     }
                 );
 
-                //console.log(collection);
                 // Reference the state if needed later
                 state.set('image_crate_photos', collection);
-
             }
 
-            this.content.set(new StockPhotosBrowser({
+            var state = this.state(),
+                selection = state.get('selection'),
+                view;
+
+            this.content.set(new wp.media.view.AttachmentsBrowser({
+                className: 'image-crate attachments-browser',
                 controller: this,
-                collection: collection
+                collection: collection,
+                selection: this.options.selection,
+                model: state,
+                filters: false,
+                date: false,
+                sidebar: true,
+                sortable: false,
             }));
 
         },
@@ -115,6 +123,11 @@ _.extend( wp.media.view.MediaFrame.prototype, {
         }
     }
 });
+
+// var AttachmentDetails = wp.media.view.Attachment.Details;
+// wp.media.view.Attachment.Details = AttachmentDetails.extend({
+//
+// });
 
 wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
     coreBindHandlers.apply(this, arguments);
@@ -133,19 +146,45 @@ wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
 wp.media.view.MediaFrame.Post.prototype.createStates = function () {
     coreCreateStates.apply(this, arguments);
     this.states.add(new ImageProviderController);
-    // this.states.add([
-    //     new wp.media.controller.Library({
-    //         id: 'ii',
-    //         router: 'ii',
-    //         toolbar: 'ii-toolbar',
-    //         title: 'Image Crate',
-    //         priority: 800,
-    //         searchable: true,
-    //         sortable: false
-    //     })
-    // ]);
 };
-},{"./controllers/image-provider-controller.js":1,"./models/image-provider-photos.js":4,"./views/browser/image-provider-photos.js":6}],3:[function(require,module,exports){
+},{"./controllers/image-provider-controller.js":1,"./models/image-provider-photo-model.js":3,"./views/browser/image-provider-photos.js":6}],3:[function(require,module,exports){
+/* global require */
+var StockPhotosQuery = require('./image-provider-photos-query');
+
+var StockPhotos = wp.media.model.Attachments.extend({
+
+    initialize: function (models, options) {
+
+        wp.media.model.Attachments.prototype.initialize.call(this, models, options);
+
+        this.StockPhotosProps = new Backbone.Model();
+
+        this.StockPhotosProps.set('importing', false);
+        this.StockPhotosProps.set('previewing', false);
+
+    },
+
+    _requery: function (refresh) {
+
+        var props;
+
+        if (this.props.get('query')) {
+
+            props = this.props.toJSON();
+
+            props.cache = ( true !== refresh );
+
+            this.mirror(StockPhotosQuery.get(props));
+
+        }
+
+    }
+
+});
+
+module.exports = StockPhotos;
+
+},{"./image-provider-photos-query":4}],4:[function(require,module,exports){
 var StockPhotosQuery = wp.media.model.Query.extend({
 
         /**
@@ -204,6 +243,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
              * @returns {Query}
              */
             return function (props, options) {
+                var someprops = props;
                 var Query = StockPhotosQuery,
                     args = {},
                     query,
@@ -267,44 +307,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
 
 module.exports = StockPhotosQuery;
 
-},{}],4:[function(require,module,exports){
-/* global require */
-var StockPhotosQuery = require('./image-provider-photos-query');
-
-var StockPhotos = wp.media.model.Attachments.extend({
-
-    initialize: function (models, options) {
-
-        wp.media.model.Attachments.prototype.initialize.call(this, models, options);
-
-        this.StockPhotosProps = new Backbone.Model();
-
-        this.StockPhotosProps.set('importing', false);
-        this.StockPhotosProps.set('previewing', false);
-
-    },
-
-    _requery: function (refresh) {
-
-        var props;
-
-        if (this.props.get('query')) {
-
-            props = this.props.toJSON();
-
-            props.cache = ( true !== refresh );
-
-            this.mirror(StockPhotosQuery.get(props));
-
-        }
-
-    }
-
-});
-
-module.exports = StockPhotos;
-
-},{"./image-provider-photos-query":3}],5:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /* global module, wpaas_stock_photos */
 
 var StockPhotoThumb = wp.media.view.Attachment.extend({
@@ -318,8 +321,6 @@ var StockPhotoThumb = wp.media.view.Attachment.extend({
 
         wp.media.view.Attachment.prototype.initialize.apply(this, arguments);
 
-        var selection = this.options.selection;
-        console.log( selection );
        // this.listenTo(this.collection.StockPhotosProps, 'change:importing', this.toggleState);
 
     },
@@ -425,172 +426,98 @@ module.exports = StockPhotoThumb;
 var StockPhotoThumb = require('./image-provider-photo.js');
     //StockPhotosFilter = require('./image-provider-photos-filter.js');
 
+// var coreCreateAttachments  = wp.media.view.AttachmentsBrowser.prototype.createAttachments;
+var coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize;
+var coreAttachmentsCreateSingle  = wp.media.view.AttachmentsBrowser.prototype.createSingle;
+
 var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
-//var StockPhotosBrowser = wp.media.view.Frame.extend({
+// var StockPhotosBrowser = wp.media.view.Frame.extend({
 
     tagName: 'div',
     className: 'image-crate attachments-browser',
+    defaults: _.defaults({
+        filters: false,
+        search: false,
+        date: false,
+        display: false,
+        sidebar: false,
+        AttachmentView: wp.media.view.Attachment.Library
+    }, wp.media.view.AttachmentsBrowser.prototype.defaults),
 
-    initialize: function () {
-
-        this.createToolbar();
-        this.createAttachments();
-        // this.updateContent();
-
-        this.listenTo(this.collection, 'add remove reset', _.bind(this.updateContent, this));
-
-        // this.controller.on('toggle:upload:attachment', this.toggleUploader, this);
-        // this.controller.on('edit:selection', this.editSelection);
-        // this.createToolbar();
-        // this.createUploader();
-        // this.createAttachments();
-        // if (this.options.sidebar) {
-            this.createSidebar();
-        // }
-        // this.updateContent();
-        //
-        // if (!this.options.sidebar || 'errors' === this.options.sidebar) {
-        //     this.$el.addClass('hide-sidebar');
-        //
-        //     if ('errors' === this.options.sidebar) {
-        //         this.$el.addClass('sidebar-for-errors');
-        //     }
-        // }
-        //
-        // this.collection.on('add remove reset', this.updateContent, this);
-    },
-
-
-    createAttachments: function () {
-        this.attachments = new wp.media.view.Attachments({
-            controller: this.controller,
-            collection: this.collection,
-            AttachmentView: StockPhotoThumb
-        });
-
-        this.views.add(this.attachments);
-
-        this.attachmentsNoResults = new wp.media.View({
-            controller: this.controller,
-            tagName: 'div',
-            className: 'uploader-inline'
-        });
-
-        this.attachmentsNoResults.$el.addClass('hidden');
-        this.attachmentsNoResults.$el.html(
-            '<div class="uploader-inline-content has-upload-message">' +
-            '<h2 class="upload-message">' +
-            'No Images sucka' +
-            //wpaas_stock_photos.no_images +
-            '</h2></div>'
-        );
-
-        this.views.add(this.attachmentsNoResults);
-
-    },
-
-    createToolbar: function () {
-
-        var toolbarOptions;
-
-        toolbarOptions = {
-            controller: this.controller
-        };
-
-        this.toolbar = new wp.media.view.Toolbar(toolbarOptions);
-
-        this.views.add(this.toolbar);
-
-        // This is required to prevent a js warning
-        this.toolbar.set('spinner', new wp.media.view.Spinner({
-            priority: -60
-        }));
-
-        // "Filters" will return a <select>, need to render
-        // screen reader text before
-        this.toolbar.set('filtersLabel', new wp.media.view.Label({
-            value: 'Helo',
-            attributes: {
-                'for': 'media-attachment-filters'
-            },
-            priority: -80
-        }).render());
-
-        // Let's put the actual category filter
-        this.toolbar.set('filters', new wp.media.view.AttachmentFilters({
-            controller: this.controller,
-            model: this.collection.props,
-            StockPhotosProps: this.collection.StockPhotosProps,
-            priority: -80
-        }).render());
-
-    },
-
-    createSidebar: function () {
-        var options = this.options,
-            selection = options.selection,
-            sidebar = this.sidebar = new wp.media.view.Sidebar({
-                controller: this.controller
-            });
-
-    //     // todo: need to figure out what selection:single is
     //
-        this.views.add(sidebar);
+    // createToolbar: function () {
     //
-    //     // if (this.controller.uploader) {
-    //     //     sidebar.set('uploads', new wp.media.view.UploaderStatus({
-    //     // //         controller: this.controller,
-    //     //         priority: 40
-    //     //     }));
-    //     // }
+    //     var toolbarOptions;
+    //
+    //     toolbarOptions = {
+    //         controller: this.controller
+    //     };
+    //
+    //     this.toolbar = new wp.media.view.Toolbar(toolbarOptions);
+    //
+    //     this.views.add(this.toolbar);
+    //
+    //     // This is required to prevent a js warning
+    //     this.toolbar.set('spinner', new wp.media.view.Spinner({
+    //         priority: -60
+    //     }));
+    //
+    //     // "Filters" will return a <select>, need to render
+    //     // screen reader text before
+    //     // this.toolbar.set('filtersLabel', new wp.media.view.Label({
+    //     //     value: wpaas_stock_photos.filter_label,
+    //     //     attributes: {
+    //     //         'for': 'media-attachment-filters'
+    //     //     },
+    //     //     priority: -80
+    //     // }).render());
     //     //
-    //     // selection.on('selection:single', this.createSingle, this);
-    //     // selection.on('selection:unsingle', this.disposeSingle, this);
+    //     // // Let's put the actual category filter
+    //     // this.toolbar.set('filters', new StockPhotosFilter({
+    //     //     controller: this.controller,
+    //     //     model: this.collection.props,
+    //     //     StockPhotosProps: this.collection.StockPhotosProps,
+    //     //     priority: -80
+    //     // }).render());
     //
-    //     // if (selection.single()) {
-    //     //     this.createSingle();
-    //     // }
-    },
-
-    dispose: function () {
-        // this.options.selection.off(null, null, this);
-        wp.media.View.prototype.dispose.apply(this, arguments);
-        return this;
-    },
-
-    updateContent: function () {
-
-        var view = this;
-
-        this.toolbar.get('spinner').show();
-
-        if (this.collection.length) {
-
-            view.attachmentsNoResults.$el.addClass('hidden');
-
-            view.toolbar.get('spinner').hide();
-
-            return;
-
-        }
-
-        this.collection.more().always(function () {
-
-            if (!view.collection.length) {
-
-                view.attachmentsNoResults.$el.removeClass('hidden');
-
-            } else {
-
-                view.attachmentsNoResults.$el.addClass('hidden');
-
-            }
-
-            view.toolbar.get('spinner').hide();
-
-        });
-
-    }
+    // },
+    //
+    // createAttachments: function () {
+    //
+    //     this.attachments = new wp.media.view.Attachments({
+    //         controller: this.controller,
+    //         collection: this.collection,
+    //         AttachmentView: StockPhotoThumb
+    //     });
+    //
+    //     this.views.add(this.attachments);
+    //
+    //     this.attachmentsNoResults = new wp.media.View({
+    //         controller: this.controller,
+    //         tagName: 'div',
+    //         className: 'uploader-inline'
+    //     });
+    //
+    //     this.attachmentsNoResults.$el.addClass('hidden');
+    //     this.attachmentsNoResults.$el.html(
+    //         '<div class="uploader-inline-content has-upload-message">' +
+    //         '<h2 class="upload-message">' +
+    //         'No Images' +
+    //         '</h2></div>'
+    //     );
+    //
+    //     this.views.add(this.attachmentsNoResults);
+    //
+    // },
+    //
+    // disposeSingle: function () {
+    //     var sidebar = this.sidebar;
+    //     sidebar.unset('details');
+    //     sidebar.unset('compat');
+    //     sidebar.unset('display');
+    //     // Hide the sidebar on mobile
+    //     sidebar.$el.removeClass('visible');
+    // }
 
 });
 

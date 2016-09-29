@@ -3,7 +3,7 @@ var ImageProviderController = wp.media.controller.Library.extend({
         id: 'ii',
         title: 'Image Source',
         multiple: false,
-        content: 'getty',
+        // content: 'getty',
         menu: 'default',
         router: 'ii',
         toolbar: 'ii-toolbar',
@@ -15,15 +15,14 @@ var ImageProviderController = wp.media.controller.Library.extend({
         contentUserSetting: true,
         syncSelection: false,
         priority: 800
-    }, wp.media.controller.Library.prototype.defaults),
+    }, wp.media.controller.Library.prototype.defaults ),
 
     initialize: function () {
         if (!this.get('library')) {
-            this.set('library', wp.media.query({ii: true}));
+            this.set('library', wp.media.query({ ii: true }) );
         }
-
         wp.media.controller.Library.prototype.initialize.apply(this, arguments);
-    },
+    }
 
 });
 

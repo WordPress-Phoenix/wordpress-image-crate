@@ -56,6 +56,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
              * @returns {Query}
              */
             return function (props, options) {
+                var someprops = props;
                 var Query = StockPhotosQuery,
                     args = {},
                     query,

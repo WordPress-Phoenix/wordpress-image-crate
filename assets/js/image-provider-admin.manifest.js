@@ -1,6 +1,6 @@
 
 var ImageProviderController = require('./controllers/image-provider-controller.js'),
-    StockPhotosModel = require('./models/image-provider-photos.js'),
+    StockPhotosModel = require('./models/image-provider-photo-model.js'),
     StockPhotosBrowser = require('./views/browser/image-provider-photos.js'),
     coreCreateStates = wp.media.view.MediaFrame.Post.prototype.createStates,
     coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers;
@@ -65,15 +65,24 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                     }
                 );
 
-                //console.log(collection);
                 // Reference the state if needed later
                 state.set('image_crate_photos', collection);
-
             }
 
-            this.content.set(new StockPhotosBrowser({
+            var state = this.state(),
+                selection = state.get('selection'),
+                view;
+
+            this.content.set(new wp.media.view.AttachmentsBrowser({
+                className: 'image-crate attachments-browser',
                 controller: this,
-                collection: collection
+                collection: collection,
+                selection: this.options.selection,
+                model: state,
+                filters: false,
+                date: false,
+                sidebar: true,
+                sortable: false,
             }));
 
         },
@@ -83,6 +92,11 @@ _.extend( wp.media.view.MediaFrame.prototype, {
         }
     }
 });
+
+// var AttachmentDetails = wp.media.view.Attachment.Details;
+// wp.media.view.Attachment.Details = AttachmentDetails.extend({
+//
+// });
 
 wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
     coreBindHandlers.apply(this, arguments);
@@ -101,15 +115,4 @@ wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
 wp.media.view.MediaFrame.Post.prototype.createStates = function () {
     coreCreateStates.apply(this, arguments);
     this.states.add(new ImageProviderController);
-    // this.states.add([
-    //     new wp.media.controller.Library({
-    //         id: 'ii',
-    //         router: 'ii',
-    //         toolbar: 'ii-toolbar',
-    //         title: 'Image Crate',
-    //         priority: 800,
-    //         searchable: true,
-    //         sortable: false
-    //     })
-    // ]);
 };
