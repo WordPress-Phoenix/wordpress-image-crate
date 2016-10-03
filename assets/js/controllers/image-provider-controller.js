@@ -3,7 +3,6 @@ var ImageProviderController = wp.media.controller.Library.extend({
         id: 'ii',
         title: 'Image Source',
         multiple: false,
-        // content: 'getty',
         menu: 'default',
         router: 'ii',
         toolbar: 'ii-toolbar',
@@ -14,7 +13,8 @@ var ImageProviderController = wp.media.controller.Library.extend({
         describe: false,
         contentUserSetting: true,
         syncSelection: false,
-        priority: 800
+        priority: 800,
+        isImageCrate: true
     }, wp.media.controller.Library.prototype.defaults ),
 
     initialize: function () {

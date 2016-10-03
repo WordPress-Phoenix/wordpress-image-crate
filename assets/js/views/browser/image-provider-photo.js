@@ -2,27 +2,24 @@
 
 var StockPhotoThumb = wp.media.view.Attachment.extend({
 
-    // events: {
-    //     // 'click': 'previewImage'
-    // },
-    // template: wp.template('attachment'),
-
     initialize: function () {
 
         wp.media.view.Attachment.prototype.initialize.apply(this, arguments);
-
-       // this.listenTo(this.collection.StockPhotosProps, 'change:importing', this.toggleState);
+        _.extend(this.events, {
+            'click': 'imageCrateActiveMode'
+        });
 
     },
 
+    imageCrateActiveMode: function() {
+        console.log( this.controller.isModeActive('grid') );
+        console.log('^ grid');
+    },
+
     render: function () {
-
         wp.media.view.Attachment.prototype.render.apply(this, arguments);
-
-        // this.toggleState();
-
+        this.imageCrateActiveMode();
         return this;
-
     },
 
     // overwrite the image size pulling function

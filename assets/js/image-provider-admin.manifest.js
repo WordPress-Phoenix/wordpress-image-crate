@@ -1,23 +1,22 @@
 
 var ImageProviderController = require('./controllers/image-provider-controller.js'),
     StockPhotosModel = require('./models/image-provider-photo-model.js'),
-    StockPhotosBrowser = require('./views/browser/image-provider-photos.js'),
+    // StockPhotosBrowser = require('./views/browser/image-provider-photos.js'),
     coreCreateStates = wp.media.view.MediaFrame.Post.prototype.createStates,
-    coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers;
+    coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers,
+    coreAttachmentRender = wp.media.view.Attachment.prototype.render;
 
 _.extend( wp.media.view.MediaFrame.prototype, {
     ii: {
-
         activate: function () {
-            // coreActivate.apply(this, arguments);
             var view = _.first(this.views.get('.media-frame-router')),
                 viewSettings = {};
 
-            viewSettings.getty = {text: 'Getty Images', priority: 60};
-            // viewSettings.usatoday = {text: 'USA Today', priority: 80};
+            viewSettings.usatoday = {text: 'USA Today Sports', priority: 60};
+            // viewSettings.getty = {text: 'Getty Images', priority: 80};
             view.set(viewSettings);
 
-            this.content.mode('getty');
+            this.content.mode('usatoday');
         },
 
         createToolbar: function (  ) {
@@ -27,7 +26,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 items: {
                     insert: {
                         style: 'primary',
-                        text: 'Insert the Getty',
+                        text: 'Insert Image',
                         priority: 80,
                         requires: {
                             library: true,
@@ -37,10 +36,10 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                         click: function () {
                             var state = controller.state(),
                                 selection = state.get('selection');
+                            
+                            console.log( 'we made it!' );
 
                             controller.close();
-                            // make the call to insert
-                            // state.trigger('videopress:insert', selection).reset();
                         }
                     }
                 }
@@ -48,13 +47,11 @@ _.extend( wp.media.view.MediaFrame.prototype, {
 
         },
 
-        loadGetty: function () {
+        loadUSAT: function () {
             var state = this.state(),
                 collection = state.get('image_crate_photos');
 
             if (_.isUndefined(collection)) {
-              //  console.log('not loaded');
-
                 collection = new StockPhotosModel(
                     null,
                     {
@@ -77,7 +74,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 className: 'image-crate attachments-browser',
                 controller: this,
                 collection: collection,
-                selection: this.options.selection,
+                selection: selection,
                 model: state,
                 filters: false,
                 date: false,
@@ -87,16 +84,20 @@ _.extend( wp.media.view.MediaFrame.prototype, {
 
         },
 
-        loadUSAT: function () {
-            console.log('usat ready');
+        loadGetty: function () {
+            console.log('getty ready');
         }
     }
 });
 
-// var AttachmentDetails = wp.media.view.Attachment.Details;
-// wp.media.view.Attachment.Details = AttachmentDetails.extend({
-//
-// });
+wp.media.view.Attachment.prototype.render = function() {
+    var options = this.options || {};
+    if ('ii' == this.controller.state().get('id')) {
+        options.size = this.imageSize('full');
+    }
+    coreAttachmentRender.apply( this, arguments );
+};
+
 
 wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
     coreBindHandlers.apply(this, arguments);

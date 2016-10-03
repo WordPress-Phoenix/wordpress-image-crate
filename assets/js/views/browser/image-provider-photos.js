@@ -8,7 +8,6 @@ var coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.init
 var coreAttachmentsCreateSingle  = wp.media.view.AttachmentsBrowser.prototype.createSingle;
 
 var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
-// var StockPhotosBrowser = wp.media.view.Frame.extend({
 
     tagName: 'div',
     className: 'image-crate attachments-browser',
@@ -18,7 +17,8 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
         date: false,
         display: false,
         sidebar: false,
-        AttachmentView: wp.media.view.Attachment.Library
+        //AttachmentView: wp.media.view.Attachment.Library
+        AttachmentView: StockPhotoThumb
     }, wp.media.view.AttachmentsBrowser.prototype.defaults),
 
     //
