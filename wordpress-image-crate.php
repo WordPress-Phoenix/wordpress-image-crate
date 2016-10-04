@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WP Trapper Keeper
+ * Plugin Name: Image Crate
  * Plugin URI: https://github.com/WordPress-Phoenix/wordpress-trapper-keeper
  * Description: Add image providers to the WordPress media modal.
  * Author: justintucker
