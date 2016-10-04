@@ -1,4 +1,4 @@
-var ImageProviderController = wp.media.controller.Library.extend({
+var ImageCrateController = wp.media.controller.Library.extend({
     defaults: _.defaults({
         id: 'ii',
         title: 'Image Source',
@@ -26,4 +26,4 @@ var ImageProviderController = wp.media.controller.Library.extend({
 
 });
 
-module.exports = ImageProviderController;
+module.exports = ImageCrateController;

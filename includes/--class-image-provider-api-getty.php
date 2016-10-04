@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Image_Provider_Api {
+class Image_Crate_Api {
 
 	private $key;
 	private $secret;

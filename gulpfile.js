@@ -7,9 +7,9 @@ var browserify = require('browserify'),
 
 // bundle the modules
 gulp.task('packup', function () {
-    return browserify('assets/js/image-provider-admin.manifest.js')
+    return browserify('assets/js/image-crate-admin.manifest.js')
         .bundle()
-        .pipe(source('image-provider-admin.js'))
+        .pipe(source('image-crate-admin.js'))
         .pipe(gulp.dest('assets/js'));
 });
 
@@ -17,7 +17,7 @@ gulp.task('packup', function () {
 // ['packup'] makes this task a dependency to run ['compress']
 gulp.task('compress', ['packup'], function (cb) {
     pump([
-            gulp.src('assets/js/image-provider-admin.js'),
+            gulp.src('assets/js/image-crate-admin.js'),
             uglify(),
             rename({suffix: '.min'}),
             gulp.dest('assets/js')

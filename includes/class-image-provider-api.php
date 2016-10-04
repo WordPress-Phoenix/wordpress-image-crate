@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Image_Api_Provider Class
+ * Image_Crate_Api Class
  *
  * @version  0.1.1
- * @package  WP_Trapper_Keeper
+ * @package  WP_Image_Crate
  * @author   justintucker
  */
 
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Image_Provider_Api {
+class Image_Crate_Api {
 
 	private $key;
 	private $secret;

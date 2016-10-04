@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var ImageProviderController = wp.media.controller.Library.extend({
+var ImageCrateController = wp.media.controller.Library.extend({
     defaults: _.defaults({
         id: 'ii',
         title: 'Image Source',
@@ -27,11 +27,11 @@ var ImageProviderController = wp.media.controller.Library.extend({
 
 });
 
-module.exports = ImageProviderController;
+module.exports = ImageCrateController;
 },{}],2:[function(require,module,exports){
 
-var ImageProviderController = require('./controllers/image-provider-controller.js'),
-    StockPhotosModel = require('./models/image-provider-photo-model.js'),
+var ImageCrateController = require('./controllers/image-crate-controller.js'),
+    StockPhotosModel = require('./models/image-crate-photo-model.js'),
     // StockPhotosBrowser = require('./views/browser/image-provider-photos.js'),
     coreCreateStates = wp.media.view.MediaFrame.Post.prototype.createStates,
     coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers,
@@ -67,10 +67,10 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                         click: function () {
                             var state = controller.state(),
                                 selection = state.get('selection');
-                            
+
                             console.log( 'we made it!' );
 
-                            controller.close();
+                            // controller.close();
                         }
                     }
                 }
@@ -83,6 +83,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 collection = state.get('image_crate_photos');
 
             if (_.isUndefined(collection)) {
+                console.log( 'is undefined' );
                 collection = new StockPhotosModel(
                     null,
                     {
@@ -146,22 +147,20 @@ wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
 
 wp.media.view.MediaFrame.Post.prototype.createStates = function () {
     coreCreateStates.apply(this, arguments);
-    this.states.add(new ImageProviderController);
+    this.states.add(new ImageCrateController);
 };
-},{"./controllers/image-provider-controller.js":1,"./models/image-provider-photo-model.js":3}],3:[function(require,module,exports){
+},{"./controllers/image-crate-controller.js":1,"./models/image-crate-photo-model.js":3}],3:[function(require,module,exports){
 /* global require */
-var StockPhotosQuery = require('./image-provider-photos-query');
+var StockPhotosQuery = require('./image-crate-photos-query');
 
 var StockPhotos = wp.media.model.Attachments.extend({
 
     initialize: function (models, options) {
 
         wp.media.model.Attachments.prototype.initialize.call(this, models, options);
-
-        this.StockPhotosProps = new Backbone.Model();
-
-        this.StockPhotosProps.set('importing', false);
-        this.StockPhotosProps.set('previewing', false);
+        // this.StockPhotosProps = new Backbone.Model();
+        // this.StockPhotosProps.set('importing', false);
+        // this.StockPhotosProps.set('previewing', false);
 
     },
 
@@ -185,7 +184,7 @@ var StockPhotos = wp.media.model.Attachments.extend({
 
 module.exports = StockPhotos;
 
-},{"./image-provider-photos-query":4}],4:[function(require,module,exports){
+},{"./image-crate-photos-query":4}],4:[function(require,module,exports){
 var StockPhotosQuery = wp.media.model.Query.extend({
 
         /**

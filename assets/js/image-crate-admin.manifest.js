@@ -1,6 +1,6 @@
 
-var ImageProviderController = require('./controllers/image-provider-controller.js'),
-    StockPhotosModel = require('./models/image-provider-photo-model.js'),
+var ImageCrateController = require('./controllers/image-crate-controller.js'),
+    StockPhotosModel = require('./models/image-crate-photo-model.js'),
     // StockPhotosBrowser = require('./views/browser/image-provider-photos.js'),
     coreCreateStates = wp.media.view.MediaFrame.Post.prototype.createStates,
     coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers,
@@ -36,10 +36,10 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                         click: function () {
                             var state = controller.state(),
                                 selection = state.get('selection');
-                            
+
                             console.log( 'we made it!' );
 
-                            controller.close();
+                            // controller.close();
                         }
                     }
                 }
@@ -52,6 +52,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 collection = state.get('image_crate_photos');
 
             if (_.isUndefined(collection)) {
+                console.log( 'is undefined' );
                 collection = new StockPhotosModel(
                     null,
                     {
@@ -115,5 +116,5 @@ wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
 
 wp.media.view.MediaFrame.Post.prototype.createStates = function () {
     coreCreateStates.apply(this, arguments);
-    this.states.add(new ImageProviderController);
+    this.states.add(new ImageCrateController);
 };

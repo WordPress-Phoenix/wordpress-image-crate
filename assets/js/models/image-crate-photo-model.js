@@ -1,16 +1,14 @@
 /* global require */
-var StockPhotosQuery = require('./image-provider-photos-query');
+var StockPhotosQuery = require('./image-crate-photos-query');
 
 var StockPhotos = wp.media.model.Attachments.extend({
 
     initialize: function (models, options) {
 
         wp.media.model.Attachments.prototype.initialize.call(this, models, options);
-
-        this.StockPhotosProps = new Backbone.Model();
-
-        this.StockPhotosProps.set('importing', false);
-        this.StockPhotosProps.set('previewing', false);
+        // this.StockPhotosProps = new Backbone.Model();
+        // this.StockPhotosProps.set('importing', false);
+        // this.StockPhotosProps.set('previewing', false);
 
     },
 

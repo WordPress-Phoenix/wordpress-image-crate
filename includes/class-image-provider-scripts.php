@@ -1,9 +1,9 @@
 <?php
 /**
- * Image_Api_Provider Class
+ * Image_Crate_Scripts Class
  *
  * @version  0.1.1
- * @package  WP_Trapper_Keeper
+ * @package  WP_Image_Crate
  * @author   justintucker
  */
 
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Image_Provider_Scripts {
+class Image_Crate_Scripts {
 
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), PHP_INT_MAX );
@@ -43,13 +43,13 @@ class Image_Provider_Scripts {
 		}
 
 		$suffix = SCRIPT_DEBUG ? '' : '.min';
-		wp_enqueue_script( 'image-implementor', TK_URL . "/assets/js/image-provider-admin{$suffix}.js", array('media-views'), '0.1.0', true );
+		wp_enqueue_script( 'image-implementor', TK_URL . "/assets/js/image-crate-admin{$suffix}.js", array('media-views'), '0.1.0', true );
 		//wp_enqueue_script( 'image-implementor', TK_URL . "/assets/js/image-provider-admin{$suffix}.css", [ 'media-views' ], '0.1.0', true );
 
 		wp_localize_script(
-			'image-implementor',
-			'image_implementor', array(
-				'page_title' => __( 'Image Implementor', 'image-implementor' )
+			'image-crate',
+			'crate', array(
+				'page_title' => __( 'Image Crate', 'image-crate' )
 			)
 		);
 

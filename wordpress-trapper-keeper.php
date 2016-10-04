@@ -7,12 +7,12 @@
  * Version: 0.1.1
  * Author URI: http://github.com/justintucker
  * License: GPL V2
- * Text Domain: trapper_keeper
+ * Text Domain: image-crate
  *
  * GitHub Plugin URI: https://github.com/WordPress-Phoenix/wordpress-trapper-keeper
  * GitHub Branch: master
  *
- * @package  WP_Trapper_Keeper
+ * @package  WP_Image_Crate
  * @category plugin
  * @author justintucker
  * @internal Plugin derived from https://github.com/scarstens/worpress-plugin-boilerplate-redux
@@ -25,14 +25,14 @@ if ( ! function_exists( 'add_filter' ) ) {
 	exit();
 }
 
-if ( ! class_exists( 'Trapper_Keeper' ) ) {
+if ( ! class_exists( 'Image_Crate' ) ) {
 
 	define( 'TK_VERSION', '1.0.0' );
 	define( 'TK_URL', plugins_url( basename( __DIR__ ) ) );
 	define( 'TK_PATH', dirname( __FILE__ ) );
 	define( 'TK_INC', TK_PATH . '/includes' );
 
-	class Trapper_Keeper {
+	class Image_Crate {
 
 		public $debug;
 		public $installed_dir;
@@ -52,7 +52,7 @@ if ( ! class_exists( 'Trapper_Keeper' ) ) {
 
 			// hook can be used by mu plugins to modify plugin behavior after plugin is setup
 			do_action( get_called_class() . '_preface', $this );
-			define( 'TRAPPER_URL', plugins_url( basename( __DIR__ ) ) );
+			define( 'IMAGE_CRATE_URL', plugins_url( basename( __DIR__ ) ) );
 
 			//simplify getting site options with custom prefix with multisite compatibility
 			if ( ! function_exists( 'get_custom_option' ) ) {
@@ -95,9 +95,9 @@ if ( ! class_exists( 'Trapper_Keeper' ) ) {
 
 			do_action( get_called_class() . '_before_init' );
 
-			new Image_Provider_Scripts();
-			$provider = new Image_Provider_Api();
-			new Image_Provider_Ajax( $provider );
+			new Image_Crate_Scripts();
+			$provider = new Image_Crate_Api();
+			new Image_Crate_Ajax( $provider );
 
 			do_action( get_called_class() . '_after_init' );
 		}
@@ -160,7 +160,7 @@ if ( ! class_exists( 'Trapper_Keeper' ) ) {
 			// Setup plugins global params
 			// TODO: customize with your plugins custom prefix (usually matches your text domain)
 			if ( ! defined('SITEOPTION_PREFIX') ) {
-				define( 'SITEOPTION_PREFIX', 'trapper_keeper_option_' );
+				define( 'SITEOPTION_PREFIX', 'image_crate_option_' );
 			}
 			$this->modules        = new stdClass();
 			$this->modules->count = 0;
@@ -183,12 +183,12 @@ if ( ! class_exists( 'Trapper_Keeper' ) ) {
 /**
  * Build and initialize the plugin
  */
-if ( class_exists( 'Trapper_Keeper' ) ) {
+if ( class_exists( 'Image_Crate' ) ) {
 	// Installation and un-installation hooks
 	register_activation_hook( __FILE__, 'activate' );
 	register_deactivation_hook( __FILE__, 'deactivate' );
 
 	// instantiate the plugin class, which should never be instantiated more then once
 	global $main_plugin;
-	$main_plugin = new Trapper_Keeper();
+	$main_plugin = new Image_Crate();
 }

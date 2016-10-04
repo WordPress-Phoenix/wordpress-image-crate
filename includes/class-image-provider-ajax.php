@@ -1,9 +1,9 @@
 <?php
 /**
- * Image_Api_Provider Class
+ * Image_Crate_Ajax Class
  *
  * @version  0.1.1
- * @package  WP_Trapper_Keeper
+ * @package  WP_Image_Crate
  * @author   justintucker
  */
 
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Image_Provider_Ajax {
+class Image_Crate_Ajax {
 
 	private $api = null;
 
