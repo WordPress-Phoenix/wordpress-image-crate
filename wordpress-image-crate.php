@@ -27,10 +27,10 @@ if ( ! function_exists( 'add_filter' ) ) {
 
 if ( ! class_exists( 'Image_Crate' ) ) {
 
-	define( 'TK_VERSION', '1.0.0' );
-	define( 'TK_URL', plugins_url( basename( __DIR__ ) ) );
-	define( 'TK_PATH', dirname( __FILE__ ) );
-	define( 'TK_INC', TK_PATH . '/includes' );
+	define( 'IC_VERSION', '1.0.0' );
+	define( 'IC_URL', plugins_url( basename( __DIR__ ) ) );
+	define( 'IC_PATH', dirname( __FILE__ ) );
+	define( 'IC_INC', IC_PATH . '/includes' );
 
 	class Image_Crate {
 

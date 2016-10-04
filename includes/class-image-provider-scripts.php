@@ -43,8 +43,8 @@ class Image_Crate_Scripts {
 		}
 
 		$suffix = SCRIPT_DEBUG ? '' : '.min';
-		wp_enqueue_script( 'image-implementor', TK_URL . "/assets/js/image-crate-admin{$suffix}.js", array('media-views'), '0.1.0', true );
-		//wp_enqueue_script( 'image-implementor', TK_URL . "/assets/js/image-provider-admin{$suffix}.css", [ 'media-views' ], '0.1.0', true );
+		wp_enqueue_script( 'image-implementor', IC_URL . "/assets/js/image-crate-admin{$suffix}.js", array('media-views'), '0.1.0', true );
+		//wp_enqueue_script( 'image-implementor', IC_URL . "/assets/js/image-provider-admin{$suffix}.css", [ 'media-views' ], '0.1.0', true );
 
 		wp_localize_script(
 			'image-crate',
