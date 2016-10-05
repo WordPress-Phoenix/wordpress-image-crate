@@ -1,13 +1,12 @@
 
 var ImageCrateController = require('./controllers/image-crate-controller.js'),
     StockPhotosModel = require('./models/image-crate-photo-model.js'),
-    // StockPhotosBrowser = require('./views/browser/image-provider-photos.js'),
+    StockPhotoBrowser = require('./views/browser/image-crate-photos.js'),
     coreCreateStates = wp.media.view.MediaFrame.Post.prototype.createStates,
-    coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers,
-    coreAttachmentRender = wp.media.view.Attachment.prototype.render;
+    coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers;
 
 _.extend( wp.media.view.MediaFrame.prototype, {
-    ii: {
+    image_crate: {
         activate: function () {
             var view = _.first(this.views.get('.media-frame-router')),
                 viewSettings = {};
@@ -26,7 +25,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 items: {
                     insert: {
                         style: 'primary',
-                        text: 'Insert Image',
+                        text: 'Download Image',
                         priority: 80,
                         requires: {
                             library: true,
@@ -36,8 +35,32 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                         click: function () {
                             var state = controller.state(),
                                 selection = state.get('selection');
+                            // this.$el.addClass('hide-toolbar');
+                            wp.media.ajax({
+                                data: {
+                                    action: 'image_crate_download',
+                                    filename: selection.models[0].get('filename'),
+                                    id: selection.models[0].get('id'),
+                                    download_uri: selection.models[0].get('download_uri')
+                                    // nonce: this.model.get('nonces').download
+                                }
+                            }).done(function (attachment) {
 
-                            console.log( 'we made it!' );
+                                var browse = wp.media.frame.content.mode('browse');
+
+                                // console.log( done );
+
+                                browse.get('gallery').collection.add(attachment);
+                                browse.get('selection').collection.add(attachment);
+
+                                // This will trigger all mutation observer
+                                wp.Uploader.queue.add(attachment);
+                                wp.Uploader.queue.remove(attachment);
+
+                                // @todo find a better way
+                                browse.get('gallery').$('li:first .thumbnail').click();
+
+                            });
 
                             // controller.close();
                         }
@@ -47,9 +70,12 @@ _.extend( wp.media.view.MediaFrame.prototype, {
 
         },
 
+
+
         loadUSAT: function () {
             var state = this.state(),
-                collection = state.get('image_crate_photos');
+                collection = state.get('image_crate_photos'),
+                selection = state.get('selection');
 
             if (_.isUndefined(collection)) {
                 console.log( 'is undefined' );
@@ -67,21 +93,17 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 state.set('image_crate_photos', collection);
             }
 
-            var state = this.state(),
-                selection = state.get('selection'),
-                view;
-
-            this.content.set(new wp.media.view.AttachmentsBrowser({
-                className: 'image-crate attachments-browser',
+            this.content.set( new StockPhotoBrowser({
+                // className: 'image-crate attachments-browser',
                 controller: this,
                 collection: collection,
                 selection: selection,
                 model: state,
                 filters: false,
+                search: false,
                 date: false,
-                sidebar: true,
-                sortable: false,
-            }));
+                display: false,
+            }) );
 
         },
 
@@ -91,26 +113,31 @@ _.extend( wp.media.view.MediaFrame.prototype, {
     }
 });
 
-wp.media.view.Attachment.prototype.render = function() {
-    var options = this.options || {};
-    if ('ii' == this.controller.state().get('id')) {
-        options.size = this.imageSize('full');
-    }
-    coreAttachmentRender.apply( this, arguments );
-};
+// var coreAttachmentRender = wp.media.view.Attachment.prototype.render;
+// wp.media.view.Attachment.prototype.render = function() {
+//     var options = this.options || {};
+//     if ('image-crate' == this.controller.state().get('id')) {
+//         //todo: medium sizes are loading for some reason, needs to load thumbnail
+//         // var sizes = this.model.get('sizes');
+//         // options.size = sizes.thumbnail.url;
+//     }
+//     coreAttachmentRender.apply( this, arguments );
+//
+//     return this;
+// };
 
 
 wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
     coreBindHandlers.apply(this, arguments);
 
-    this.on('router:create:ii', this.createRouter, this);
-    this.on('router:activate:ii', this.ii.activate, this);
-    this.on('router:deactivate:ii', this.deactivate, this);
+    this.on('router:create:image-crate', this.createRouter, this);
+    this.on('router:activate:image-crate', this.image_crate.activate, this);
+    this.on('router:deactivate:image-crate', this.deactivate, this);
 
-    this.on('toolbar:create:ii-toolbar', this.ii.createToolbar, this);
+    this.on('toolbar:create:image-crate-toolbar', this.image_crate.createToolbar, this);
 
-    this.on('content:render:getty', this.ii.loadGetty, this);
-    this.on('content:render:usatoday', this.ii.loadUSAT, this);
+    this.on('content:render:getty', this.image_crate.loadGetty, this);
+    this.on('content:render:usatoday', this.image_crate.loadUSAT, this);
 
 };
 

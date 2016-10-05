@@ -1,12 +1,12 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var ImageCrateController = wp.media.controller.Library.extend({
     defaults: _.defaults({
-        id: 'ii',
+        id: 'image-crate',
         title: 'Image Source',
         multiple: false,
         menu: 'default',
-        router: 'ii',
-        toolbar: 'ii-toolbar',
+        router: 'image-crate',
+        toolbar: 'image-crate-toolbar',
         searchable: true,
         filterable: false,
         sortable: false,
@@ -32,13 +32,12 @@ module.exports = ImageCrateController;
 
 var ImageCrateController = require('./controllers/image-crate-controller.js'),
     StockPhotosModel = require('./models/image-crate-photo-model.js'),
-    // StockPhotosBrowser = require('./views/browser/image-provider-photos.js'),
+    StockPhotoBrowser = require('./views/browser/image-crate-photos.js'),
     coreCreateStates = wp.media.view.MediaFrame.Post.prototype.createStates,
-    coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers,
-    coreAttachmentRender = wp.media.view.Attachment.prototype.render;
+    coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers;
 
 _.extend( wp.media.view.MediaFrame.prototype, {
-    ii: {
+    image_crate: {
         activate: function () {
             var view = _.first(this.views.get('.media-frame-router')),
                 viewSettings = {};
@@ -57,7 +56,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 items: {
                     insert: {
                         style: 'primary',
-                        text: 'Insert Image',
+                        text: 'Download Image',
                         priority: 80,
                         requires: {
                             library: true,
@@ -67,8 +66,32 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                         click: function () {
                             var state = controller.state(),
                                 selection = state.get('selection');
+                            // this.$el.addClass('hide-toolbar');
+                            wp.media.ajax({
+                                data: {
+                                    action: 'image_crate_download',
+                                    filename: selection.models[0].get('filename'),
+                                    id: selection.models[0].get('id'),
+                                    download_uri: selection.models[0].get('download_uri')
+                                    // nonce: this.model.get('nonces').download
+                                }
+                            }).done(function (attachment) {
 
-                            console.log( 'we made it!' );
+                                var browse = wp.media.frame.content.mode('browse');
+
+                                // console.log( done );
+
+                                browse.get('gallery').collection.add(attachment);
+                                browse.get('selection').collection.add(attachment);
+
+                                // This will trigger all mutation observer
+                                wp.Uploader.queue.add(attachment);
+                                wp.Uploader.queue.remove(attachment);
+
+                                // @todo find a better way
+                                browse.get('gallery').$('li:first .thumbnail').click();
+
+                            });
 
                             // controller.close();
                         }
@@ -78,9 +101,12 @@ _.extend( wp.media.view.MediaFrame.prototype, {
 
         },
 
+
+
         loadUSAT: function () {
             var state = this.state(),
-                collection = state.get('image_crate_photos');
+                collection = state.get('image_crate_photos'),
+                selection = state.get('selection');
 
             if (_.isUndefined(collection)) {
                 console.log( 'is undefined' );
@@ -98,21 +124,17 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 state.set('image_crate_photos', collection);
             }
 
-            var state = this.state(),
-                selection = state.get('selection'),
-                view;
-
-            this.content.set(new wp.media.view.AttachmentsBrowser({
-                className: 'image-crate attachments-browser',
+            this.content.set( new StockPhotoBrowser({
+                // className: 'image-crate attachments-browser',
                 controller: this,
                 collection: collection,
                 selection: selection,
                 model: state,
                 filters: false,
+                search: false,
                 date: false,
-                sidebar: true,
-                sortable: false,
-            }));
+                display: false,
+            }) );
 
         },
 
@@ -122,26 +144,31 @@ _.extend( wp.media.view.MediaFrame.prototype, {
     }
 });
 
-wp.media.view.Attachment.prototype.render = function() {
-    var options = this.options || {};
-    if ('ii' == this.controller.state().get('id')) {
-        options.size = this.imageSize('full');
-    }
-    coreAttachmentRender.apply( this, arguments );
-};
+// var coreAttachmentRender = wp.media.view.Attachment.prototype.render;
+// wp.media.view.Attachment.prototype.render = function() {
+//     var options = this.options || {};
+//     if ('image-crate' == this.controller.state().get('id')) {
+//         //todo: medium sizes are loading for some reason, needs to load thumbnail
+//         // var sizes = this.model.get('sizes');
+//         // options.size = sizes.thumbnail.url;
+//     }
+//     coreAttachmentRender.apply( this, arguments );
+//
+//     return this;
+// };
 
 
 wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
     coreBindHandlers.apply(this, arguments);
 
-    this.on('router:create:ii', this.createRouter, this);
-    this.on('router:activate:ii', this.ii.activate, this);
-    this.on('router:deactivate:ii', this.deactivate, this);
+    this.on('router:create:image-crate', this.createRouter, this);
+    this.on('router:activate:image-crate', this.image_crate.activate, this);
+    this.on('router:deactivate:image-crate', this.deactivate, this);
 
-    this.on('toolbar:create:ii-toolbar', this.ii.createToolbar, this);
+    this.on('toolbar:create:image-crate-toolbar', this.image_crate.createToolbar, this);
 
-    this.on('content:render:getty', this.ii.loadGetty, this);
-    this.on('content:render:usatoday', this.ii.loadUSAT, this);
+    this.on('content:render:getty', this.image_crate.loadGetty, this);
+    this.on('content:render:usatoday', this.image_crate.loadUSAT, this);
 
 };
 
@@ -149,7 +176,7 @@ wp.media.view.MediaFrame.Post.prototype.createStates = function () {
     coreCreateStates.apply(this, arguments);
     this.states.add(new ImageCrateController);
 };
-},{"./controllers/image-crate-controller.js":1,"./models/image-crate-photo-model.js":3}],3:[function(require,module,exports){
+},{"./controllers/image-crate-controller.js":1,"./models/image-crate-photo-model.js":3,"./views/browser/image-crate-photos.js":6}],3:[function(require,module,exports){
 /* global require */
 var StockPhotosQuery = require('./image-crate-photos-query');
 
@@ -205,7 +232,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
             options = options || {};
             options.context = this;
             options.data = _.extend(options.data || {}, {
-                action: 'image_implementor_get'
+                action: 'image_crate_get'
             });
 
             // Clone the args so manipulation is non-destructive.
@@ -300,4 +327,99 @@ var StockPhotosQuery = wp.media.model.Query.extend({
 
 module.exports = StockPhotosQuery;
 
-},{}]},{},[2]);
+},{}],5:[function(require,module,exports){
+/* global module, wpaas_stock_photos */
+var StockPhotoThumb = wp.media.view.Attachment.extend({
+
+    initialize: function () {
+
+        wp.media.view.Attachment.prototype.initialize.apply(this, arguments);
+        _.extend(this.events, {
+            'click': 'imageCrateActiveMode'
+        });
+
+    },
+
+    imageCrateActiveMode: function() {
+        console.log('is dumb');
+    },
+
+    render: function () {
+
+        var options = this.options || {};
+        if ('image' === options.type) {
+            options.size = this.imageSize('thumbnail');
+        }
+
+        wp.media.view.Attachment.prototype.render.apply(this, arguments);
+
+        return this;
+    }
+    // downloadImage: function () {
+    //
+    //     var t = this;
+    //
+    //     wp.media.ajax({
+    //         data: {
+    //             action: 'image_crate_download',
+    //             filename: this.model.get('filename'),
+    //             id: this.model.get('id'),
+    //             nonce: this.model.get('nonces').download
+    //         }
+    //     }).done(function (attachment) {
+    //
+    //         var browse = wp.media.frame.content.mode('browse');
+    //
+    //         browse.get('gallery').collection.add(attachment);
+    //         browse.get('selection').collection.add(attachment);
+    //
+    //         // This will trigger all mutation observer
+    //         wp.Uploader.queue.add(attachment);
+    //         wp.Uploader.queue.remove(attachment);
+    //
+    //         // @todo find a better way
+    //         browse.get('gallery').$('li:first .thumbnail').click();
+    //
+    //     }).fail(function () {
+    //
+    //         // @todo
+    //
+    //     }).always(function () {
+    //
+    //         // t.collection.StockPhotosProps.set('importing', false);
+    //         // t.toggleState();
+    //         t.$el.blur();
+    //
+    //     });
+    //
+    // }
+});
+
+module.exports = StockPhotoThumb;
+
+},{}],6:[function(require,module,exports){
+/* global require */
+
+var StockPhotoThumb = require('./image-crate-photo.js'),
+    coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize,
+    coreAttachmentsCreateSingle  = wp.media.view.AttachmentsBrowser.prototype.createSingle;
+
+var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
+
+    tagName: 'div',
+    className: 'image-crate attachments-browser',
+    defaults: _.defaults({
+        filters: false,
+        search: false,
+        date: false,
+        display: false,
+        sidebar: true,
+        // AttachmentView: wp.media.view.Attachment.Library
+        AttachmentView: StockPhotoThumb
+    }, wp.media.view.AttachmentsBrowser.prototype.defaults)
+
+});
+
+module.exports = StockPhotosBrowser;
+
+},{"./image-crate-photo.js":5}]},{},[2]);

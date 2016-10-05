@@ -93,6 +93,7 @@ class Image_Crate_Api {
 	}
 
 	private function prepare_attachment_for_js( $attachment ) {
+
 		// how usat sends over data
 		return array(
 			'id' => $attachment['imgId'],
@@ -111,7 +112,8 @@ class Image_Crate_Api {
 					'url' => $attachment['previewUrl'],
 				),
 			),
-			'download_uri' => sprintf( '%s?auto_download=false', $attachment['fullUrl'] ) ,
+			//'download_uri' => sprintf( '%s?auto_download=false', $attachment['fullUrl'] ) ,
+			'download_uri' => $attachment['fullUrl'],
 			'max_width' => $attachment['width'],
 			'max_height' => $attachment['height'],
 		);

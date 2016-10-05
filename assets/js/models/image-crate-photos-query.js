@@ -18,7 +18,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
             options = options || {};
             options.context = this;
             options.data = _.extend(options.data || {}, {
-                action: 'image_implementor_get'
+                action: 'image_crate_get'
             });
 
             // Clone the args so manipulation is non-destructive.

@@ -1,6 +1,6 @@
 /* global require */
 
-var StockPhotoThumb = require('./image-provider-photo.js'),
+var StockPhotoThumb = require('./image-crate-photo.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize,
     coreAttachmentsCreateSingle  = wp.media.view.AttachmentsBrowser.prototype.createSingle;
 
@@ -13,10 +13,10 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
         search: false,
         date: false,
         display: false,
-        sidebar: false,
-        //AttachmentView: wp.media.view.Attachment.Library
+        sidebar: true,
+        // AttachmentView: wp.media.view.Attachment.Library
         AttachmentView: StockPhotoThumb
-    }, wp.media.view.AttachmentsBrowser.prototype.defaults),
+    }, wp.media.view.AttachmentsBrowser.prototype.defaults)
 
 });
 

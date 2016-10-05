@@ -1,11 +1,11 @@
 var ImageCrateController = wp.media.controller.Library.extend({
     defaults: _.defaults({
-        id: 'ii',
+        id: 'image-crate',
         title: 'Image Source',
         multiple: false,
         menu: 'default',
-        router: 'ii',
-        toolbar: 'ii-toolbar',
+        router: 'image-crate',
+        toolbar: 'image-crate-toolbar',
         searchable: true,
         filterable: false,
         sortable: false,
