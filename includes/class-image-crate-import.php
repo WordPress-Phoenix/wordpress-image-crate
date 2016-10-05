@@ -52,6 +52,15 @@ final class Image_Crate_Import {
 
 		}
 
+		$proper_name = $filename;
+		$api_image   = $file_array['name'];
+
+		$image_type = pathinfo( $api_image );
+		$file_name  = basename( $api_image, '.' . $image_type['extension'] );
+
+		$file_array['name'] = str_replace( $file_name, $proper_name, $api_image );
+
+
 		// Do the validation and storage stuff
 		$id = media_handle_sideload( $file_array, 0 );
 

@@ -60,38 +60,26 @@ class Image_Crate_Ajax {
 		//}
 
 		$filename = sanitize_file_name( $_POST['filename'] );
+		$filename = strtolower( $filename );
 		$id       = absint( $_POST['id'] );
 		$filename = sprintf('%s-%s', $id, $filename);
 
 		//check_ajax_referer( 'image_crate_download_' . $id, 'nonce' );
 
-		/**
-		 * Resize to max 2400 px wide 80% quality
-		 * Documentation: https://github.com/asilvas/node-image-steam
-		 */
-		//$url = esc_url_raw( sprintf( '%s/%s/:/rs=w:2400/qt=q:80', \WPaaS\Plugin::config( 'imageApi.url' ), $filename ) );
-
-		//$url = esc_url_raw( sprintf( 'http://www.usatodaysportsimages.com/api/download/?imageID=%s?auto_download=false', $id ) );
-
 		$import   = new Image_Crate_Import();
 		$image_id = $import->image( $id, $filename );
 
 		if ( ! $image_id ) {
-
 			wp_send_json_error();
-
 		}
 
 		$attachment = wp_prepare_attachment_for_js( $image_id );
 
 		if ( ! $attachment ) {
-
 			wp_send_json_error();
-
 		}
 
 		wp_send_json_success( $attachment );
 
 	}
-
 }
