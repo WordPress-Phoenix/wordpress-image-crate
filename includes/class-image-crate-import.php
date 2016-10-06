@@ -17,49 +17,48 @@ final class Image_Crate_Import {
 	/**
 	 * Import image from an url
 	 *
-	 * @param $url
+	 * @param $service_image_id
+	 * @param $filename
 	 *
 	 * @return bool|int|object
 	 */
-	public function image( $imageID, $filename ) {
+	public function image( $service_image_id, $filename ) {
 
 		$file_array = [];
 
-		// Download file to temp location
-		$file_array['tmp_name'] = $this->download( $imageID );
+		$post_name = strtolower( $filename );
+		$id_exists = $this->check_attachment( $post_name );
+
+		// filename will determine if download will occur
+		if ( 0 > $id_exists  ) {
+		    return $id_exists;
+		}
+
+		$file_array['tmp_name'] = $this->download( $service_image_id );
 
 		if ( ! $file_array['tmp_name'] ) {
-
 			return false;
-
 		}
 
 		preg_match( '/[^\?]+\.(jpe?g|jpe|gif|png)\b/i', $file_array['tmp_name'], $matches );
 
 		if ( ! $matches ) {
-
 			unlink( $file_array['tmp_name'] );
-
 			return false;
-
 		}
 
 		$file_array['name'] = basename( $matches[0] );
 
 		if ( ! function_exists( 'media_handle_sideload' ) ) {
-
 			require_once ABSPATH . 'wp-admin/includes/media.php';
-
 		}
 
-		$proper_name = $filename;
 		$api_image   = $file_array['name'];
 
 		$image_type = pathinfo( $api_image );
 		$file_name  = basename( $api_image, '.' . $image_type['extension'] );
-
-		$file_array['name'] = str_replace( $file_name, $proper_name, $api_image );
-
+		$post_name = sprintf( '%s-%s', $service_image_id, $post_name );
+		$file_array['name'] = str_replace( $file_name, $post_name, $api_image );
 
 		// Do the validation and storage stuff
 		$id = media_handle_sideload( $file_array, 0 );
@@ -73,16 +72,14 @@ final class Image_Crate_Import {
 	/**
 	 * Download a file by its URL
 	 *
-	 * @param  string $url
+	 * @param  string $id
 	 *
 	 * @return bool|string
 	 */
 	private function download( $id ) {
 
 		if ( ! function_exists( 'download_url' ) ) {
-
 			require_once ABSPATH . 'wp-admin/includes/file.php';
-
 		}
 
 		$baseUrl              = 'http://api.usatodaysportsimages.com/api/download/';
@@ -119,12 +116,10 @@ final class Image_Crate_Import {
 		$file = download_url( $requestUrl );
 
 		if ( is_wp_error( $file ) ) {
-
 			return false;
-
 		}
 
-			// Added functionality to deal with image without extension
+		// Added functionality to deal with image without extension
 		$tmp_ext = pathinfo( $file, PATHINFO_EXTENSION );
 
 		// Get the real image extension
@@ -158,4 +153,36 @@ final class Image_Crate_Import {
 
 	}
 
+	/**
+	 * Check if attachment exists
+	 *
+	 * @param        $post_name
+	 * @param string $call_type
+	 *
+	 * @return int Post attachment id
+	 */
+	public function check_attachment( $post_name, $call_type = 'remote' ) {
+
+		// Switch to another blog to check post existence.
+		if ( $call_type == 'remote' && is_multisite() ) {
+			//$site = get_current_site();
+			//$site_id = $site->id;
+			// todo: hard coded number for testing, remove for production
+			$site_id = '229';
+			switch_to_blog( $site_id );
+		}
+
+		global $wpdb;
+		$attachment_id = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_name='%s';", $post_name ) );
+
+		if ( ! empty( $attachment_id ) ) {
+			$attachment_id = $attachment_id[0];
+		}
+
+		if ( $call_type == 'remote' && is_multisite() ) {
+			restore_current_blog();
+		}
+
+		return $attachment_id;
+	}
 }

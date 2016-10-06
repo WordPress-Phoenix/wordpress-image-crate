@@ -60,14 +60,12 @@ class Image_Crate_Ajax {
 		//}
 
 		$filename = sanitize_file_name( $_POST['filename'] );
-		$filename = strtolower( $filename );
-		$id       = absint( $_POST['id'] );
-		$filename = sprintf('%s-%s', $id, $filename);
+		$service_image_id = absint( $_POST['id'] );
 
 		//check_ajax_referer( 'image_crate_download_' . $id, 'nonce' );
 
 		$import   = new Image_Crate_Import();
-		$image_id = $import->image( $id, $filename );
+		$image_id = $import->image( $service_image_id, $filename );
 
 		if ( ! $image_id ) {
 			wp_send_json_error();
