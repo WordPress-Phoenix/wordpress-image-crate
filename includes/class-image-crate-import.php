@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Image_Crate_Import {
 
+	private $directory;
+
 	/**
 	 * Import image from an url
 	 *
@@ -22,17 +24,25 @@ final class Image_Crate_Import {
 	 *
 	 * @return bool|int|object
 	 */
-	public function image( $service_image_id, $filename ) {
+	public function image( $service_image_id, $filename, $custom_directory ) {
+
+		if ( $custom_directory ) {
+		    $this->directory = $custom_directory;
+		}
 
 		$file_array = [];
 
 		$post_name = strtolower( $filename );
 		$id_exists = $this->check_attachment( $post_name );
 
+
 		// filename will determine if download will occur
 		if ( 0 > $id_exists  ) {
 		    return $id_exists;
 		}
+
+		// place the images in a custom directory
+		add_filter( 'upload_dir', array( &$this, 'set_upload_dir' ) );
 
 		$file_array['tmp_name'] = $this->download( $service_image_id );
 
@@ -184,5 +194,24 @@ final class Image_Crate_Import {
 		}
 
 		return $attachment_id;
+	}
+
+	/**
+	 * Temporarily change upload directory for downloading getty images
+	 *
+	 * @param   array $upload Filtered upload dir locations
+	 *
+	 * @return  array Filtered upload dir locations
+	 */
+	public function set_upload_dir( $upload ) {
+
+		$upload['subdir']  = '/' . $this->directory . $upload['subdir'];
+		$upload['basedir'] = WP_CONTENT_DIR . '/uploads';
+		$upload['baseurl'] = content_url() . '/uploads';
+		$upload['path']    = $upload['basedir'] . $upload['subdir'];
+		$upload['url']     = $upload['baseurl'] . $upload['subdir'];
+
+		return $upload;
+
 	}
 }

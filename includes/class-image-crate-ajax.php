@@ -65,7 +65,8 @@ class Image_Crate_Ajax {
 		//check_ajax_referer( 'image_crate_download_' . $id, 'nonce' );
 
 		$import   = new Image_Crate_Import();
-		$image_id = $import->image( $service_image_id, $filename );
+		$dir = $this->api->directory;
+		$image_id = $import->image( $service_image_id, $filename, $dir );
 
 		if ( ! $image_id ) {
 			wp_send_json_error();

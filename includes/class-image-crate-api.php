@@ -18,12 +18,14 @@ class Image_Crate_Api {
 	private $key;
 	private $secret;
 	private $api_url;
+	public $directory;
 
 	public function __construct() {
 		// todo: obviously these values need to live somewhere else
 		$this->key = USAT_API_KEY;
 		$this->secret = USAT_API_SECRET;
 		$this->api_url = "http://www.usatodaysportsimages.com/api/searchAPI/";
+		$this->directory = 'usat-images';
 	}
 
 	public function fetch( $phrase, $pageToLoad ) {
