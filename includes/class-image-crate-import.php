@@ -233,5 +233,4 @@ final class Image_Crate_Import {
 		return $upload;
 
 	}
-
 }
