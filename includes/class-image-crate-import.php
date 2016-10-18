@@ -56,7 +56,7 @@ final class Image_Crate_Import {
 
 
 		// filename will determine if download will occur
-		if ( 0 > $id_exists  ) {
+		if ( $id_exists > 0  ) {
 		    return $id_exists;
 		}
 
