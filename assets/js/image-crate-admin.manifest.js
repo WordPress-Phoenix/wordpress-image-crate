@@ -35,7 +35,10 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                         click: function () {
                             var state = controller.state(),
                                 selection = state.get('selection');
-                            // this.$el.addClass('hide-toolbar');
+
+                            this.$el.attr('disabled', 'disabled')
+                                    .text('Downloading');
+
                             wp.media.ajax({
                                 data: {
                                     action: 'image_crate_download',
@@ -47,9 +50,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                             }).done(function (attachment) {
 
                                 var browse = wp.media.frame.content.mode('browse');
-
-                                // console.log( done );
-
                                 browse.get('gallery').collection.add(attachment);
                                 browse.get('selection').collection.add(attachment);
 
@@ -57,7 +57,9 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                                 wp.Uploader.queue.add(attachment);
                                 wp.Uploader.queue.remove(attachment);
 
-                                // @todo find a better way
+                                // reset back to insert mode for adding post to editor
+                                controller.setState('insert');
+
                                 browse.get('gallery').$('li:first .thumbnail').click();
 
                             });
@@ -70,21 +72,20 @@ _.extend( wp.media.view.MediaFrame.prototype, {
 
         },
 
-
-
         loadUSAT: function () {
             var state = this.state(),
                 collection = state.get('image_crate_photos'),
                 selection = state.get('selection');
 
-            if (_.isUndefined(collection)) {
-                console.log( 'is undefined' );
+            if ( _.isUndefined( collection ) ) {
                 collection = new StockPhotosModel(
                     null,
                     {
                         props: {
                             query: true,
-                            category: 'generic'
+                            // search: 'airplane',
+                            // posts_per_page: 5,
+                            // paged: 1
                         }
                     }
                 );
@@ -94,15 +95,13 @@ _.extend( wp.media.view.MediaFrame.prototype, {
             }
 
             this.content.set( new StockPhotoBrowser({
-                // className: 'image-crate attachments-browser',
+                className: 'image-crate attachments-browser',
                 controller: this,
                 collection: collection,
                 selection: selection,
                 model: state,
                 filters: false,
-                search: false,
                 date: false,
-                display: false,
             }) );
 
         },

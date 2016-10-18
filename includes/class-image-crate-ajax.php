@@ -29,10 +29,10 @@ class Image_Crate_Ajax {
 			wp_send_json_error();
 		}
 
-		$search_term = isset( $_POST['query']['search_term'] ) ? $_POST['query']['search_term'] : false;
+		$search_term = isset( $_POST['query']['search'] ) ? $_POST['query']['search'] : false;
 		$page = isset( $_POST['query']['paged'] ) ? $_POST['query']['paged'] : 1;
 
-		$search_term = 'marvel';
+		$search_term = 'airplane';
 
 		if ( false == $search_term ) {
 			wp_send_json_error();
