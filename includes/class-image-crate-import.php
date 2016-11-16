@@ -203,9 +203,10 @@ final class Image_Crate_Import {
 
 		global $wpdb;
 		$attachment_id = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_name='%s';", $post_name ) );
+		$attachment_id = $attachment_id[0];
 
-		if ( ! empty( $attachment_id ) ) {
-			$attachment_id = $attachment_id[0];
+		if ( empty( $attachment_id ) ) {
+			$attachment_id = 0;
 		}
 
 		if ( $call_type == 'remote' && is_multisite() ) {

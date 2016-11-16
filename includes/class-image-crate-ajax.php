@@ -32,7 +32,7 @@ class Image_Crate_Ajax {
 		$search_term = isset( $_POST['query']['search'] ) ? $_POST['query']['search'] : false;
 		$page = isset( $_POST['query']['paged'] ) ? $_POST['query']['paged'] : 1;
 
-		$search_term = 'airplane';
+		//$search_term = 'tom brady';
 
 		if ( false == $search_term ) {
 			wp_send_json_error();

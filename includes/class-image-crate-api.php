@@ -47,33 +47,35 @@ class Image_Crate_Api {
 		$nonce                = md5( mt_rand() );
 		$oauthSignatureMethod = "HMAC-SHA1";
 		$oauthVersion         = "1.0";
-		//$limit                = '2';
-		//$mode                 = 'any';
-		$terms                = $phrase; // todo: maje this format friendly to usa today
+		$limit                = 24;
+		//$mode                 = 'phrase';
+		$terms                = urlencode( $phrase ); // todo: make this format friendly to usa today
 
 		//generate signature
 		$sigBase = "GET&" . rawurlencode( $baseUrl ) . "&"
-		           . rawurlencode( "oauth_consumer_key=" . rawurlencode( $consumerKey )
-		                           . "&oauth_nonce=" . rawurlencode( $nonce )
-		                           . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
-		                           . "&oauth_timestamp=" . $oauthTimestamp
-		                           . "&oauth_version=" . $oauthVersion
-		                           . "&terms=" . $terms );
+		           . rawurlencode( "limit=" . $limit
+                   //. "&mode=" . $mode
+		           . "&oauth_consumer_key=" . rawurlencode( $consumerKey )
+                   . "&oauth_nonce=" . rawurlencode( $nonce )
+                   . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
+                   . "&oauth_timestamp=" . $oauthTimestamp
+                   . "&oauth_version=" . $oauthVersion
+                   . "&terms=" . $terms );
 
 		$sigKey   = $consumerSecret . "&";
 		$oauthSig = base64_encode( hash_hmac( "sha1", $sigBase, $sigKey, true ) );
 
 		//generate full request URL
 		$requestUrl = $baseUrl . "?"
-		              . "oauth_consumer_key=" . rawurlencode( $consumerKey )
+		              . "limit=" . $limit
+		              //. "&mode=" . $mode
+		              . "&oauth_consumer_key=" . rawurlencode( $consumerKey )
 		              . "&oauth_nonce=" . rawurlencode( $nonce )
 		              . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
 		              . "&oauth_timestamp=" . rawurlencode( $oauthTimestamp )
 		              . "&oauth_version=" . rawurlencode( $oauthVersion )
 		              . "&oauth_signature=" . rawurlencode( $oauthSig )
-		              //. "&mode=" . $mode
 		              . "&terms=" . $terms;
-		              //. "&limit=" . $limit;
 
 		//make call
 		$response = wp_remote_get( $requestUrl, array(
