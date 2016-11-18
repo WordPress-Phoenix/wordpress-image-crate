@@ -17,6 +17,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
             // Overload the read method so Attachment.fetch() functions correctly.
             options = options || {};
             options.context = this;
+            // todo: cleaner way to do this?
             options.data = _.extend(options.data || {}, {
                 action: 'image_crate_get'
             });
@@ -29,6 +30,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
             }
 
             options.data.query = args;
+            console.log(  options );
             return wp.media.ajax(options);
 
         }
@@ -63,50 +65,33 @@ var StockPhotosQuery = wp.media.model.Query.extend({
                 // Generate the query `args` object.
                 // Correct any differing property names.
                 _.each(props, function (value, prop) {
-
                     if (_.isNull(value)) {
-
                         return;
-
                     }
-
                     args[prop] = value;
-
                 });
-
 
                 // Fill any other default query args.
                 _.defaults(args, Query.defaultArgs);
 
                 // Search the query cache for a matching query.
                 if (cache) {
-
                     query = _.find(queries, function (query) {
-
                         return _.isEqual(query.args, args);
-
                     });
-
                 } else {
-
                     queries = [];
-
                 }
 
                 // Otherwise, create a new query and add it to the cache.
                 if (!query) {
-
                     query = new Query([], _.extend(options || {}, {
                         props: props,
                         args: args
                     }));
-
                     queries.push(query);
-
                 }
-
                 return query;
-
             };
         }())
     });

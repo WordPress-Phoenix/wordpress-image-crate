@@ -8,6 +8,8 @@ var ImageCrateController = require('./controllers/image-crate-controller.js'),
 _.extend( wp.media.view.MediaFrame.prototype, {
     image_crate: {
         activate: function () {
+            // todo: am I using this correctly
+            // todo: goal to more image providers as tabs
             var view = _.first(this.views.get('.media-frame-router')),
                 viewSettings = {};
 
@@ -27,6 +29,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                         style: 'primary',
                         text: 'Download Image',
                         priority: 80,
+                        // todo: why does require selection only work if at least one image is in the library
                         requires: {
                             library: true,
                             selection: true
@@ -69,7 +72,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                     }
                 }
             }));
-
         },
 
         loadUSAT: function () {
@@ -83,9 +85,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                     {
                         props: {
                             query: true,
-                            // search: 'airplane',
-                            // posts_per_page: 5,
-                            // paged: 1
                         }
                     }
                 );

@@ -1,7 +1,7 @@
 var ImageCrateController = wp.media.controller.Library.extend({
     defaults: _.defaults({
         id: 'image-crate',
-        title: 'Image Source',
+        title: 'Image Crate',
         multiple: false,
         menu: 'default',
         router: 'image-crate',
@@ -18,8 +18,9 @@ var ImageCrateController = wp.media.controller.Library.extend({
     }, wp.media.controller.Library.prototype.defaults ),
 
     initialize: function () {
+        // todo: Using this correctly
         if (!this.get('library')) {
-            this.set('library', wp.media.query({ ii: true }) );
+            this.set('library', wp.media.query({ imagecrate: true }) );
         }
         wp.media.controller.Library.prototype.initialize.apply(this, arguments);
     }

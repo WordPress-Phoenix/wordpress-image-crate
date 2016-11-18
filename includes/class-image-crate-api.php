@@ -33,7 +33,7 @@ class Image_Crate_Api {
 		add_filter( 'image_send_to_editor', array( $this, 'send_to_editor' ), 10, 1 );
 	}
 
-	public function fetch( $phrase, $pageToLoad ) {
+	public function fetch( $phrase, $per_page, $pageToLoad ) {
 
 		// todo: maybe add filters for expansion
 		// One thing to note about this, if you add other parameters to the call you need to append them to
@@ -47,8 +47,9 @@ class Image_Crate_Api {
 		$nonce                = md5( mt_rand() );
 		$oauthSignatureMethod = "HMAC-SHA1";
 		$oauthVersion         = "1.0";
-		$limit                = 24;
+		$limit                = $per_page;
 		$mode                 = 'phrase';
+		$offset               = $pageToLoad;
 		$terms                = $phrase; // todo: make this format friendly to usa today
 
 		//generate signature
@@ -60,6 +61,7 @@ class Image_Crate_Api {
                    . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
                    . "&oauth_timestamp=" . $oauthTimestamp
                    . "&oauth_version=" . $oauthVersion
+                   . "&offset=" . $offset
                    . "&terms=" . $terms );
 
 		$sigKey   = $consumerSecret . "&";
@@ -75,6 +77,7 @@ class Image_Crate_Api {
 		              . "&oauth_timestamp=" . rawurlencode( $oauthTimestamp )
 		              . "&oauth_version=" . rawurlencode( $oauthVersion )
 		              . "&oauth_signature=" . rawurlencode( $oauthSig )
+		              . "&offset=" . $offset
 		              . "&terms=" . $terms;
 
 		//make call

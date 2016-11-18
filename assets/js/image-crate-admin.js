@@ -2,7 +2,7 @@
 var ImageCrateController = wp.media.controller.Library.extend({
     defaults: _.defaults({
         id: 'image-crate',
-        title: 'Image Source',
+        title: 'Image Crate',
         multiple: false,
         menu: 'default',
         router: 'image-crate',
@@ -19,8 +19,9 @@ var ImageCrateController = wp.media.controller.Library.extend({
     }, wp.media.controller.Library.prototype.defaults ),
 
     initialize: function () {
+        // todo: Using this correctly
         if (!this.get('library')) {
-            this.set('library', wp.media.query({ ii: true }) );
+            this.set('library', wp.media.query({ imagecrate: true }) );
         }
         wp.media.controller.Library.prototype.initialize.apply(this, arguments);
     }
@@ -39,6 +40,8 @@ var ImageCrateController = require('./controllers/image-crate-controller.js'),
 _.extend( wp.media.view.MediaFrame.prototype, {
     image_crate: {
         activate: function () {
+            // todo: am I using this correctly
+            // todo: goal to more image providers as tabs
             var view = _.first(this.views.get('.media-frame-router')),
                 viewSettings = {};
 
@@ -58,6 +61,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                         style: 'primary',
                         text: 'Download Image',
                         priority: 80,
+                        // todo: why does require selection only work if at least one image is in the library
                         requires: {
                             library: true,
                             selection: true
@@ -100,7 +104,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                     }
                 }
             }));
-
         },
 
         loadUSAT: function () {
@@ -114,9 +117,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                     {
                         props: {
                             query: true,
-                            // search: 'airplane',
-                            // posts_per_page: 5,
-                            // paged: 1
                         }
                     }
                 );
@@ -182,16 +182,13 @@ var StockPhotosQuery = require('./image-crate-photos-query');
 var StockPhotos = wp.media.model.Attachments.extend({
 
     initialize: function (models, options) {
-
         wp.media.model.Attachments.prototype.initialize.call(this, models, options);
-        // this.StockPhotosProps = new Backbone.Model();
-        // this.StockPhotosProps.set('importing', false);
-        // this.StockPhotosProps.set('previewing', false);
-
     },
 
+    // todo: bug - page query/load on scroll
+    // todo: bug - state to display when first opening frame
+    // todo: bug - de-bouncing search
     _requery: function (refresh) {
-
         var props;
 
         if ( this.props.get('query') ) {
@@ -200,7 +197,6 @@ var StockPhotos = wp.media.model.Attachments.extend({
             this.mirror( StockPhotosQuery.get( props ) );
         }
     }
-
 });
 
 module.exports = StockPhotos;
@@ -225,6 +221,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
             // Overload the read method so Attachment.fetch() functions correctly.
             options = options || {};
             options.context = this;
+            // todo: cleaner way to do this?
             options.data = _.extend(options.data || {}, {
                 action: 'image_crate_get'
             });
@@ -237,6 +234,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
             }
 
             options.data.query = args;
+            console.log(  options );
             return wp.media.ajax(options);
 
         }
@@ -271,50 +269,33 @@ var StockPhotosQuery = wp.media.model.Query.extend({
                 // Generate the query `args` object.
                 // Correct any differing property names.
                 _.each(props, function (value, prop) {
-
                     if (_.isNull(value)) {
-
                         return;
-
                     }
-
                     args[prop] = value;
-
                 });
-
 
                 // Fill any other default query args.
                 _.defaults(args, Query.defaultArgs);
 
                 // Search the query cache for a matching query.
                 if (cache) {
-
                     query = _.find(queries, function (query) {
-
                         return _.isEqual(query.args, args);
-
                     });
-
                 } else {
-
                     queries = [];
-
                 }
 
                 // Otherwise, create a new query and add it to the cache.
                 if (!query) {
-
                     query = new Query([], _.extend(options || {}, {
                         props: props,
                         args: args
                     }));
-
                     queries.push(query);
-
                 }
-
                 return query;
-
             };
         }())
     });
@@ -324,19 +305,6 @@ module.exports = StockPhotosQuery;
 },{}],5:[function(require,module,exports){
 /* global module, wpaas_stock_photos */
 var StockPhotoThumb = wp.media.view.Attachment.extend({
-
-    initialize: function () {
-
-        wp.media.view.Attachment.prototype.initialize.apply(this, arguments);
-        _.extend(this.events, {
-            'click': 'imageCrateActiveMode'
-        });
-
-    },
-
-    imageCrateActiveMode: function() {
-        console.log('is dumb');
-    },
 
     render: function () {
 
@@ -357,6 +325,7 @@ module.exports = StockPhotoThumb;
 /* global require */
 
 var StockPhotoThumb = require('./image-crate-photo.js'),
+    ImageCrateSearch = require('./search.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize,
     coreAttachmentsCreateSingle  = wp.media.view.AttachmentsBrowser.prototype.createSingle;
 
@@ -364,6 +333,7 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
 
     tagName: 'div',
     className: 'image-crate attachments-browser',
+
     defaults: _.defaults({
         filters: false,
         search: false,
@@ -374,8 +344,57 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
         AttachmentView: StockPhotoThumb
     }, wp.media.view.AttachmentsBrowser.prototype.defaults),
 
+    initialize: function () {
+        coreAttachmentsInitialize.apply(this, arguments);
+        this.toolbar.set('search', new ImageCrateSearch({
+            controller: this.controller,
+            model: this.collection.props,
+            priority: 60
+        }).render())
+
+    }
+
 });
 
 module.exports = StockPhotosBrowser;
 
-},{"./image-crate-photo.js":5}]},{},[2]);
+},{"./image-crate-photo.js":5,"./search.js":7}],7:[function(require,module,exports){
+var ImageCrateSearch = wp.media.View.extend({
+    tagName: 'input',
+    className: 'search ic-search',
+    id: 'media-search-input',
+
+    attributes: {
+        type: 'search',
+        placeholder: 'Search Provider'
+    },
+
+    events: {
+        'input': 'search',
+        'keyup': 'search',
+    },
+
+    /**
+     * @returns {wp.media.view.Search} Returns itself to allow chaining
+     */
+    render: function () {
+        this.el.value = this.model.escape('search');
+        return this;
+    },
+
+    search: function (event) {
+        this.deBounceSearch(event);
+    },
+
+    deBounceSearch: _.debounce(function (event) {
+        if (event.target.value) {
+            this.model.set('search', event.target.value);
+        } else {
+            this.model.unset('search');
+        }
+    }, 500)
+
+});
+
+module.exports = ImageCrateSearch;
+},{}]},{},[2]);
