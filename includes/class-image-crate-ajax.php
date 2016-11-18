@@ -32,7 +32,7 @@ class Image_Crate_Ajax {
 		$search_term = isset( $_POST['query']['search'] ) ? $_POST['query']['search'] : false;
 		$page = isset( $_POST['query']['paged'] ) ? $_POST['query']['paged'] : 1;
 
-		//$search_term = 'tom brady';
+		$search_term = 'broncos';
 
 		if ( false == $search_term ) {
 			wp_send_json_error();
@@ -44,7 +44,7 @@ class Image_Crate_Ajax {
 			wp_send_json_success( [] );
 		}
 
-		$images = $this->api->prepare_attachments( $images );
+		$images = $this->api->prepare_attachments( $images['items'] );
 
 		return wp_send_json_success( $images );
 

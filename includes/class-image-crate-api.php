@@ -48,13 +48,13 @@ class Image_Crate_Api {
 		$oauthSignatureMethod = "HMAC-SHA1";
 		$oauthVersion         = "1.0";
 		$limit                = 24;
-		//$mode                 = 'phrase';
-		$terms                = urlencode( $phrase ); // todo: make this format friendly to usa today
+		$mode                 = 'phrase';
+		$terms                = $phrase; // todo: make this format friendly to usa today
 
 		//generate signature
 		$sigBase = "GET&" . rawurlencode( $baseUrl ) . "&"
 		           . rawurlencode( "limit=" . $limit
-                   //. "&mode=" . $mode
+                   . "&mode=" . $mode
 		           . "&oauth_consumer_key=" . rawurlencode( $consumerKey )
                    . "&oauth_nonce=" . rawurlencode( $nonce )
                    . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
@@ -67,8 +67,8 @@ class Image_Crate_Api {
 
 		//generate full request URL
 		$requestUrl = $baseUrl . "?"
-		              . "limit=" . $limit
-		              //. "&mode=" . $mode
+		              . "&limit=" . $limit
+		              . "&mode=" . rawurlencode( $mode )
 		              . "&oauth_consumer_key=" . rawurlencode( $consumerKey )
 		              . "&oauth_nonce=" . rawurlencode( $nonce )
 		              . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
@@ -90,9 +90,11 @@ class Image_Crate_Api {
 		$response_body = json_decode(wp_remote_retrieve_body( $response ), true);
 
 		// todo: fix array error catching for secondary array_map param
-		$images = array_map( function ( $index ) {
+		$images['items'] = array_map( function ( $index ) {
 			return $index[0];
 		}, $response_body['results']['item'] );
+
+		$images['total'] = $response_body['results']['totalAvailableImages'];
 
 		return $images;
 
