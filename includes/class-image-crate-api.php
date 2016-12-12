@@ -62,7 +62,7 @@ class Image_Crate_Api {
                    . "&oauth_timestamp=" . $oauthTimestamp
                    . "&oauth_version=" . $oauthVersion
                    . "&offset=" . $offset
-                   . "&terms=" . $terms );
+                   . "&terms=" . rawurlencode( $terms ) );
 
 		$sigKey   = $consumerSecret . "&";
 		$oauthSig = base64_encode( hash_hmac( "sha1", $sigBase, $sigKey, true ) );
@@ -78,7 +78,7 @@ class Image_Crate_Api {
 		              . "&oauth_version=" . rawurlencode( $oauthVersion )
 		              . "&oauth_signature=" . rawurlencode( $oauthSig )
 		              . "&offset=" . $offset
-		              . "&terms=" . $terms;
+		              . "&terms=" . rawurlencode( $terms );
 
 		//make call
 		$response = wp_remote_get( $requestUrl, array(
@@ -98,7 +98,6 @@ class Image_Crate_Api {
 		}, $response_body['results']['item'] );
 
 		return $images;
-
 	}
 
 	public function prepare_attachments( $attachments ) {
