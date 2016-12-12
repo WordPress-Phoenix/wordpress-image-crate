@@ -187,12 +187,12 @@ var StockPhotos = wp.media.model.Attachments.extend({
 
     // todo: bug - page query/load on scroll
     // todo: bug - state to display when first opening frame
-    // todo: bug - de-bouncing search
     _requery: function (refresh) {
         var props;
 
         if ( this.props.get('query') ) {
             props = this.props.toJSON();
+            // console.log( props );
             props.cache = ( true !== refresh );
             this.mirror( StockPhotosQuery.get( props ) );
         }
@@ -215,27 +215,56 @@ var StockPhotosQuery = wp.media.model.Query.extend({
          * @returns {Promise}
          */
         sync: function (method, model, options) {
-
             var args;
 
             // Overload the read method so Attachment.fetch() functions correctly.
-            options = options || {};
-            options.context = this;
-            // todo: cleaner way to do this?
-            options.data = _.extend(options.data || {}, {
-                action: 'image_crate_get'
-            });
+            if ('read' === method) {
+                options = options || {};
+                options.context = this;
+                options.data = _.extend(options.data || {}, {
+                    action: 'image_crate_get',
+                });
 
-            // Clone the args so manipulation is non-destructive.
-            args = _.clone(this.args);
-            // Determine which page to query.
-            if (-1 !== args.posts_per_page) {
-                args.paged = Math.round(this.length / args.posts_per_page) + 1;
+                // Clone the args so manipulation is non-destructive.
+                args = _.clone(this.args);
+
+                // Determine which page to query.
+                if (-1 !== args.posts_per_page) {
+                    args.paged = Math.round(this.length / args.posts_per_page) + 1;
+                }
+
+                options.data.query = args;
+                return wp.media.ajax(options);
+
+                // Otherwise, fall back to Backbone.sync()
+            } else {
+                /**
+                 * Call wp.media.model.Attachments.sync or Backbone.sync
+                 */
+                fallback = Attachments.prototype.sync ? Attachments.prototype : Backbone;
+                return fallback.sync.apply(this, arguments);
             }
 
-            options.data.query = args;
-            console.log(  options );
-            return wp.media.ajax(options);
+            // var args;
+            //
+            // // Overload the read method so Attachment.fetch() functions correctly.
+            // options = options || {};
+            // options.context = this;
+            // // todo: cleaner way to do this?
+            // options.data = _.extend(options.data || {}, {
+            //     action: 'image_crate_get'
+            // });
+            //
+            // // Clone the args so manipulation is non-destructive.
+            // args = _.clone(this.args);
+            // // Determine which page to query.
+            // if (-1 !== args.posts_per_page) {
+            //     args.paged = Math.round(this.length / args.posts_per_page) + 1;
+            // }
+            //
+            // options.data.query = args;
+            // // console.log(  options );
+            // return wp.media.ajax(options);
 
         }
 
@@ -359,6 +388,12 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
 module.exports = StockPhotosBrowser;
 
 },{"./image-crate-photo.js":5,"./search.js":7}],7:[function(require,module,exports){
+/**
+ * There's a bug in core where searches aren't debounced in the media library.
+ * Normally, not a problem, but with external api calls or tons of image/users, ajax
+ * calls could effect server performance. This fixes that for now.
+ */
+
 var ImageCrateSearch = wp.media.View.extend({
     tagName: 'input',
     className: 'search ic-search',

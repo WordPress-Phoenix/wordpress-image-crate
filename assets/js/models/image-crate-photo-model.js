@@ -14,6 +14,7 @@ var StockPhotos = wp.media.model.Attachments.extend({
 
         if ( this.props.get('query') ) {
             props = this.props.toJSON();
+            // console.log( props );
             props.cache = ( true !== refresh );
             this.mirror( StockPhotosQuery.get( props ) );
         }

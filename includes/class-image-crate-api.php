@@ -33,7 +33,7 @@ class Image_Crate_Api {
 		add_filter( 'image_send_to_editor', array( $this, 'send_to_editor' ), 10, 1 );
 	}
 
-	public function fetch( $phrase, $per_page, $pageToLoad ) {
+	public function fetch( $phrase, $page, $per_page ) {
 
 		// todo: maybe add filters for expansion
 		// One thing to note about this, if you add other parameters to the call you need to append them to
@@ -49,7 +49,7 @@ class Image_Crate_Api {
 		$oauthVersion         = "1.0";
 		$limit                = $per_page;
 		$mode                 = 'phrase';
-		$offset               = $pageToLoad;
+		$offset               = $page;
 		$terms                = $phrase; // todo: make this format friendly to usa today
 
 		//generate signature
@@ -93,11 +93,9 @@ class Image_Crate_Api {
 		$response_body = json_decode(wp_remote_retrieve_body( $response ), true);
 
 		// todo: fix array error catching for secondary array_map param
-		$images['items'] = array_map( function ( $index ) {
+		$images = array_map( function ( $index ) {
 			return $index[0];
 		}, $response_body['results']['item'] );
-
-		$images['total'] = $response_body['results']['totalAvailableImages'];
 
 		return $images;
 

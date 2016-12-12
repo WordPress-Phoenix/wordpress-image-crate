@@ -11,27 +11,56 @@ var StockPhotosQuery = wp.media.model.Query.extend({
          * @returns {Promise}
          */
         sync: function (method, model, options) {
-
             var args;
 
             // Overload the read method so Attachment.fetch() functions correctly.
-            options = options || {};
-            options.context = this;
-            // todo: cleaner way to do this?
-            options.data = _.extend(options.data || {}, {
-                action: 'image_crate_get'
-            });
+            if ('read' === method) {
+                options = options || {};
+                options.context = this;
+                options.data = _.extend(options.data || {}, {
+                    action: 'image_crate_get',
+                });
 
-            // Clone the args so manipulation is non-destructive.
-            args = _.clone(this.args);
-            // Determine which page to query.
-            if (-1 !== args.posts_per_page) {
-                args.paged = Math.round(this.length / args.posts_per_page) + 1;
+                // Clone the args so manipulation is non-destructive.
+                args = _.clone(this.args);
+
+                // Determine which page to query.
+                if (-1 !== args.posts_per_page) {
+                    args.paged = Math.round(this.length / args.posts_per_page) + 1;
+                }
+
+                options.data.query = args;
+                return wp.media.ajax(options);
+
+                // Otherwise, fall back to Backbone.sync()
+            } else {
+                /**
+                 * Call wp.media.model.Attachments.sync or Backbone.sync
+                 */
+                fallback = Attachments.prototype.sync ? Attachments.prototype : Backbone;
+                return fallback.sync.apply(this, arguments);
             }
 
-            options.data.query = args;
-            console.log(  options );
-            return wp.media.ajax(options);
+            // var args;
+            //
+            // // Overload the read method so Attachment.fetch() functions correctly.
+            // options = options || {};
+            // options.context = this;
+            // // todo: cleaner way to do this?
+            // options.data = _.extend(options.data || {}, {
+            //     action: 'image_crate_get'
+            // });
+            //
+            // // Clone the args so manipulation is non-destructive.
+            // args = _.clone(this.args);
+            // // Determine which page to query.
+            // if (-1 !== args.posts_per_page) {
+            //     args.paged = Math.round(this.length / args.posts_per_page) + 1;
+            // }
+            //
+            // options.data.query = args;
+            // // console.log(  options );
+            // return wp.media.ajax(options);
 
         }
 

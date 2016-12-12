@@ -25,35 +25,27 @@ class Image_Crate_Ajax {
 
 	public function get() {
 
+		// todo: need to add a filter here. fansided users are not allowed to upload files
 		if ( ! current_user_can( 'upload_files' ) ) {
 			wp_send_json_error();
 		}
 
-		$search_term = isset( $_POST['query']['search'] ) ? $_POST['query']['search'] : false;
-		$page = isset( $_POST['query']['paged'] ) ? $_POST['query']['paged'] : 1;
-		$per_page = isset( $_POST['query']['posts_per_page'] ) ? absint( $_POST['query']['posts_per_page'] ) : 20;
-
-		//$search_term = 'broncos';
+		$search_term = isset( $_REQUEST['query']['search'] ) ? $_REQUEST['query']['search'] : false;
+		$page = isset( $_REQUEST['query']['paged'] ) ? $_REQUEST['query']['paged'] : 1;
+		$per_page = isset( $_POST['query']['posts_per_page'] ) ? absint( $_POST['query']['posts_per_page'] ) : 40;
+		$page = ( $page * $per_page ) + 1;
 
 		if ( false == $search_term ) {
 			wp_send_json_error();
 		}
 
-		$images = $this->api->fetch( $search_term, 41, $page );
+		$images = $this->api->fetch( $search_term, $page, $per_page );
 
 		if ( empty( $images ) ) {
 			wp_send_json_success( [] );
 		}
 
-		$total       = $images['total'];
-		$total_pages = ceil( $total / $per_page );
-		$page        = max( $page, 1 );
-		$page        = min( $page, $total_pages );
-		$offset      = ( $page - 1 ) * $per_page;
-
-		//$images = array_splice( $images['items'], $offset, $per_page );
-		//$images = array_map( [ $this, 'prepare_attachement_for_js' ], $images );
-		$images = $this->api->prepare_attachments( $images['items'] );
+		$images = $this->api->prepare_attachments( $images );
 		$images = array_filter( $images );
 
 
