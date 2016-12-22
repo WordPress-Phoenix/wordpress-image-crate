@@ -32,6 +32,7 @@ module.exports = ImageCrateController;
 },{}],2:[function(require,module,exports){
 
 var ImageCrateController = require('./controllers/image-crate-controller.js'),
+    StockPhotoThumb = require('./views/browser/image-crate-photo.js'),
     StockPhotosModel = require('./models/image-crate-photo-model.js'),
     StockPhotoBrowser = require('./views/browser/image-crate-photos.js'),
     coreCreateStates = wp.media.view.MediaFrame.Post.prototype.createStates,
@@ -125,7 +126,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 state.set('image_crate_photos', collection);
             }
 
-            this.content.set( new StockPhotoBrowser({
+            this.content.set(new StockPhotoBrowser({
                 className: 'image-crate attachments-browser',
                 controller: this,
                 collection: collection,
@@ -133,8 +134,8 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 model: state,
                 filters: false,
                 date: false,
-            }) );
-
+                AttachmentView: StockPhotoThumb
+            }));
         },
 
         loadGetty: function () {
@@ -142,20 +143,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
         }
     }
 });
-
-// var coreAttachmentRender = wp.media.view.Attachment.prototype.render;
-// wp.media.view.Attachment.prototype.render = function() {
-//     var options = this.options || {};
-//     if ('image-crate' == this.controller.state().get('id')) {
-//         //todo: medium sizes are loading for some reason, needs to load thumbnail
-//         // var sizes = this.model.get('sizes');
-//         // options.size = sizes.thumbnail.url;
-//     }
-//     coreAttachmentRender.apply( this, arguments );
-//
-//     return this;
-// };
-
 
 wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
     coreBindHandlers.apply(this, arguments);
@@ -175,7 +162,7 @@ wp.media.view.MediaFrame.Post.prototype.createStates = function () {
     coreCreateStates.apply(this, arguments);
     this.states.add(new ImageCrateController);
 };
-},{"./controllers/image-crate-controller.js":1,"./models/image-crate-photo-model.js":3,"./views/browser/image-crate-photos.js":6}],3:[function(require,module,exports){
+},{"./controllers/image-crate-controller.js":1,"./models/image-crate-photo-model.js":3,"./views/browser/image-crate-photo.js":5,"./views/browser/image-crate-photos.js":6}],3:[function(require,module,exports){
 /* global require */
 var StockPhotosQuery = require('./image-crate-photos-query');
 
@@ -336,16 +323,65 @@ module.exports = StockPhotosQuery;
 var StockPhotoThumb = wp.media.view.Attachment.extend({
 
     render: function () {
+        var options = _.defaults(this.model.toJSON(), {
+            orientation: 'landscape',
+            uploading: false,
+            type: '',
+            subtype: '',
+            icon: '',
+            filename: '',
+            caption: '',
+            title: '',
+            dateFormatted: '',
+            width: '',
+            height: '',
+            compat: false,
+            alt: '',
+            description: ''
+        }, this.options);
 
-        var options = this.options || {};
+        options.buttons = this.buttons;
+        options.describe = this.controller.state().get('describe');
+
         if ('image' === options.type) {
             options.size = this.imageSize('thumbnail');
         }
 
-        wp.media.view.Attachment.prototype.render.apply(this, arguments);
+        options.can = {};
+        if (options.nonces) {
+            options.can.remove = !!options.nonces['delete'];
+            options.can.save = !!options.nonces.update;
+        }
+
+        if (this.controller.state().get('allowLocalEdits')) {
+            options.allowLocalEdits = true;
+        }
+
+        if (options.uploading && !options.percent) {
+            options.percent = 0;
+        }
+
+        this.views.detach();
+        this.$el.html(this.template(options));
+
+        this.$el.toggleClass('uploading', options.uploading);
+
+        if (options.uploading) {
+            this.$bar = this.$('.media-progress-bar div');
+        } else {
+            delete this.$bar;
+        }
+
+        // Check if the model is selected.
+        this.updateSelect();
+
+        // Update the save status.
+        this.updateSave();
+
+        this.views.render();
 
         return this;
-    }
+    },
 });
 
 module.exports = StockPhotoThumb;
@@ -353,8 +389,7 @@ module.exports = StockPhotoThumb;
 },{}],6:[function(require,module,exports){
 /* global require */
 
-var StockPhotoThumb = require('./image-crate-photo.js'),
-    ImageCrateSearch = require('./search.js'),
+var ImageCrateSearch = require('./search.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize,
     coreAttachmentsCreateSingle  = wp.media.view.AttachmentsBrowser.prototype.createSingle;
 
@@ -369,12 +404,11 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
         date: false,
         display: false,
         sidebar: true,
-        // AttachmentView: wp.media.view.Attachment.Library
-        AttachmentView: StockPhotoThumb
     }, wp.media.view.AttachmentsBrowser.prototype.defaults),
 
     initialize: function () {
         coreAttachmentsInitialize.apply(this, arguments);
+
         this.toolbar.set('search', new ImageCrateSearch({
             controller: this.controller,
             model: this.collection.props,
@@ -387,7 +421,7 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
 
 module.exports = StockPhotosBrowser;
 
-},{"./image-crate-photo.js":5,"./search.js":7}],7:[function(require,module,exports){
+},{"./search.js":7}],7:[function(require,module,exports){
 /**
  * There's a bug in core where searches aren't debounced in the media library.
  * Normally, not a problem, but with external api calls or tons of image/users, ajax

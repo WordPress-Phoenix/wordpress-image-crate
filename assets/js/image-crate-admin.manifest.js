@@ -1,5 +1,6 @@
 
 var ImageCrateController = require('./controllers/image-crate-controller.js'),
+    StockPhotoThumb = require('./views/browser/image-crate-photo.js'),
     StockPhotosModel = require('./models/image-crate-photo-model.js'),
     StockPhotoBrowser = require('./views/browser/image-crate-photos.js'),
     coreCreateStates = wp.media.view.MediaFrame.Post.prototype.createStates,
@@ -93,7 +94,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 state.set('image_crate_photos', collection);
             }
 
-            this.content.set( new StockPhotoBrowser({
+            this.content.set(new StockPhotoBrowser({
                 className: 'image-crate attachments-browser',
                 controller: this,
                 collection: collection,
@@ -101,8 +102,8 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 model: state,
                 filters: false,
                 date: false,
-            }) );
-
+                AttachmentView: StockPhotoThumb
+            }));
         },
 
         loadGetty: function () {
@@ -110,20 +111,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
         }
     }
 });
-
-// var coreAttachmentRender = wp.media.view.Attachment.prototype.render;
-// wp.media.view.Attachment.prototype.render = function() {
-//     var options = this.options || {};
-//     if ('image-crate' == this.controller.state().get('id')) {
-//         //todo: medium sizes are loading for some reason, needs to load thumbnail
-//         // var sizes = this.model.get('sizes');
-//         // options.size = sizes.thumbnail.url;
-//     }
-//     coreAttachmentRender.apply( this, arguments );
-//
-//     return this;
-// };
-
 
 wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
     coreBindHandlers.apply(this, arguments);

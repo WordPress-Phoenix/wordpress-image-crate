@@ -116,12 +116,18 @@ class Image_Crate_Api {
 			'sizes' => array(
 				'thumbnail' => array(
 					'url' => $attachment['thumbUrl'],
+					'width' => $attachment['width'],
+					'height' => $attachment['height'],
 				),
 				'full' => array(
 					'url' => $attachment['fullUrl'],
+					'width'  => $attachment['width'],
+					'height' => $attachment['height'],
 				),
 				'large'   => array(
 					'url' => $attachment['previewUrl'],
+					'width'  => $attachment['width'],
+					'height' => $attachment['height'],
 				),
 			),
 			//'download_uri' => sprintf( '%s?auto_download=false', $attachment['fullUrl'] ) ,
