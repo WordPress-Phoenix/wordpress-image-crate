@@ -1,27 +1,52 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 /**
  * Image_Crate_Api Class
+ *
+ * Handle returned data for image source
  *
  * @version  0.1.1
  * @package  WP_Image_Crate
  * @author   justintucker
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 class Image_Crate_Api {
 
+	/**
+	 * Key for image source endpoint
+	 *
+	 * @var string
+	 */
 	private $key;
+
+	/**
+	 * Secret for image source endpoint
+	 *
+	 * @var string
+	 */
 	private $secret;
+
+	/**
+	 * Image source endpoint to hit
+	 *
+	 * @var string
+	 */
 	private $api_url;
+
+	/**
+	 * Directory where to store images
+	 *
+	 * @var string
+	 */
 	public $directory;
 
+	/**
+	 * Setup image source calls and filters
+	 */
 	public function __construct() {
-		// todo: obviously these values need to live somewhere else
 		$this->key = USAT_API_KEY;
 		$this->secret = USAT_API_SECRET;
 		$this->api_url = "http://www.usatodaysportsimages.com/api/searchAPI/";
@@ -33,13 +58,18 @@ class Image_Crate_Api {
 		add_filter( 'image_send_to_editor', array( $this, 'send_to_editor' ), 10, 1 );
 	}
 
+	/**
+	 * Request image data from source
+	 *
+	 * @param string $phrase Search phrase to make the call
+	 * @param string $page Offset to return a new 'page'
+	 * @param string $per_page Amount to show per page
+	 *
+	 * @return array|bool
+	 */
 	public function fetch( $phrase, $page, $per_page ) {
-
-		// todo: maybe add filters for expansion
 		// One thing to note about this, if you add other parameters to the call you need to append them to
 		// the sigBase variable in Alphabetical order or the call will fail.
-
-		// Oauth Params
 		$baseUrl              = $this->api_url;
 		$consumerKey          = $this->key;
 		$consumerSecret       = $this->secret;
@@ -50,9 +80,9 @@ class Image_Crate_Api {
 		$limit                = $per_page;
 		$mode                 = 'phrase';
 		$offset               = $page;
-		$terms                = $phrase; // todo: make this format friendly to usa today
+		$terms                = $phrase;
 
-		//generate signature
+		// Generate signature
 		$sigBase = "GET&" . rawurlencode( $baseUrl ) . "&"
 		           . rawurlencode( "limit=" . $limit
                    . "&mode=" . $mode
@@ -67,7 +97,7 @@ class Image_Crate_Api {
 		$sigKey   = $consumerSecret . "&";
 		$oauthSig = base64_encode( hash_hmac( "sha1", $sigBase, $sigKey, true ) );
 
-		//generate full request URL
+		// Generate full request URL
 		$requestUrl = $baseUrl . "?"
 		              . "&limit=" . $limit
 		              . "&mode=" . rawurlencode( $mode )
@@ -80,7 +110,7 @@ class Image_Crate_Api {
 		              . "&offset=" . $offset
 		              . "&terms=" . rawurlencode( $terms );
 
-		//make call
+		// Make call
 		$response = wp_remote_get( $requestUrl, array(
 			'method'  => 'GET',
 			'timeout' => 10,
@@ -100,13 +130,25 @@ class Image_Crate_Api {
 		return $images;
 	}
 
+	/**
+	 * Iterate over results to map data
+	 *
+	 * @param array $attachments raw data from the remote call
+	 *
+	 * @return array Image data formatted to what WordPress expects
+	 */
 	public function prepare_attachments( $attachments ) {
 		return array_map( array( $this, 'prepare_attachment_for_js' ), $attachments );
 	}
 
+	/**
+	 * Map requested image data to what WordPress expects
+	 *
+	 * @param array $attachment
+	 *
+	 * @return array Formatted data backbone collections
+	 */
 	private function prepare_attachment_for_js( $attachment ) {
-
-		// how usat sends over data
 		return array(
 			'id' => $attachment['imgId'],
 			'title' => $attachment['headline'],
@@ -130,7 +172,6 @@ class Image_Crate_Api {
 					'height' => $attachment['height'],
 				),
 			),
-			//'download_uri' => sprintf( '%s?auto_download=false', $attachment['fullUrl'] ) ,
 			'download_uri' => $attachment['fullUrl'],
 			'max_width' => $attachment['width'],
 			'max_height' => $attachment['height'],
@@ -138,25 +179,20 @@ class Image_Crate_Api {
 	}
 
 	/**
-	 * Set up image path to point to new getty image location
+	 * Set up image path to point to new $directory location
 	 *
-	 * @param   array $response array of prepared attachment data.
+	 * @param array $response array of prepared attachment data.
 	 *
-	 * @return  string              array of updated attachment data.
+	 * @return array Updated attachment data.
 	 */
 	public function update_media_modal_file_refs( $response ) {
-
 		if ( preg_match( "/" . $this->directory . "/", $response['url'] ) ) {
-
 			$response['url'] = $this->set_image_path( $response['url'] );
-
 			if ( isset( $response['sizes'] ) ) {
-
 				foreach ( $response['sizes'] as $key => $size ) {
 					$response['sizes'][ $key ]['url'] = $this->set_image_path( $size['url'] );
 				}
 			}
-
 		}
 
 		return $response;
@@ -170,10 +206,9 @@ class Image_Crate_Api {
 	 *
 	 * @param   string|array $image_path Default image source
 	 *
-	 * @return  string|array                    Updated image src to include 'getty-images'
+	 * @return  string|array Updated image src to include 'getty-images'
 	 */
 	public function set_image_path( $image_path ) {
-
 		// Make sure image path url is a string
 		if ( is_array( $image_path ) ) {
 			$image_path_url = $image_path[0];
@@ -204,10 +239,9 @@ class Image_Crate_Api {
 	 *
 	 * @param   array $sources One or more arrays of source data to include in the 'srcset'.
 	 *
-	 * @return  array               Array with updated src in urls
+	 * @return  array Data with updated src in urls
 	 */
 	public function update_scrset_attr( $sources ) {
-
 		foreach ( $sources as $key => $source ) {
 			if ( preg_match( "/" . $this->directory . "/", $sources[ $key ]['url'] ) ) {
 				$sources[ $key ]['url'] = $this->set_image_path( $source['url'] );
@@ -223,7 +257,7 @@ class Image_Crate_Api {
 	 *
 	 * @param   string $html Image markup sent to the editor
 	 *
-	 * @return  string|array             Updated markup with 'getty-images' in src
+	 * @return  string|array Updated markup with 'getty-images' in src
 	 */
 	public function send_to_editor( $html ) {
 		return $this->set_image_path( $html );

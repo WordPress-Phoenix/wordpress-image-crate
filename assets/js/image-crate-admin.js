@@ -25,7 +25,6 @@ var ImageCrateController = wp.media.controller.Library.extend({
         }
         wp.media.controller.Library.prototype.initialize.apply(this, arguments);
     }
-
 });
 
 module.exports = ImageCrateController;
@@ -41,13 +40,14 @@ var ImageCrateController = require('./controllers/image-crate-controller.js'),
 _.extend( wp.media.view.MediaFrame.prototype, {
     image_crate: {
         activate: function () {
-            // todo: am I using this correctly
             // todo: goal to more image providers as tabs
             var view = _.first(this.views.get('.media-frame-router')),
                 viewSettings = {};
 
-            viewSettings.usatoday = {text: 'USA Today Sports', priority: 60};
-            // viewSettings.getty = {text: 'Getty Images', priority: 80};
+            viewSettings.usatoday = {
+                text: 'USA Today Sports',
+                priority: 60
+            };
             view.set(viewSettings);
 
             this.content.mode('usatoday');
@@ -62,7 +62,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                         style: 'primary',
                         text: 'Download Image',
                         priority: 80,
-                        // todo: why does require selection only work if at least one image is in the library
+                        // todo: fix bug where require selection only works if at least one image is in the library
                         requires: {
                             library: true,
                             selection: true
@@ -81,6 +81,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                                     filename: selection.models[0].get('filename'),
                                     id: selection.models[0].get('id'),
                                     download_uri: selection.models[0].get('download_uri')
+                                    // todo: add nonces
                                     // nonce: this.model.get('nonces').download
                                 }
                             }).done(function (attachment) {
@@ -99,8 +100,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                                 browse.get('gallery').$('li:first .thumbnail').click();
 
                             });
-
-                            // controller.close();
                         }
                     }
                 }
@@ -137,10 +136,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 AttachmentView: StockPhotoThumb
             }));
         },
-
-        loadGetty: function () {
-            console.log('getty ready');
-        }
     }
 });
 
@@ -153,9 +148,7 @@ wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
 
     this.on('toolbar:create:image-crate-toolbar', this.image_crate.createToolbar, this);
 
-    this.on('content:render:getty', this.image_crate.loadGetty, this);
     this.on('content:render:usatoday', this.image_crate.loadUSAT, this);
-
 };
 
 wp.media.view.MediaFrame.Post.prototype.createStates = function () {
@@ -171,15 +164,12 @@ var StockPhotos = wp.media.model.Attachments.extend({
     initialize: function (models, options) {
         wp.media.model.Attachments.prototype.initialize.call(this, models, options);
     },
-
-    // todo: bug - page query/load on scroll
     // todo: bug - state to display when first opening frame
     _requery: function (refresh) {
         var props;
 
         if ( this.props.get('query') ) {
             props = this.props.toJSON();
-            // console.log( props );
             props.cache = ( true !== refresh );
             this.mirror( StockPhotosQuery.get( props ) );
         }
@@ -231,30 +221,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
                 fallback = Attachments.prototype.sync ? Attachments.prototype : Backbone;
                 return fallback.sync.apply(this, arguments);
             }
-
-            // var args;
-            //
-            // // Overload the read method so Attachment.fetch() functions correctly.
-            // options = options || {};
-            // options.context = this;
-            // // todo: cleaner way to do this?
-            // options.data = _.extend(options.data || {}, {
-            //     action: 'image_crate_get'
-            // });
-            //
-            // // Clone the args so manipulation is non-destructive.
-            // args = _.clone(this.args);
-            // // Determine which page to query.
-            // if (-1 !== args.posts_per_page) {
-            //     args.paged = Math.round(this.length / args.posts_per_page) + 1;
-            // }
-            //
-            // options.data.query = args;
-            // // console.log(  options );
-            // return wp.media.ajax(options);
-
         }
-
     },
     {
         /**
@@ -319,7 +286,6 @@ var StockPhotosQuery = wp.media.model.Query.extend({
 module.exports = StockPhotosQuery;
 
 },{}],5:[function(require,module,exports){
-/* global module, wpaas_stock_photos */
 var StockPhotoThumb = wp.media.view.Attachment.extend({
 
     render: function () {
@@ -390,11 +356,9 @@ module.exports = StockPhotoThumb;
 /* global require */
 
 var ImageCrateSearch = require('./search.js'),
-    coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize,
-    coreAttachmentsCreateSingle  = wp.media.view.AttachmentsBrowser.prototype.createSingle;
+    coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize;
 
 var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
-
     tagName: 'div',
     className: 'image-crate attachments-browser',
 
@@ -408,19 +372,15 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
 
     initialize: function () {
         coreAttachmentsInitialize.apply(this, arguments);
-
         this.toolbar.set('search', new ImageCrateSearch({
             controller: this.controller,
             model: this.collection.props,
             priority: 60
         }).render())
-
     }
-
 });
 
 module.exports = StockPhotosBrowser;
-
 },{"./search.js":7}],7:[function(require,module,exports){
 /**
  * There's a bug in core where searches aren't debounced in the media library.

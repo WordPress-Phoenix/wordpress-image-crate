@@ -1,4 +1,8 @@
-/* global module, wpaas_stock_photos */
+/**
+ * wp.media.view.StockPhotoThumb
+ *
+ * @augments wp.media.view.Attachment
+ */
 var StockPhotoThumb = wp.media.view.Attachment.extend({
 
     render: function () {

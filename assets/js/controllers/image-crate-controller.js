@@ -1,3 +1,10 @@
+/**
+ * wp.media.controller.ImageCrateController
+ *
+ * A state for downloading images from an external image source
+ *
+ * @augments wp.media.controller.Library
+ */
 var ImageCrateController = wp.media.controller.Library.extend({
     defaults: _.defaults({
         id: 'image-crate',
@@ -18,13 +25,11 @@ var ImageCrateController = wp.media.controller.Library.extend({
     }, wp.media.controller.Library.prototype.defaults ),
 
     initialize: function () {
-        // todo: Using this correctly
         if (!this.get('library')) {
             this.set('library', wp.media.query({ imagecrate: true }) );
         }
         wp.media.controller.Library.prototype.initialize.apply(this, arguments);
     }
-
 });
 
 module.exports = ImageCrateController;

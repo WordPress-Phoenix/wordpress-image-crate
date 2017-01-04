@@ -1,30 +1,43 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 /**
  * Image_Crate_Ajax Class
+ *
+ * AJAX Event Handler.
  *
  * @version  0.1.1
  * @package  WP_Image_Crate
  * @author   justintucker
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 class Image_Crate_Ajax {
 
+	/**
+	 * Holds api object for making data calls.
+	 *
+	 * @var object
+	 */
 	private $api = null;
 
-	function __construct( $api ) {
+	/**
+	 * Setup api class connections
+	 *
+	 * @param $api
+	 */
+	public function __construct( $api ) {
 		$this->api = $api;
 
 		add_action( 'wp_ajax_image_crate_get', array( $this, 'get' ) );
 		add_action( 'wp_ajax_image_crate_download', array( $this, 'download') );
 	}
 
+	/**
+	 * Get images and send them to the media modal.
+	 */
 	public function get() {
-
 		// todo: need to add a filter here. fansided users are not allowed to upload files
 		if ( ! current_user_can( 'upload_files' ) ) {
 			wp_send_json_error();
@@ -48,9 +61,7 @@ class Image_Crate_Ajax {
 		$images = $this->api->prepare_attachments( $images );
 		$images = array_filter( $images );
 
-
 		return wp_send_json_success( $images );
-
 	}
 
 	/**
@@ -58,6 +69,7 @@ class Image_Crate_Ajax {
 	 */
 	public function download() {
 
+		// todo: add in nonces
 		//if ( ! isset( $_POST['filename'], $_POST['id'], $_POST['nonce'] ) ) {
 		//	wp_send_json_error();
 		//}
@@ -67,7 +79,7 @@ class Image_Crate_Ajax {
 
 		//check_ajax_referer( 'image_crate_download_' . $id, 'nonce' );
 
-		$import   = new Image_Crate_Import();
+		$import = new Image_Crate_Import();
 		$dir = $this->api->directory;
 		$image_id = $import->image( $service_image_id, $filename, $dir );
 
@@ -82,6 +94,5 @@ class Image_Crate_Ajax {
 		}
 
 		wp_send_json_success( $attachment );
-
 	}
 }

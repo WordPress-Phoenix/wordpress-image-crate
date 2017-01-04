@@ -1,39 +1,19 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 /**
- * Image_Crate_Import Class
+ * Image_Crate_Api Class
+ *
+ * Handle returned data for image source
  *
  * @version  0.1.1
  * @package  WP_Image_Crate
  * @author   justintucker
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 final class Image_Crate_Import {
-
-	/**
-	 * Custom Directory for image storage
-	 * @var string
-	 */
-	//private $directory;
-
-	/**
-	 * Get this party started
-	 *
-	 * todo: maybe fix collection not loading, unless attachments have been loaded
-	 */
-	public function __construct() {
-		/*
-		 * Update image source urls for images uploaded to the getty api
-		 */
-		//add_filter( 'wp_prepare_attachment_for_js', array( $this, 'update_media_modal_file_refs' ), 99, 1 );
-		//add_filter( 'wp_get_attachment_image_src', array( $this, 'set_image_path' ) );
-		//add_filter( 'wp_calculate_image_srcset', array( $this, 'update_scrset_attr' ), 10, 1 );
-		//add_filter( 'image_send_to_editor', array( $this, 'send_to_editor' ), 10, 1 );
-	}
 
 	/**
 	 * Import image from an url
@@ -166,7 +146,6 @@ final class Image_Crate_Import {
 		$file = $new_file;
 
 		return $file;
-
 	}
 
 	/**
@@ -177,9 +156,7 @@ final class Image_Crate_Import {
 	 * @return bool
 	 */
 	private function delete_file( $filepath ) {
-
 		return is_readable( $filepath ) ? @unlink( $filepath ) : false;
-
 	}
 
 	/**
@@ -191,7 +168,6 @@ final class Image_Crate_Import {
 	 * @return int Post attachment id
 	 */
 	public function check_attachment( $post_name, $call_type = 'remote' ) {
-
 		// Switch to another blog to check post existence.
 		if ( $call_type == 'remote' && is_multisite() ) {
 			//$site = get_current_site();
@@ -224,7 +200,6 @@ final class Image_Crate_Import {
 	 * @return  array Filtered upload dir locations
 	 */
 	public function set_upload_dir( $upload ) {
-
 		$upload['subdir']  = '/' . $this->directory . $upload['subdir'];
 		$upload['basedir'] = WP_CONTENT_DIR . '/uploads';
 		$upload['baseurl'] = content_url() . '/uploads';
@@ -232,6 +207,5 @@ final class Image_Crate_Import {
 		$upload['url']     = $upload['baseurl'] . $upload['subdir'];
 
 		return $upload;
-
 	}
 }

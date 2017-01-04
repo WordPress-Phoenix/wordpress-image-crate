@@ -1,9 +1,8 @@
 /**
- * There's a bug in core where searches aren't debounced in the media library.
- * Normally, not a problem, but with external api calls or tons of image/users, ajax
- * calls could effect server performance. This fixes that for now.
+ * wp.media.view.ImageCrateSearch
+ *
+ * @augments wp.media.view.Search
  */
-
 var ImageCrateSearch = wp.media.View.extend({
     tagName: 'input',
     className: 'search ic-search',
@@ -31,6 +30,11 @@ var ImageCrateSearch = wp.media.View.extend({
         this.deBounceSearch(event);
     },
 
+    /**
+     * There's a bug in core where searches aren't debounced in the media library.
+     * Normally, not a problem, but with external api calls or tons of image/users, ajax
+     * calls could effect server performance. This fixes that for now.
+     */
     deBounceSearch: _.debounce(function (event) {
         if (event.target.value) {
             this.model.set('search', event.target.value);

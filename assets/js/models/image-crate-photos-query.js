@@ -1,3 +1,10 @@
+/**
+ * wp.media.model.Query
+ *
+ * A collection of attachments from the external data source.
+ *
+ * @augments wp.media.model.Query
+ */
 var StockPhotosQuery = wp.media.model.Query.extend({
 
         /**
@@ -40,30 +47,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
                 fallback = Attachments.prototype.sync ? Attachments.prototype : Backbone;
                 return fallback.sync.apply(this, arguments);
             }
-
-            // var args;
-            //
-            // // Overload the read method so Attachment.fetch() functions correctly.
-            // options = options || {};
-            // options.context = this;
-            // // todo: cleaner way to do this?
-            // options.data = _.extend(options.data || {}, {
-            //     action: 'image_crate_get'
-            // });
-            //
-            // // Clone the args so manipulation is non-destructive.
-            // args = _.clone(this.args);
-            // // Determine which page to query.
-            // if (-1 !== args.posts_per_page) {
-            //     args.paged = Math.round(this.length / args.posts_per_page) + 1;
-            // }
-            //
-            // options.data.query = args;
-            // // console.log(  options );
-            // return wp.media.ajax(options);
-
         }
-
     },
     {
         /**
