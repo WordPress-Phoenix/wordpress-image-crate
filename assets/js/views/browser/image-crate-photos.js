@@ -5,13 +5,9 @@
  * @augments wp.media.view.AttachmentsBrowser
  */
 var ImageCrateSearch = require('./search.js'),
+    NoResults = require('./no-results.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize;
 
-var NoResults = wp.media.view.UploaderInline.extend({
-    tagName: 'div',
-    className: 'image-crate-no-results',
-    template: wp.template('image-crate-no-results'),
-});
 
 var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
     tagName: 'div',
@@ -35,13 +31,10 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
     },
 
     createUploader: function () {
-        // TODO: THIS IS CAUSING A CLASS NAME ERROR
         this.uploader = new NoResults({
             controller: this.controller,
             status: false,
-            message: 'No Images boi'
-            // message: this.controller.isModeActive('grid') ? '' : l10n.noItemsFound,
-            // canClose: this.controller.isModeActive('grid')
+            message: 'Sorry, No images were found.'
         });
 
         this.uploader.hide();

@@ -385,121 +385,9 @@ module.exports = StockPhotoThumb;
  * @augments wp.media.view.AttachmentsBrowser
  */
 var ImageCrateSearch = require('./search.js'),
+    NoResults = require('./no-results.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize;
 
-var NoResults = wp.media.view.UploaderInline.extend({
-    tagName: 'div',
-    className: 'image-crate-no-results',
-    template: wp.template('image-crate-no-results'),
-
-    events: {
-        'click .close': 'hide'
-    },
-
-    initialize: function () {
-        _.defaults(this.options, {
-            message: '',
-            status: true,
-            canClose: false
-        });
-
-        if (!this.options.$browser && this.controller.uploader) {
-            this.options.$browser = this.controller.uploader.$browser;
-        }
-
-        if (_.isUndefined(this.options.postId)) {
-            this.options.postId = wp.media.view.settings.post.id;
-        }
-
-        if (this.options.status) {
-            this.views.set('.upload-inline-status', new wp.media.view.UploaderStatus({
-                controller: this.controller
-            }));
-        }
-    },
-
-    prepare: function () {
-        var suggestedWidth = this.controller.state().get('suggestedWidth'),
-            suggestedHeight = this.controller.state().get('suggestedHeight'),
-            data = {};
-
-        data.message = this.options.message;
-        data.canClose = this.options.canClose;
-
-        if (suggestedWidth && suggestedHeight) {
-            data.suggestedWidth = suggestedWidth;
-            data.suggestedHeight = suggestedHeight;
-        }
-
-        return data;
-    },
-    /**
-     * @returns {wp.media.view.UploaderInline} Returns itself to allow chaining
-     */
-    dispose: function () {
-        if (this.disposing) {
-            /**
-             * call 'dispose' directly on the parent class
-             */
-            return View.prototype.dispose.apply(this, arguments);
-        }
-
-        // Run remove on `dispose`, so we can be sure to refresh the
-        // uploader with a view-less DOM. Track whether we're disposing
-        // so we don't trigger an infinite loop.
-        this.disposing = true;
-        return this.remove();
-    },
-    /**
-     * @returns {wp.media.view.UploaderInline} Returns itself to allow chaining
-     */
-    remove: function () {
-        /**
-         * call 'remove' directly on the parent class
-         */
-        var result = View.prototype.remove.apply(this, arguments);
-
-        _.defer(_.bind(this.refresh, this));
-        return result;
-    },
-
-    refresh: function () {
-        var uploader = this.controller.uploader;
-
-        if (uploader) {
-            uploader.refresh();
-        }
-    },
-    /**
-     * @returns {wp.media.view.UploaderInline}
-     */
-    ready: function () {
-        var $browser = this.options.$browser,
-            $placeholder;
-
-        if (this.controller.uploader) {
-            $placeholder = this.$('.browser');
-
-            // Check if we've already replaced the placeholder.
-            if ($placeholder[0] === $browser[0]) {
-                return;
-            }
-
-            $browser.detach().text($placeholder.text());
-            $browser[0].className = $placeholder[0].className;
-            $placeholder.replaceWith($browser.show());
-        }
-
-        this.refresh();
-        return this;
-    },
-    show: function () {
-        this.$el.removeClass('hidden');
-    },
-    hide: function () {
-        this.$el.addClass('hidden');
-    }
-});
 
 var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
     tagName: 'div',
@@ -526,9 +414,7 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
         this.uploader = new NoResults({
             controller: this.controller,
             status: false,
-            message: 'No Images boi'
-            // message: this.controller.isModeActive('grid') ? '' : l10n.noItemsFound,
-            // canClose: this.controller.isModeActive('grid')
+            message: 'Sorry, No images were found.'
         });
 
         this.uploader.hide();
@@ -537,7 +423,45 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
 });
 
 module.exports = StockPhotosBrowser;
-},{"./search.js":7}],7:[function(require,module,exports){
+},{"./no-results.js":7,"./search.js":8}],7:[function(require,module,exports){
+/**
+ * wp.media.view.NoResults
+ *
+ * @augments wp.media.view.UploaderInline
+ */
+var UploaderInline = wp.media.view.UploaderInline,
+    NoResults;
+
+NoResults = UploaderInline.extend({
+    tagName: 'div',
+    className: 'image-crate-no-results uploader-inline',
+    template: wp.template('image-crate-no-results'),
+
+    ready: function () {
+        var $browser = this.options.$browser,
+            $placeholder;
+
+        if (this.controller.uploader) {
+            $placeholder = this.$('.browser');
+
+            // Check if we've already replaced the placeholder.
+            if ($placeholder[0] === $browser[0]) {
+                return;
+            }
+
+            $browser.detach().text($placeholder.text());
+            $browser[0].className = 'browser button button-hero';
+            $placeholder.replaceWith($browser.show());
+        }
+
+        this.refresh();
+        return this;
+    }
+});
+
+module.exports = NoResults;
+
+},{}],8:[function(require,module,exports){
 /**
  * wp.media.view.ImageCrateSearch
  *
