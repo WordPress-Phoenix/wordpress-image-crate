@@ -1,4 +1,11 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/**
+ * wp.media.controller.ImageCrateController
+ *
+ * A state for downloading images from an external image source
+ *
+ * @augments wp.media.controller.Library
+ */
 var ImageCrateController = wp.media.controller.Library.extend({
     defaults: _.defaults({
         id: 'image-crate',
@@ -19,7 +26,6 @@ var ImageCrateController = wp.media.controller.Library.extend({
     }, wp.media.controller.Library.prototype.defaults ),
 
     initialize: function () {
-        // todo: Using this correctly
         if (!this.get('library')) {
             this.set('library', wp.media.query({ imagecrate: true }) );
         }
@@ -156,7 +162,14 @@ wp.media.view.MediaFrame.Post.prototype.createStates = function () {
     this.states.add(new ImageCrateController);
 };
 },{"./controllers/image-crate-controller.js":1,"./models/image-crate-photo-model.js":3,"./views/browser/image-crate-photo.js":5,"./views/browser/image-crate-photos.js":6}],3:[function(require,module,exports){
-/* global require */
+/**
+ * wp.media.model.StockPhotosQuery
+ *
+ * A collection of attachments.
+ *
+ * @class
+ * @augments wp.media.model.Attachments
+ */
 var StockPhotosQuery = require('./image-crate-photos-query');
 
 var StockPhotos = wp.media.model.Attachments.extend({
@@ -179,6 +192,13 @@ var StockPhotos = wp.media.model.Attachments.extend({
 module.exports = StockPhotos;
 
 },{"./image-crate-photos-query":4}],4:[function(require,module,exports){
+/**
+ * wp.media.model.Query
+ *
+ * A collection of attachments from the external data source.
+ *
+ * @augments wp.media.model.Query
+ */
 var StockPhotosQuery = wp.media.model.Query.extend({
 
         /**
@@ -286,6 +306,11 @@ var StockPhotosQuery = wp.media.model.Query.extend({
 module.exports = StockPhotosQuery;
 
 },{}],5:[function(require,module,exports){
+/**
+ * wp.media.view.StockPhotoThumb
+ *
+ * @augments wp.media.view.Attachment
+ */
 var StockPhotoThumb = wp.media.view.Attachment.extend({
 
     render: function () {
@@ -353,10 +378,128 @@ var StockPhotoThumb = wp.media.view.Attachment.extend({
 module.exports = StockPhotoThumb;
 
 },{}],6:[function(require,module,exports){
-/* global require */
-
+/**
+ * wp.media.view.StockPhotosBrowser
+ *
+ * @class
+ * @augments wp.media.view.AttachmentsBrowser
+ */
 var ImageCrateSearch = require('./search.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize;
+
+var NoResults = wp.media.view.UploaderInline.extend({
+    tagName: 'div',
+    className: 'image-crate-no-results',
+    template: wp.template('image-crate-no-results'),
+
+    events: {
+        'click .close': 'hide'
+    },
+
+    initialize: function () {
+        _.defaults(this.options, {
+            message: '',
+            status: true,
+            canClose: false
+        });
+
+        if (!this.options.$browser && this.controller.uploader) {
+            this.options.$browser = this.controller.uploader.$browser;
+        }
+
+        if (_.isUndefined(this.options.postId)) {
+            this.options.postId = wp.media.view.settings.post.id;
+        }
+
+        if (this.options.status) {
+            this.views.set('.upload-inline-status', new wp.media.view.UploaderStatus({
+                controller: this.controller
+            }));
+        }
+    },
+
+    prepare: function () {
+        var suggestedWidth = this.controller.state().get('suggestedWidth'),
+            suggestedHeight = this.controller.state().get('suggestedHeight'),
+            data = {};
+
+        data.message = this.options.message;
+        data.canClose = this.options.canClose;
+
+        if (suggestedWidth && suggestedHeight) {
+            data.suggestedWidth = suggestedWidth;
+            data.suggestedHeight = suggestedHeight;
+        }
+
+        return data;
+    },
+    /**
+     * @returns {wp.media.view.UploaderInline} Returns itself to allow chaining
+     */
+    dispose: function () {
+        if (this.disposing) {
+            /**
+             * call 'dispose' directly on the parent class
+             */
+            return View.prototype.dispose.apply(this, arguments);
+        }
+
+        // Run remove on `dispose`, so we can be sure to refresh the
+        // uploader with a view-less DOM. Track whether we're disposing
+        // so we don't trigger an infinite loop.
+        this.disposing = true;
+        return this.remove();
+    },
+    /**
+     * @returns {wp.media.view.UploaderInline} Returns itself to allow chaining
+     */
+    remove: function () {
+        /**
+         * call 'remove' directly on the parent class
+         */
+        var result = View.prototype.remove.apply(this, arguments);
+
+        _.defer(_.bind(this.refresh, this));
+        return result;
+    },
+
+    refresh: function () {
+        var uploader = this.controller.uploader;
+
+        if (uploader) {
+            uploader.refresh();
+        }
+    },
+    /**
+     * @returns {wp.media.view.UploaderInline}
+     */
+    ready: function () {
+        var $browser = this.options.$browser,
+            $placeholder;
+
+        if (this.controller.uploader) {
+            $placeholder = this.$('.browser');
+
+            // Check if we've already replaced the placeholder.
+            if ($placeholder[0] === $browser[0]) {
+                return;
+            }
+
+            $browser.detach().text($placeholder.text());
+            $browser[0].className = $placeholder[0].className;
+            $placeholder.replaceWith($browser.show());
+        }
+
+        this.refresh();
+        return this;
+    },
+    show: function () {
+        this.$el.removeClass('hidden');
+    },
+    hide: function () {
+        this.$el.addClass('hidden');
+    }
+});
 
 var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
     tagName: 'div',
@@ -377,17 +520,29 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
             model: this.collection.props,
             priority: 60
         }).render())
-    }
+    },
+
+    createUploader: function () {
+        this.uploader = new NoResults({
+            controller: this.controller,
+            status: false,
+            message: 'No Images boi'
+            // message: this.controller.isModeActive('grid') ? '' : l10n.noItemsFound,
+            // canClose: this.controller.isModeActive('grid')
+        });
+
+        this.uploader.hide();
+        this.views.add(this.uploader);
+    },
 });
 
 module.exports = StockPhotosBrowser;
 },{"./search.js":7}],7:[function(require,module,exports){
 /**
- * There's a bug in core where searches aren't debounced in the media library.
- * Normally, not a problem, but with external api calls or tons of image/users, ajax
- * calls could effect server performance. This fixes that for now.
+ * wp.media.view.ImageCrateSearch
+ *
+ * @augments wp.media.view.Search
  */
-
 var ImageCrateSearch = wp.media.View.extend({
     tagName: 'input',
     className: 'search ic-search',
@@ -415,6 +570,11 @@ var ImageCrateSearch = wp.media.View.extend({
         this.deBounceSearch(event);
     },
 
+    /**
+     * There's a bug in core where searches aren't debounced in the media library.
+     * Normally, not a problem, but with external api calls or tons of image/users, ajax
+     * calls could effect server performance. This fixes that for now.
+     */
     deBounceSearch: _.debounce(function (event) {
         if (event.target.value) {
             this.model.set('search', event.target.value);
