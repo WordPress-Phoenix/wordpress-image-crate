@@ -21,6 +21,7 @@ class Image_Crate_Scripts {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), PHP_INT_MAX );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), PHP_INT_MAX );
 		add_action( 'admin_print_styles', array( $this, 'alter_attachment_thumb_display'), PHP_INT_MAX);
+		add_action( 'print_media_templates', array( $this, 'no_results_template') );
 	}
 
 	/**
@@ -59,5 +60,25 @@ class Image_Crate_Scripts {
 				'page_title' => __( 'Image Crate', 'image-crate' )
 			)
 		);
+	}
+
+	/**
+	 * Append custom template to body
+	 */
+	public function no_results_template() {
+        ?>
+        <script type="text/html" id="tmpl-image-crate-no-results">
+            <# var messageClass = data.message ? 'has-upload-message' : 'no-upload-message'; #>
+            <div class="uploader-inline-content {{ messageClass }}">
+                <# if ( data.message ) { #>
+                    <h2 class="upload-message">{{ data.message }}</h2>
+                <# } #>
+
+                <div class="upload-ui">
+                    <h2 class="upload-instructions drop-instructions"><?php _e( 'Please search for a different term.' ); ?></h2>
+                </div>
+            </div>
+        </script>
+        <?php
 	}
 }
