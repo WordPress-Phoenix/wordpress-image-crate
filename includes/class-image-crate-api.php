@@ -56,6 +56,7 @@ class Image_Crate_Api {
 		add_filter( 'wp_get_attachment_image_src', array( $this, 'set_image_path' ) );
 		add_filter( 'wp_calculate_image_srcset', array( $this, 'update_scrset_attr' ), 10, 1 );
 		add_filter( 'image_send_to_editor', array( $this, 'send_to_editor' ), 10, 1 );
+		add_filter( 'image_get_intermediate_size', array( $this, 'set_image_editor_thumb_url' ), 10, 1 );
 	}
 
 	/**
@@ -232,6 +233,21 @@ class Image_Crate_Api {
 		}
 
 		return $image_path;
+	}
+
+	/**
+	 * Filter edit image thumbnail in admin modal editor
+	 *
+	 * @param $data
+	 *
+	 * @return mixed
+	 */
+	public function set_image_editor_thumb_url( $data ) {
+		if ( stristr($data['url'], $this->directory ) ) {
+			$data['url'] = $this->set_image_path( $data['url'] );
+		}
+
+		return $data;
 	}
 
 	/**
