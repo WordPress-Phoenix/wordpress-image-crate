@@ -66,7 +66,7 @@ final class Image_Crate_Import {
 
 		$image_type = pathinfo( $api_image );
 		$file_name  = basename( $api_image, '.' . $image_type['extension'] );
-		$post_name = sprintf( '%s-%s', $service_image_id, $post_name );
+		//$post_name = sprintf( '%s-%s', $service_image_id, $post_name );
 		$file_array['name'] = str_replace( $file_name, $post_name, $api_image );
 
 		// Do the validation and storage stuff

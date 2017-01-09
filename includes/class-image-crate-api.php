@@ -153,7 +153,7 @@ class Image_Crate_Api {
 		return array(
 			'id' => $attachment['imgId'],
 			'title' => $attachment['headline'],
-			'filename' => $attachment['headline'],
+			'filename' => $attachment['imgId'] . ' ' .$attachment['headline'],
 			'caption' => $attachment['caption'],
 			'type' => 'image',
 			'sizes' => array(

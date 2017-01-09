@@ -81,6 +81,9 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                             this.$el.attr('disabled', 'disabled')
                                     .text('Downloading');
 
+                            console.log( 'filename' );
+                            console.log( selection.models[0].get('filename') );
+
                             wp.media.ajax({
                                 data: {
                                     action: 'image_crate_download',
@@ -94,11 +97,14 @@ _.extend( wp.media.view.MediaFrame.prototype, {
 
                                 var browse = wp.media.frame.content.mode('browse');
                                 browse.get('gallery').collection.add(attachment);
-                                // browse.get('selection').collection.add(attachment);
+                                browse.get('selection').collection.add(attachment);
+                                
+                                console.log( 'attachment' );
+                                console.log(attachment );
 
                                 // This will trigger all mutation observer
-                                // wp.Uploader.queue.add(attachment);
-                                // wp.Uploader.queue.remove(attachment);
+                                wp.Uploader.queue.add(attachment);
+                                wp.Uploader.queue.remove(attachment);
 
                                 // reset back to insert mode for adding post to editor
                                 controller.setState('insert');
