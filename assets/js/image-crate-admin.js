@@ -4,12 +4,14 @@
  *
  * A state for downloading images from an external image source
  *
+ * todo: localize text
+ *
  * @augments wp.media.controller.Library
  */
 var ImageCrateController = wp.media.controller.Library.extend({
     defaults: _.defaults({
         id: 'image-crate',
-        title: 'Image Crate',
+        title: imagecrate.page_title,
         multiple: false,
         menu: 'default',
         router: 'image-crate',
@@ -477,7 +479,7 @@ var ImageCrateSearch = wp.media.View.extend({
 
     attributes: {
         type: 'search',
-        placeholder: 'Search Provider'
+        placeholder: 'Search Images'
     },
 
     events: {

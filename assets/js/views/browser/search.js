@@ -10,7 +10,7 @@ var ImageCrateSearch = wp.media.View.extend({
 
     attributes: {
         type: 'search',
-        placeholder: 'Search Provider'
+        placeholder: 'Search Images'
     },
 
     events: {

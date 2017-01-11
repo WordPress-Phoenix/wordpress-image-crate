@@ -61,9 +61,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                                 browse.get('gallery').collection.add(attachment);
                                 browse.get('selection').collection.add(attachment);
 
-                                console.log( 'attachment' );
-                                console.log(attachment );
-
                                 // This will trigger all mutation observer
                                 wp.Uploader.queue.add(attachment);
                                 wp.Uploader.queue.remove(attachment);
