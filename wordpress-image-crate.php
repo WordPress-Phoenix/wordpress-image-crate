@@ -62,9 +62,9 @@ if ( ! class_exists( 'Image_Crate' ) ) {
 				// builds  the function in global scope
 				function get_custom_option( $s = '', $network_option = false ) {
 					if ( $network_option ) {
-						return get_site_option( image_crate . $s );
+						return get_site_option( IMAGE_CRATE . $s );
 					} else {
-						return get_option( image_crate . $s );
+						return get_option( IMAGE_CRATE . $s );
 					}
 				}
 			}
@@ -88,8 +88,6 @@ if ( ! class_exists( 'Image_Crate' ) ) {
 
 
 		} // END public function __construct
-
-
 
 		/**
 		 * Initialize the plugin - for public (front end)
@@ -158,14 +156,13 @@ if ( ! class_exists( 'Image_Crate' ) ) {
 			// load all files with the pattern class-filename.php from the includes directory
 			foreach ( glob( dirname( __FILE__ ) . '/includes/class-*.php' ) as $class ) {
 				require_once $class;
-				//$this->modules->count ++;
 			}
 		}
 
 		protected function configure_defaults() {
 			// Setup plugins global params
-			if ( ! defined('image_crate') ) {
-				define( 'image_crate', 'image_crate_option_' );
+			if ( ! defined('IMAGE_CRATE') ) {
+				define( 'IMAGE_CRATE', 'image_crate_option_' );
 			}
 			$this->modules        = new stdClass();
 			$this->modules->count = 0;

@@ -4,8 +4,6 @@
  *
  * A state for downloading images from an external image source
  *
- * todo: localize text
- *
  * @augments wp.media.controller.Library
  */
 var ImageCrateController = wp.media.controller.Library.extend({
@@ -181,7 +179,6 @@ var StockPhotos = wp.media.model.Attachments.extend({
     initialize: function (models, options) {
         wp.media.model.Attachments.prototype.initialize.call(this, models, options);
     },
-    // todo: bug - state to display when first opening frame
     _requery: function (refresh) {
         var props;
 

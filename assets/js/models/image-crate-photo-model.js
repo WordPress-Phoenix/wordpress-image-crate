@@ -13,7 +13,6 @@ var StockPhotos = wp.media.model.Attachments.extend({
     initialize: function (models, options) {
         wp.media.model.Attachments.prototype.initialize.call(this, models, options);
     },
-    // todo: bug - state to display when first opening frame
     _requery: function (refresh) {
         var props;
 

@@ -66,7 +66,7 @@ class Image_Crate_Scripts {
 	}
 
 	/**
-	 * Append custom template to body
+	 * Append custom to display no results
 	 */
 	public function no_results_template() {
         ?>
