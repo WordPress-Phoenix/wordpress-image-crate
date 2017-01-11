@@ -45,8 +45,10 @@ class Image_Crate_Api {
 
 	/**
 	 * Setup image source calls and filters
+	 *
+	 * @param $plugin Image_Crate
 	 */
-	public function __construct() {
+	public function __construct( $plugin ) {
 		$this->key = USAT_API_KEY;
 		$this->secret = USAT_API_SECRET;
 		$this->api_url = "http://www.usatodaysportsimages.com/api/searchAPI/";
@@ -57,6 +59,95 @@ class Image_Crate_Api {
 		add_filter( 'wp_calculate_image_srcset', array( $this, 'update_scrset_attr' ), 10, 1 );
 		add_filter( 'image_send_to_editor', array( $this, 'send_to_editor' ), 10, 1 );
 		add_filter( 'image_get_intermediate_size', array( $this, 'set_image_editor_thumb_url' ), 10, 1 );
+		add_filter( 'image_crate_controller_title', array( $this, 'filter_controller_title') );
+		add_action( 'admin_init', array( $this, 'register_fields' ) );
+		add_filter( 'plugin_action_links_'. $plugin->plugin_name , array( $this, 'add_action_links' ) );
+	}
+
+	/**
+	 * Filter page title in media modal.
+	 *
+	 * @param $title
+	 *
+	 * @return mixed
+	 */
+	public function filter_controller_title( $title ) {
+		$title['page_title'] = 'USA Today Sports Images';
+		return $title;
+	}
+
+	/**
+	 * Register default field.
+	 */
+	public function register_fields () {
+		register_setting( 'general', 'image_crate_default_search', 'esc_attr' );
+		add_settings_field(
+			'image_crate_default_search_term',
+			'<label for="image_crate_default_search_term">' . __( 'Image Crate Default Term', 'image_crate_default_search' ) . '</label>',
+			array( $this, 'fields_html' ),
+			'general'
+		);
+	}
+
+	/**
+	 * Output form field markup
+	 */
+	public function fields_html() {
+		$value = get_option( 'image_crate_default_search', '' );
+		echo '<input type="text" id="image_crate_default_search_term" name="image_crate_default_search" value="' . esc_attr( $value ) . '" />';
+	}
+
+	/**
+	 * Set default query
+	 *
+	 * @return string
+	 */
+	public function set_default_query() {
+		global $fs_vip;
+
+		// check if site option
+		$term = get_option( 'image_crate_default_search', false );
+
+		// fallback to api details
+		if ( empty( $term ) ) {
+			$current_site_details = $fs_vip->modules->site_settings->get_details();
+			$location = ! empty( $current_site_details['location'] ) ? $current_site_details['location'] : '';
+			$topic = ! empty( $current_site_details['topic'] ) ? $current_site_details['topic'] : '';
+
+			// format term based on data set
+			if ( $location == '' && $topic != '' ) {
+				$term = $topic;
+			} elseif( $location != '' && $topic != '' ) {
+				$term = sprintf('%s %s', $location, $topic );
+			}
+
+			// remove all from any term
+			$term = str_replace( 'All', '', $term);
+		}
+
+		return $term;
+	}
+
+	/**
+	 * Add settings link to plugin list page
+	 *
+	 * @param $links Current plugin links
+	 *
+	 * @return array Plugin menu data
+	 */
+	public function add_action_links( $links ) {
+		$links[] = '<a href="' . admin_url( 'options-general.php#image_crate_default_search_term' ) . '">Settings</a>';
+
+		return $links;
+	}
+
+	/**
+	 * Get the default query
+	 *
+	 * @return string
+	 */
+	public function get_default_query() {
+		return $this->set_default_query();
 	}
 
 	/**

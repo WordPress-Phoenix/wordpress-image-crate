@@ -42,6 +42,7 @@ if ( ! class_exists( 'Image_Crate' ) ) {
 		public $network;
 		public $current_blog_globals;
 		public $detect;
+		public $plugin_name;
 
 		/**
 		 * Construct the plugin object
@@ -53,6 +54,8 @@ if ( ! class_exists( 'Image_Crate' ) ) {
 			// hook can be used by mu plugins to modify plugin behavior after plugin is setup
 			do_action( get_called_class() . '_preface', $this );
 			define( 'IMAGE_CRATE_URL', plugins_url( basename( __DIR__ ) ) );
+
+			$this->plugin_name = plugin_basename( __FILE__ );
 
 			//simplify getting site options with custom prefix with multisite compatibility
 			if ( ! function_exists( 'get_custom_option' ) ) {
@@ -83,7 +86,10 @@ if ( ! class_exists( 'Image_Crate' ) ) {
 			// hook can be used by mu plugins to modify plugin behavior after plugin is setup
 			do_action( get_called_class() . '_setup', $this );
 
+
 		} // END public function __construct
+
+
 
 		/**
 		 * Initialize the plugin - for public (front end)
@@ -96,7 +102,7 @@ if ( ! class_exists( 'Image_Crate' ) ) {
 			do_action( get_called_class() . '_before_init' );
 
 			new Image_Crate_Scripts();
-			$provider = new Image_Crate_Api();
+			$provider = new Image_Crate_Api( $this );
 			new Image_Crate_Ajax( $provider );
 
 			do_action( get_called_class() . '_after_init' );
