@@ -89,18 +89,14 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                                     action: 'image_crate_download',
                                     filename: selection.models[0].get('filename'),
                                     id: selection.models[0].get('id'),
-                                    download_uri: selection.models[0].get('download_uri')
-                                    // todo: add nonces
-                                    // nonce: this.model.get('nonces').download
+                                    download_uri: selection.models[0].get('download_uri'),
+                                    _ajax_nonce: imagecrate.nonce
                                 }
                             }).done(function (attachment) {
 
                                 var browse = wp.media.frame.content.mode('browse');
                                 browse.get('gallery').collection.add(attachment);
                                 browse.get('selection').collection.add(attachment);
-                                
-                                console.log( 'attachment' );
-                                console.log(attachment );
 
                                 // This will trigger all mutation observer
                                 wp.Uploader.queue.add(attachment);
@@ -226,6 +222,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
                 options.context = this;
                 options.data = _.extend(options.data || {}, {
                     action: 'image_crate_get',
+                    _ajax_nonce: imagecrate.nonce
                 });
 
                 // Clone the args so manipulation is non-destructive.

@@ -26,6 +26,7 @@ var StockPhotosQuery = wp.media.model.Query.extend({
                 options.context = this;
                 options.data = _.extend(options.data || {}, {
                     action: 'image_crate_get',
+                    _ajax_nonce: imagecrate.nonce
                 });
 
                 // Clone the args so manipulation is non-destructive.

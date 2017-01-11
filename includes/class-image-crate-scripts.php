@@ -52,14 +52,17 @@ class Image_Crate_Scripts {
 		}
 
 		$suffix = SCRIPT_DEBUG ? '' : '.min';
-		wp_enqueue_script( 'image-implementor', IC_URL . "/assets/js/image-crate-admin{$suffix}.js", array('media-views'), '0.1.0', true );
+		wp_register_script( 'image-crate', IC_URL . "/assets/js/image-crate-admin{$suffix}.js", array('media-views'), '0.1.0', true );
 
 		wp_localize_script(
 			'image-crate',
-			'crate', array(
-				'page_title' => __( 'Image Crate', 'image-crate' )
-			)
+			'imagecrate', apply_filters('image_crate_controller_title', array(
+				'page_title' => __( 'Image Crate', 'image-crate' ),
+				'nonce' => wp_create_nonce( 'image_crate' )
+			))
 		);
+
+		wp_enqueue_script( 'image-crate' );
 	}
 
 	/**

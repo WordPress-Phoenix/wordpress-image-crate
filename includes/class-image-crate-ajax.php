@@ -38,12 +38,10 @@ class Image_Crate_Ajax {
 	 * Get images and send them to the media modal.
 	 */
 	public function get() {
-		// todo: need to add a filter here. fansided users are not allowed to upload files
-		if ( ! current_user_can( 'upload_files' ) ) {
-			wp_send_json_error();
-		}
 
-		$search_term = isset( $_REQUEST['query']['search'] ) ? $_REQUEST['query']['search'] : false;
+		check_ajax_referer('image_crate');
+
+		$search_term = isset( $_REQUEST['query']['search'] ) ? $_REQUEST['query']['search'] : $this->api->get_default_query();
 		$page = isset( $_REQUEST['query']['paged'] ) ? $_REQUEST['query']['paged'] : 1;
 		$per_page = isset( $_POST['query']['posts_per_page'] ) ? absint( $_POST['query']['posts_per_page'] ) : 40;
 		$page = ( $page * $per_page ) + 1;
@@ -69,15 +67,10 @@ class Image_Crate_Ajax {
 	 */
 	public function download() {
 
-		// todo: add in nonces
-		//if ( ! isset( $_POST['filename'], $_POST['id'], $_POST['nonce'] ) ) {
-		//	wp_send_json_error();
-		//}
+		check_ajax_referer( 'image_crate' );
 
 		$filename = sanitize_file_name( $_POST['filename'] );
 		$service_image_id = absint( $_POST['id'] );
-
-		//check_ajax_referer( 'image_crate_download_' . $id, 'nonce' );
 
 		$import = new Image_Crate_Import();
 		$dir = $this->api->directory;
