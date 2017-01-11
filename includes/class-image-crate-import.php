@@ -170,11 +170,8 @@ final class Image_Crate_Import {
 	public function check_attachment( $post_name, $call_type = 'remote' ) {
 		// Switch to another blog to check post existence.
 		if ( $call_type == 'remote' && is_multisite() ) {
-			//$site = get_current_site();
-			//$site_id = $site->id;
-			// todo: hard coded number for testing, remove for production
-			$site_id = '229';
-			switch_to_blog( $site_id );
+			$site = get_current_site();
+			switch_to_blog( $site->id );
 		}
 
 		global $wpdb;

@@ -3,8 +3,6 @@
  *
  * A state for downloading images from an external image source
  *
- * todo: localize text
- *
  * @augments wp.media.controller.Library
  */
 var ImageCrateController = wp.media.controller.Library.extend({

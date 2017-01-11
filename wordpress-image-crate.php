@@ -62,9 +62,9 @@ if ( ! class_exists( 'Image_Crate' ) ) {
 				// builds  the function in global scope
 				function get_custom_option( $s = '', $network_option = false ) {
 					if ( $network_option ) {
-						return get_site_option( SITEOPTION_PREFIX . $s );
+						return get_site_option( image_crate . $s );
 					} else {
-						return get_option( SITEOPTION_PREFIX . $s );
+						return get_option( image_crate . $s );
 					}
 				}
 			}
@@ -164,9 +164,8 @@ if ( ! class_exists( 'Image_Crate' ) ) {
 
 		protected function configure_defaults() {
 			// Setup plugins global params
-			// TODO: customize with your plugins custom prefix (usually matches your text domain)
-			if ( ! defined('SITEOPTION_PREFIX') ) {
-				define( 'SITEOPTION_PREFIX', 'image_crate_option_' );
+			if ( ! defined('image_crate') ) {
+				define( 'image_crate', 'image_crate_option_' );
 			}
 			$this->modules        = new stdClass();
 			$this->modules->count = 0;
