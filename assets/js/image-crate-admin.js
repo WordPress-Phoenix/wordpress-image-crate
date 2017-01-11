@@ -81,9 +81,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                             this.$el.attr('disabled', 'disabled')
                                     .text('Downloading');
 
-                            console.log( 'filename' );
-                            console.log( selection.models[0].get('filename') );
-
                             wp.media.ajax({
                                 data: {
                                     action: 'image_crate_download',
