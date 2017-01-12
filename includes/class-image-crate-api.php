@@ -170,9 +170,9 @@ class Image_Crate_Api {
 		$oauthSignatureMethod = "HMAC-SHA1";
 		$oauthVersion         = "1.0";
 		$limit                = $per_page;
-		$mode                 = 'phrase';
+		$mode                 = 'bool'; // options include (any, all, phrase, bool)
 		$offset               = $page;
-		$terms                = $phrase . '*'; // asterisk is needed for wildcard searches on usatoday images
+		$terms                = strtolower( $phrase ) . '*'; // asterisk is needed for wildcard searches on usatoday images
 
 		// Generate signature
 		$sigBase = "GET&" . rawurlencode( $baseUrl ) . "&"
