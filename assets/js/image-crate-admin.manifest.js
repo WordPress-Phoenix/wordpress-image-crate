@@ -33,7 +33,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                         priority: 80,
                         // todo: fix bug where require selection only works if at least one image is in the library
                         requires: {
-                            library: true,
+                            // library: true,
                             selection: true
                         },
 
