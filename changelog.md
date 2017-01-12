@@ -1,3 +1,7 @@
+#### 0.1.2
+* Swapped search mode
+* Fixing fixed issue where download button prevented image from downloaded 
+
 #### 0.1.1
 * Plugin Release
 
