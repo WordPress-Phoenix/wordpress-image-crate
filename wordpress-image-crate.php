@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/WordPress-Phoenix/wordpress-trapper-keeper
  * Description: Add image providers to the WordPress media modal.
  * Author: justintucker
- * Version: 0.1.2
+ * Version: 0.1.3
  * Author URI: http://github.com/justintucker
  * License: GPL V2
  * Text Domain: image-crate
