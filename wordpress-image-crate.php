@@ -58,9 +58,9 @@ if ( ! class_exists( 'Image_Crate' ) ) {
 			$this->plugin_name = plugin_basename( __FILE__ );
 
 			//simplify getting site options with custom prefix with multisite compatibility
-			if ( ! function_exists( 'get_custom_option' ) ) {
+			if ( ! function_exists( 'get_crate_option' ) ) {
 				// builds  the function in global scope
-				function get_custom_option( $s = '', $network_option = false ) {
+				function get_crate_option( $s = '', $network_option = false ) {
 					if ( $network_option ) {
 						return get_site_option( IMAGE_CRATE . $s );
 					} else {
@@ -68,6 +68,7 @@ if ( ! class_exists( 'Image_Crate' ) ) {
 					}
 				}
 			}
+
 			// configure and setup the plugin class variables
 			$this->configure_defaults();
 
