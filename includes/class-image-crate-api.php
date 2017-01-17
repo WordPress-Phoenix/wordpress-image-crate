@@ -170,7 +170,7 @@ class Image_Crate_Api {
 		$oauthSignatureMethod = "HMAC-SHA1";
 		$oauthVersion         = "1.0";
 		$limit                = $per_page;
-		$mode                 = 'bool'; // options include (any, all, phrase, bool)
+		$mode                 = 'phrase'; // options include (any, all, phrase, bool)
 		$offset               = $page;
 		$terms                = strtolower( $phrase ) . '*'; // asterisk is needed for wildcard searches on usatoday images
 
@@ -206,6 +206,7 @@ class Image_Crate_Api {
 		$response = wp_remote_get( $requestUrl, array(
 			'method'  => 'GET',
 			'timeout' => 10,
+			'wp-rest-cache' => 'exclude'
 		));
 
 		if ( is_wp_error( $response ) ) {

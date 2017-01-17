@@ -44,7 +44,7 @@ class Image_Crate_Ajax {
 		$search_term = isset( $_REQUEST['query']['search'] ) ? $_REQUEST['query']['search'] : $this->api->get_default_query();
 		$page = isset( $_REQUEST['query']['paged'] ) ? $_REQUEST['query']['paged'] : 1;
 		$per_page = isset( $_POST['query']['posts_per_page'] ) ? absint( $_POST['query']['posts_per_page'] ) : 40;
-		$page = ( $page * $per_page ) + 1;
+		$page = ( $page - 1 ) * $per_page;
 
 		if ( false == $search_term ) {
 			wp_send_json_error();
