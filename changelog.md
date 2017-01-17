@@ -1,3 +1,7 @@
+#### 0.1.4
+* Pagination is fixed. Search results will now return more recent images 
+* Excluded api image calls from the WordPress-Phoenix/wordpress-rest-cache plugin
+
 #### 0.1.3
 * Updated option function name
 
