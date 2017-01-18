@@ -1,3 +1,7 @@
+#### 0.1.5
+* Hide url field from search results attachment view 
+* HTML encode descriptions and captions
+
 #### 0.1.4
 * Pagination is fixed. Search results will now return more recent images 
 * Excluded api image calls from the WordPress-Phoenix/wordpress-rest-cache plugin
