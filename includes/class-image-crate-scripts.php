@@ -37,6 +37,11 @@ class Image_Crate_Scripts {
 				width: 100%;
 				height: auto;
 			}
+            /* cheap way to fields without replicating an entire js template*/
+            .image-crate .attachment-details label[data-setting=url],
+            .image-crate .attachment-details label[data-setting=alt] {
+                display: none;
+            }
 		</style>
 		<?php
 	}

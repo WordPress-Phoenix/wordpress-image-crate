@@ -244,9 +244,10 @@ class Image_Crate_Api {
 	private function prepare_attachment_for_js( $attachment ) {
 		return array(
 			'id' => $attachment['imgId'],
-			'title' => $attachment['headline'],
-			'filename' => $attachment['imgId'] . ' ' .$attachment['headline'],
-			'caption' => $attachment['caption'],
+			'title' => htmlspecialchars( $attachment['headline'] ),
+			'filename' => htmlspecialchars( $attachment['imgId'] . ' ' . $attachment['headline'] ),
+			'caption' => htmlspecialchars( $attachment['caption'] ),
+			'description' => htmlspecialchars( $attachment['caption'] ),
 			'type' => 'image',
 			'sizes' => array(
 				'thumbnail' => array(
