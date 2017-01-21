@@ -66,7 +66,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                                 controller.setState('insert');
 
                                 browse.get('gallery').$('li:first .thumbnail').click();
-
                             });
                         }
                     }
@@ -123,3 +122,22 @@ wp.media.view.MediaFrame.Post.prototype.createStates = function () {
     coreCreateStates.apply(this, arguments);
     this.states.add(new ImageCrateController);
 };
+
+/**
+ * Temporary fix until bug saving caption data is fixed
+ */
+jQuery(function ($) {
+    $(document).on( 'click', '.thumbnail', function () {
+        var caption = $('[data-setting=caption]').find('textarea'),
+            desc = $('[data-setting=description]').find('textarea');
+
+        /**
+         * If the a caption is empty, populate with the description and trigger
+         * change event to save model data.
+         */
+        if ( ! caption.val() ) {
+            caption.val( desc.val() );
+            caption.change();
+        }
+    })
+});

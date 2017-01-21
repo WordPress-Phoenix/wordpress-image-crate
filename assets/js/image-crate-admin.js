@@ -103,7 +103,6 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                                 controller.setState('insert');
 
                                 browse.get('gallery').$('li:first .thumbnail').click();
-
                             });
                         }
                     }
@@ -160,6 +159,25 @@ wp.media.view.MediaFrame.Post.prototype.createStates = function () {
     coreCreateStates.apply(this, arguments);
     this.states.add(new ImageCrateController);
 };
+
+/**
+ * Temporary fix until
+ */
+jQuery(function ($) {
+    $(document).on( 'click', '.thumbnail', function () {
+        var caption = $('[data-setting=caption]').find('textarea'),
+            desc = $('[data-setting=description]').find('textarea');
+
+        /**
+         * If the a caption is empty, populate with the description and trigger
+         * change event to save model data.
+         */
+        if ( ! caption.val() ) {
+            caption.val( desc.val() );
+            caption.change();
+        }
+    })
+});
 },{"./controllers/image-crate-controller.js":1,"./models/image-crate-photo-model.js":3,"./views/browser/image-crate-photo.js":5,"./views/browser/image-crate-photos.js":6}],3:[function(require,module,exports){
 /**
  * wp.media.model.StockPhotosQuery
@@ -329,6 +347,8 @@ var StockPhotoThumb = wp.media.view.Attachment.extend({
             alt: '',
             description: ''
         }, this.options);
+
+        // console.log(options );
 
         options.buttons = this.buttons;
         options.describe = this.controller.state().get('describe');
