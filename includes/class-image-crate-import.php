@@ -24,7 +24,6 @@ final class Image_Crate_Import {
 	 * @return bool|int|object
 	 */
 	public function image( $service_image_id, $filename, $custom_directory ) {
-
 		if ( $custom_directory ) {
 		    $this->directory = $custom_directory;
 		}
@@ -33,7 +32,6 @@ final class Image_Crate_Import {
 
 		$post_name = strtolower( $filename );
 		$id_exists = $this->check_attachment( $post_name );
-
 
 		// filename will determine if download will occur
 		if ( $id_exists > 0  ) {
@@ -66,16 +64,14 @@ final class Image_Crate_Import {
 
 		$image_type = pathinfo( $api_image );
 		$file_name  = basename( $api_image, '.' . $image_type['extension'] );
-		//$post_name = sprintf( '%s-%s', $service_image_id, $post_name );
 		$file_array['name'] = str_replace( $file_name, $post_name, $api_image );
 
 		// Do the validation and storage stuff
-		$id = media_handle_sideload( $file_array, 0 );
+		$id = media_handle_sideload( $file_array, 0, null, ['post_name' => $filename ] );
 
 		$this->delete_file( $file_array['tmp_name'] );
 
 		return is_wp_error( $id ) ? false : $id;
-
 	}
 
 	/**
@@ -170,8 +166,7 @@ final class Image_Crate_Import {
 	public function check_attachment( $post_name, $call_type = 'remote' ) {
 		// Switch to another blog to check post existence.
 		if ( $call_type == 'remote' && is_multisite() ) {
-			$site = get_current_site();
-			switch_to_blog( $site->id );
+			switch_to_blog( get_current_blog_id() );
 		}
 
 		global $wpdb;
