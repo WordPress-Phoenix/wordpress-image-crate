@@ -1,3 +1,7 @@
+#### 0.1.6
+* Fixed an error where switch to blog wasn't changing table for lookup, which resulted in duplicate images being downloaded
+* Captions will are set by automagically if not empty when clicking on a thumbnail in the media modal.
+
 #### 0.1.5
 * Hide url field from search results attachment view 
 * HTML encode descriptions and captions
