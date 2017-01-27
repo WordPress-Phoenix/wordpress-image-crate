@@ -1,3 +1,6 @@
+#### 1.0.0
+* Alter search mode type for better query results
+
 #### 0.1.6
 * Fixed an error where switch to blog wasn't changing table for lookup, which resulted in duplicate images being downloaded
 * Captions will are set by automagically if not empty when clicking on a thumbnail in the media modal.
