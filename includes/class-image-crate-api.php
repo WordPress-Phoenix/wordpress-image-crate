@@ -172,7 +172,7 @@ class Image_Crate_Api {
 		$limit                = $per_page;
 		$mode                 = 'bool'; // options include (any, all, phrase, bool)
 		$offset               = $page;
-		$terms                = sprintf( '(%s)', strtolower( $phrase ) ); // asterisk is needed for wildcard searches on usatoday images
+		$terms                = sprintf( '(%s)', strtolower( $phrase ) );
 
 		// Generate signature
 		$sigBase = "GET&" . rawurlencode( $baseUrl ) . "&"
