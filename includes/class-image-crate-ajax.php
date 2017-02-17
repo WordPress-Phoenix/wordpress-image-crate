@@ -70,11 +70,11 @@ class Image_Crate_Ajax {
 		check_ajax_referer( 'image_crate' );
 
 		$filename = sanitize_file_name( $_POST['filename'] );
-		$service_image_id = absint( $_POST['id'] );
+		$download_url = esc_url_raw( $_POST['download_uri'] );
 
 		$import = new Image_Crate_Import();
 		$dir = $this->api->directory;
-		$image_id = $import->image( $service_image_id, $filename, $dir );
+		$image_id = $import->image( $download_url, $filename, $dir );
 
 		if ( ! $image_id ) {
 			wp_send_json_error();

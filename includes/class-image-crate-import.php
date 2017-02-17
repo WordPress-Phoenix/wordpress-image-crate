@@ -18,12 +18,12 @@ final class Image_Crate_Import {
 	/**
 	 * Import image from an url
 	 *
-	 * @param $service_image_id
+	 * @param $download_url
 	 * @param $filename
 	 *
 	 * @return bool|int|object
 	 */
-	public function image( $service_image_id, $filename, $custom_directory ) {
+	public function image( $download_url, $filename, $custom_directory ) {
 		if ( $custom_directory ) {
 		    $this->directory = $custom_directory;
 		}
@@ -41,7 +41,7 @@ final class Image_Crate_Import {
 		// place the images in a custom directory
 		add_filter( 'upload_dir', array( &$this, 'set_upload_dir' ) );
 
-		$file_array['tmp_name'] = $this->download( $service_image_id );
+		$file_array['tmp_name'] = $this->download( $download_url );
 
 		if ( ! $file_array['tmp_name'] ) {
 			return false;
@@ -81,13 +81,22 @@ final class Image_Crate_Import {
 	 *
 	 * @return bool|string
 	 */
-	private function download( $id ) {
+	private function download( $url ) {
+
 
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
 
-		$baseUrl              = 'http://api.usatodaysportsimages.com/api/download/';
+		//$baseUrl              = 'http://www.usatsimg.com/api/downloadSipa/';
+		//$baseUrl              = 'http://api.usatodaysportsimages.com/api/download/';
+		//$url = 'http://www.usatodaysportsimages.com/api/download/?imageID=9096727';
+
+		preg_match( '/\?.*imageID=(\d+).*/', $url, $matches );
+		$query   = $matches[0];
+		$id      = $matches[1];
+		$baseUrl = str_replace( $query, '', $url );
+
 		$consumerKey          = USAT_API_KEY;
 		$consumerSecret       = USAT_API_SECRET;
 		$oauthTimestamp       = time();

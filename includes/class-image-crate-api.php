@@ -172,7 +172,10 @@ class Image_Crate_Api {
 		$limit                = $per_page;
 		$mode                 = 'bool'; // options include (any, all, phrase, bool)
 		$offset               = $page;
-		$terms                = sprintf( '(%s)', strtolower( $phrase ) );
+		$terms                = sprintf( '%s', strtolower( $phrase ) );
+
+		// todo: sipa should not be set all the time
+		// todo: may need to conditionally set params based on vertical
 
 		// Generate signature
 		$sigBase = "GET&" . rawurlencode( $baseUrl ) . "&"
@@ -184,6 +187,7 @@ class Image_Crate_Api {
                    . "&oauth_timestamp=" . $oauthTimestamp
                    . "&oauth_version=" . $oauthVersion
                    . "&offset=" . $offset
+                   . "&sipa=1"
                    . "&terms=" . rawurlencode( $terms ) );
 
 		$sigKey   = $consumerSecret . "&";
@@ -200,6 +204,7 @@ class Image_Crate_Api {
 		              . "&oauth_version=" . rawurlencode( $oauthVersion )
 		              . "&oauth_signature=" . rawurlencode( $oauthSig )
 		              . "&offset=" . $offset
+		              . "&sipa=1"
 		              . "&terms=" . rawurlencode( $terms );
 
 		// Make call
@@ -242,6 +247,18 @@ class Image_Crate_Api {
 	 * @return array Formatted data backbone collections
 	 */
 	private function prepare_attachment_for_js( $attachment ) {
+
+		$download_url = $attachment['fullUrl'];
+
+		/**
+		 * This condition is in place until USAT can fix the endpoint for downloading SIPA images
+		 *
+		 * Implemented 2-17-2017
+		 */
+		if ( isset( $attachment['isSipa'] ) && $attachment['isSipa'] == 1 ) {
+			$download_url = 'http://www.usatsimg.com/api/downloadSipa/?imageID=' . $attachment['uniqueId'];
+		}
+
 		return array(
 			'id' => $attachment['imgId'],
 			'title' => htmlspecialchars( $attachment['headline'] ),
@@ -266,7 +283,7 @@ class Image_Crate_Api {
 					'height' => $attachment['height'],
 				),
 			),
-			'download_uri' => $attachment['fullUrl'],
+			'download_uri' => $download_url,
 			'max_width' => $attachment['width'],
 			'max_height' => $attachment['height'],
 		);
