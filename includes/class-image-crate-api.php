@@ -55,7 +55,9 @@ class Image_Crate_Api {
 	 *
 	 * @var string
 	 */
-	public $request;
+	public $request = [];
+
+	public $sipa;
 
 	/**
 	 * Setup image source calls and filters
@@ -86,7 +88,7 @@ class Image_Crate_Api {
 	 * @return mixed
 	 */
 	public function filter_controller_title( $title ) {
-		$title['page_title'] = 'USA Today Sports Images';
+		$title['page_title'] = 'USA Today Images';
 		return $title;
 	}
 
@@ -176,16 +178,10 @@ class Image_Crate_Api {
 		$oauthVersion         = "1.0";
 		$limit                = $per_page;
 		$mode                 = 'bool'; // options include (any, all, phrase, bool)
-		//$sipa_value           = '';
 		$offset               = $page;
 		$this->vertical       = $this->determine_vertical();
+		$this->sipa           = $this->get_sipa_value();
 		$terms                = $this->search_negotiator( $phrase );
-		//$terms                = sprintf( '(%s)', strtolower( $phrase ) );
-
-		// todo: auto pull from site vertical if it exists
-		if ( 'ENTERTAINMENT' === $this->vertical ) {
-			$sipa_value = 1;
-		}
 
 		// Generate signature
 		$sigBase = "GET&" . rawurlencode( $baseUrl ) . "&"
@@ -197,7 +193,7 @@ class Image_Crate_Api {
 					. "&oauth_timestamp=" . $oauthTimestamp
 					. "&oauth_version=" . $oauthVersion
 					. "&offset=" . $offset
-					//. "&sipa=" . $sipa_value
+					. "&sipa=" . $this->sipa
 					. "&terms=" . rawurlencode( $terms ) );
 
 		$sigKey   = $consumerSecret . "&";
@@ -214,7 +210,7 @@ class Image_Crate_Api {
 					. "&oauth_version=" . rawurlencode( $oauthVersion )
 					. "&oauth_signature=" . rawurlencode( $oauthSig )
 					. "&offset=" . $offset
-					//. "&sipa=" . $sipa_value
+					. "&sipa=" . $this->sipa
 					. "&terms=" . rawurlencode( $terms );
 
 		// Make call
@@ -230,15 +226,15 @@ class Image_Crate_Api {
 
 		$response_body = json_decode(wp_remote_retrieve_body( $response ), true);
 
-		$images = array_map( function ( $index ) {
-			return $index[0];
-		}, $response_body['results']['item'] );
+		if ( ! is_null( $response_body ) ) {
+			$images = array_map( function ( $index ) {
+				return $index[0];
+			}, $response_body['results']['item'] );
 
-		return $images;
-	}
+			return $images;
+		}
 
-	private function build_query_params() {
-
+		return [];
 	}
 
 	/**
@@ -252,22 +248,29 @@ class Image_Crate_Api {
 	 * @return string
 	 */
 	public function search_negotiator( $phrase ) {
-			$search_phrase = [];
+		if ( empty( $phrase ) && false == $this->vertical) {
+		    return '';
+		}
+
+		$search_phrase = [];
 
 		if ( isset( $phrase ) ) {
 			$search_phrase[] = $phrase;
 		}
 
-		if ( isset( $this->vertical ) ) {
+		if ( isset( $this->vertical ) && 'ENT' !== $this->vertical ) {
 			array_unshift( $search_phrase, $this->vertical );
 		}
 
 		$search_phrase = array_map( function ( $item ) {
-			if ( 'false' == $item || false == $item || 'ENTERTAINMENT' == $this->vertical ) {
+			if ( 'false' == $item || false == $item ) {
 			    return false;
 			}
 
-			return sprintf( '(%s)', trim( $item ) );
+			// Entertainment is a special snowflake and needs extra filtering for more concise results.
+			$ent = 'ENT' === $this->vertical ? $this->vertical : '';
+
+			return sprintf( '(%s) %s', trim( $item ), $ent );
 		}, $search_phrase );
 
 		// Strip out any false array values
@@ -449,5 +452,17 @@ class Image_Crate_Api {
 		}
 
 		return $vertical;
+	}
+
+	/**
+	 * Set SIPA image param if the vertical is entertainment
+	 *
+	 * @return string
+	 */
+	private function get_sipa_value() {
+		if ( 'ENT' === $this->vertical ) {
+			return '1';
+		}
+		return '0';
 	}
 }

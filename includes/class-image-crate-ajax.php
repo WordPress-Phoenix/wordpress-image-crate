@@ -40,17 +40,10 @@ class Image_Crate_Ajax {
 	public function get() {
 		check_ajax_referer('image_crate');
 
-		$search_term = isset( $_REQUEST['query']['search'] ) ? $_REQUEST['query']['search'] : false;
+		$search_term = isset( $_REQUEST['query']['search'] ) ? $_REQUEST['query']['search'] : '';
 		$page = isset( $_REQUEST['query']['paged'] ) ? $_REQUEST['query']['paged'] : 1;
 		$per_page = isset( $_POST['query']['posts_per_page'] ) ? absint( $_POST['query']['posts_per_page'] ) : 40;
-
-		// todo: this needs to be abstracted to api file
-		$vertical = isset( $_REQUEST['query']['vertical'] ) ? $_REQUEST['query']['vertical'] : 'All Sports';
 		$page = ( $page - 1 ) * $per_page;
-
-		if ( false == $search_term && 'All Sports' == $vertical ) {
-			wp_send_json_error();
-		}
 
 		$images = $this->api->fetch( $search_term, $page, $per_page );
 
@@ -68,7 +61,6 @@ class Image_Crate_Ajax {
 	 * Download an image given an url
 	 */
 	public function download() {
-
 		check_ajax_referer( 'image_crate' );
 
 		$filename = sanitize_file_name( $_POST['filename'] );

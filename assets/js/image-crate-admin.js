@@ -51,7 +51,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 viewSettings = {};
 
             viewSettings.usatoday = {
-                text: 'USA Today Sports',
+                text: 'USA Today Images',
                 priority: 60
             };
             view.set(viewSettings);
@@ -403,45 +403,11 @@ module.exports = StockPhotoThumb;
  */
 var ImageCrateSearch = require('./search.js'),
     NoResults = require('./no-results.js'),
+    VerticalsFilter = require('./verticals-filter.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize,
-    coreAttachmentscreateToolbar  = wp.media.view.AttachmentsBrowser.prototype.createToolbar;
+    StockPhotosBrowser;
 
-var VerticalsFilter = wp.media.view.AttachmentFilters.extend({
-    id: 'media-attachment-vertical-filters',
-
-    createFilters: function () {
-        var filters = {};
-        var verticals = [
-            { vertical: 'NFL', text: 'NFL' },
-            { vertical: 'NBA', text: 'NBA' },
-            { vertical: 'MLB', text: 'MLB' },
-            { vertical: 'NHL', text: 'NHL' },
-            { vertical: 'NHL', text: 'NHL' },
-            { vertical: 'NCAA Basketball', text: 'NCAA - Basketball' },
-            { vertical: 'NCAA Football', text: 'NCAA - Football' },
-            { vertical: 'SOCCER', text: 'Soccer' },
-            { vertical: 'ENTERTAINMENT', text: 'Entertainment' }
-        ];
-        _.each( verticals || {}, function (value, index) {
-            filters[index] = {
-                text: value.text,
-                props: {
-                    vertical: value.vertical
-                }
-            };
-        });
-        filters.all = {
-            text: 'All Sports',
-            props: {
-                vertical: false
-            },
-            priority: 10
-        };
-        this.filters = filters;
-    }
-});
-
-var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
+StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
     tagName: 'div',
     className: 'image-crate attachments-browser',
 
@@ -456,11 +422,10 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
     initialize: function () {
         coreAttachmentsInitialize.apply(this, arguments);
         this.createToolBar();
+        this.createUploader();
     },
 
     createToolBar: function() {
-        coreAttachmentscreateToolbar.apply(this, arguments);
-
         this.toolbar.set('VerticalsFilterLabel', new wp.media.view.Label({
             value: 'Verticals Label',
             attributes: {
@@ -494,7 +459,7 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
 });
 
 module.exports = StockPhotosBrowser;
-},{"./no-results.js":7,"./search.js":8}],7:[function(require,module,exports){
+},{"./no-results.js":7,"./search.js":8,"./verticals-filter.js":9}],7:[function(require,module,exports){
 /**
  * wp.media.view.NoResults
  *
@@ -587,4 +552,47 @@ var ImageCrateSearch = wp.media.View.extend({
 });
 
 module.exports = ImageCrateSearch;
+},{}],9:[function(require,module,exports){
+/**
+ * wp.media.view.VerticalsFilter
+ *
+ * @augments wp.media.view.AttachmentFilters
+ */
+var VerticalsFilter = wp.media.view.AttachmentFilters.extend( {
+    id: 'media-attachment-vertical-filters',
+
+    createFilters: function () {
+        var filters = {};
+        var verticals = [
+            { vertical: 'NFL', text: '- NFL' },
+            { vertical: 'NBA', text: '- NBA' },
+            { vertical: 'MLB', text: '- MLB' },
+            { vertical: 'NHL', text: '- NHL' },
+            { vertical: 'NCAA Basketball', text: '- NCAA: Basketball' },
+            { vertical: 'NCAA Football', text: '- NCAA: Football' },
+            { vertical: 'SOCCER', text: '- Soccer' },
+            { vertical: 'ENT', text: 'Entertainment '}
+        ];
+
+        _.each(verticals || {}, function ( value, index ) {
+            filters[ index ] = {
+                text: value.text,
+                props: {
+                    vertical: value.vertical
+                }
+            };
+        });
+
+        filters.all = {
+            text: 'All Sports',
+            props: {
+                vertical: false
+            },
+            priority: 10
+        };
+        this.filters = filters;
+    }
+});
+
+module.exports = VerticalsFilter;
 },{}]},{},[2]);

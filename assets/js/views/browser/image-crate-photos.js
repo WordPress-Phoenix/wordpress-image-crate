@@ -6,45 +6,11 @@
  */
 var ImageCrateSearch = require('./search.js'),
     NoResults = require('./no-results.js'),
+    VerticalsFilter = require('./verticals-filter.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize,
-    coreAttachmentscreateToolbar  = wp.media.view.AttachmentsBrowser.prototype.createToolbar;
+    StockPhotosBrowser;
 
-var VerticalsFilter = wp.media.view.AttachmentFilters.extend({
-    id: 'media-attachment-vertical-filters',
-
-    createFilters: function () {
-        var filters = {};
-        var verticals = [
-            { vertical: 'NFL', text: 'NFL' },
-            { vertical: 'NBA', text: 'NBA' },
-            { vertical: 'MLB', text: 'MLB' },
-            { vertical: 'NHL', text: 'NHL' },
-            { vertical: 'NHL', text: 'NHL' },
-            { vertical: 'NCAA Basketball', text: 'NCAA - Basketball' },
-            { vertical: 'NCAA Football', text: 'NCAA - Football' },
-            { vertical: 'SOCCER', text: 'Soccer' },
-            { vertical: 'ENTERTAINMENT', text: 'Entertainment' }
-        ];
-        _.each( verticals || {}, function (value, index) {
-            filters[index] = {
-                text: value.text,
-                props: {
-                    vertical: value.vertical
-                }
-            };
-        });
-        filters.all = {
-            text: 'All Sports',
-            props: {
-                vertical: false
-            },
-            priority: 10
-        };
-        this.filters = filters;
-    }
-});
-
-var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
+StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
     tagName: 'div',
     className: 'image-crate attachments-browser',
 
@@ -59,11 +25,10 @@ var StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
     initialize: function () {
         coreAttachmentsInitialize.apply(this, arguments);
         this.createToolBar();
+        this.createUploader();
     },
 
     createToolBar: function() {
-        coreAttachmentscreateToolbar.apply(this, arguments);
-
         this.toolbar.set('VerticalsFilterLabel', new wp.media.view.Label({
             value: 'Verticals Label',
             attributes: {

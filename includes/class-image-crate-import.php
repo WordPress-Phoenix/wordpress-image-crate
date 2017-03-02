@@ -77,20 +77,16 @@ final class Image_Crate_Import {
 	/**
 	 * Download a file by its URL
 	 *
-	 * @param  string $id
+	 * @param $url
 	 *
 	 * @return bool|string
+	 * @internal param string $id
+	 *
 	 */
 	private function download( $url ) {
-
-
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
-
-		//$baseUrl              = 'http://www.usatsimg.com/api/downloadSipa/';
-		//$baseUrl              = 'http://api.usatodaysportsimages.com/api/download/';
-		//$url = 'http://www.usatodaysportsimages.com/api/download/?imageID=9096727';
 
 		preg_match( '/\?.*imageID=(\d+).*/', $url, $matches );
 		$query   = $matches[0];

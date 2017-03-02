@@ -14,7 +14,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                 viewSettings = {};
 
             viewSettings.usatoday = {
-                text: 'USA Today Sports',
+                text: 'USA Today Images',
                 priority: 60
             };
             view.set(viewSettings);
