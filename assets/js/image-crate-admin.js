@@ -406,35 +406,34 @@ var ImageCrateSearch = require('./search.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize,
     coreAttachmentscreateToolbar  = wp.media.view.AttachmentsBrowser.prototype.createToolbar;
 
-
 var VerticalsFilter = wp.media.view.AttachmentFilters.extend({
     id: 'media-attachment-vertical-filters',
 
     createFilters: function () {
         var filters = {};
         var verticals = [
-            { slug: 'nfl', text: 'NFL' },
-            { slug: 'nba', text: 'NBA' },
-            { slug: 'mlb', text: 'MLB' },
-            { slug: 'nhl', text: 'NHL' },
-            { slug: 'nhl', text: 'NHL' },
-            { slug: 'ncaab', text: 'NCAAB' },
-            { slug: 'ncaaf', text: 'NCAAF' },
-            { slug: 'nhl', text: 'Soccer' },
-            { slug: 'entertainment', text: 'Entertainment' },
+            { vertical: 'NFL', text: 'NFL' },
+            { vertical: 'NBA', text: 'NBA' },
+            { vertical: 'MLB', text: 'MLB' },
+            { vertical: 'NHL', text: 'NHL' },
+            { vertical: 'NHL', text: 'NHL' },
+            { vertical: 'NCAA Basketball', text: 'NCAA - Basketball' },
+            { vertical: 'NCAA Football', text: 'NCAA - Football' },
+            { vertical: 'SOCCER', text: 'Soccer' },
+            { vertical: 'ENTERTAINMENT', text: 'Entertainment' }
         ];
         _.each( verticals || {}, function (value, index) {
             filters[index] = {
                 text: value.text,
                 props: {
-                    slug: value.slug
+                    vertical: value.vertical
                 }
             };
         });
         filters.all = {
-            text: 'All',
+            text: 'All Sports',
             props: {
-                slug: false
+                vertical: false
             },
             priority: 10
         };
@@ -551,14 +550,20 @@ var ImageCrateSearch = wp.media.View.extend({
 
     events: {
         'input': 'search',
-        'keyup': 'search',
+        'keyup': 'search'
+    },
+
+    initialize: function() {
+        if ( this.model.get( 'search' ) === undefined ) {
+            this.model.set( 'search', imagecrate.default_search );
+        }
     },
 
     /**
      * @returns {wp.media.view.Search} Returns itself to allow chaining
      */
     render: function () {
-        this.el.value = this.model.escape('search');
+        this.el.value = this.model.get( 'search' ) === undefined ? imagecrate.default_search : this.model.escape( 'search' );
         return this;
     },
 
@@ -567,7 +572,7 @@ var ImageCrateSearch = wp.media.View.extend({
     },
 
     /**
-     * There's a bug in core where searches aren't debounced in the media library.
+     * There's a bug in core where searches aren't de-bounced in the media library.
      * Normally, not a problem, but with external api calls or tons of image/users, ajax
      * calls could effect server performance. This fixes that for now.
      */

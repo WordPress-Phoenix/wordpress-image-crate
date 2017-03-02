@@ -9,35 +9,34 @@ var ImageCrateSearch = require('./search.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize,
     coreAttachmentscreateToolbar  = wp.media.view.AttachmentsBrowser.prototype.createToolbar;
 
-
 var VerticalsFilter = wp.media.view.AttachmentFilters.extend({
     id: 'media-attachment-vertical-filters',
 
     createFilters: function () {
         var filters = {};
         var verticals = [
-            { slug: 'nfl', text: 'NFL' },
-            { slug: 'nba', text: 'NBA' },
-            { slug: 'mlb', text: 'MLB' },
-            { slug: 'nhl', text: 'NHL' },
-            { slug: 'nhl', text: 'NHL' },
-            { slug: 'ncaab', text: 'NCAAB' },
-            { slug: 'ncaaf', text: 'NCAAF' },
-            { slug: 'nhl', text: 'Soccer' },
-            { slug: 'entertainment', text: 'Entertainment' },
+            { vertical: 'NFL', text: 'NFL' },
+            { vertical: 'NBA', text: 'NBA' },
+            { vertical: 'MLB', text: 'MLB' },
+            { vertical: 'NHL', text: 'NHL' },
+            { vertical: 'NHL', text: 'NHL' },
+            { vertical: 'NCAA Basketball', text: 'NCAA - Basketball' },
+            { vertical: 'NCAA Football', text: 'NCAA - Football' },
+            { vertical: 'SOCCER', text: 'Soccer' },
+            { vertical: 'ENTERTAINMENT', text: 'Entertainment' }
         ];
         _.each( verticals || {}, function (value, index) {
             filters[index] = {
                 text: value.text,
                 props: {
-                    slug: value.slug
+                    vertical: value.vertical
                 }
             };
         });
         filters.all = {
-            text: 'All',
+            text: 'All Sports',
             props: {
-                slug: false
+                vertical: false
             },
             priority: 10
         };

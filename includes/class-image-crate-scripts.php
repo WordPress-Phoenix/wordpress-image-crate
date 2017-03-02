@@ -63,6 +63,7 @@ class Image_Crate_Scripts {
 			'image-crate',
 			'imagecrate', apply_filters('image_crate_controller_title', array(
 				'page_title' => __( 'Image Crate', 'image-crate' ),
+                'default_search' => Image_Crate_Api::get_default_query(),
 				'nonce' => wp_create_nonce( 'image_crate' )
 			))
 		);

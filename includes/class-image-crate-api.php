@@ -44,6 +44,20 @@ class Image_Crate_Api {
 	public $directory;
 
 	/**
+	 * Site vertical to pull from
+	 *
+	 * @var string
+	 */
+	public $vertical;
+
+	/**
+	 * Site vertical to pull from
+	 *
+	 * @var string
+	 */
+	public $request;
+
+	/**
 	 * Setup image source calls and filters
 	 *
 	 * @param $plugin Image_Crate
@@ -102,7 +116,7 @@ class Image_Crate_Api {
 	 *
 	 * @return string
 	 */
-	public function set_default_query() {
+	public static function get_default_query() {
 		global $fs_vip;
 
 		// check if site option
@@ -142,15 +156,6 @@ class Image_Crate_Api {
 	}
 
 	/**
-	 * Get the default query
-	 *
-	 * @return string
-	 */
-	public function get_default_query() {
-		return $this->set_default_query();
-	}
-
-	/**
 	 * Request image data from source
 	 *
 	 * @param string $phrase Search phrase to make the call
@@ -171,41 +176,46 @@ class Image_Crate_Api {
 		$oauthVersion         = "1.0";
 		$limit                = $per_page;
 		$mode                 = 'bool'; // options include (any, all, phrase, bool)
+		//$sipa_value           = '';
 		$offset               = $page;
-		$terms                = sprintf( '%s', strtolower( $phrase ) );
+		$this->vertical       = $this->determine_vertical();
+		$terms                = $this->search_negotiator( $phrase );
+		//$terms                = sprintf( '(%s)', strtolower( $phrase ) );
 
-		// todo: sipa should not be set all the time
-		// todo: may need to conditionally set params based on vertical
+		// todo: auto pull from site vertical if it exists
+		if ( 'ENTERTAINMENT' === $this->vertical ) {
+			$sipa_value = 1;
+		}
 
 		// Generate signature
 		$sigBase = "GET&" . rawurlencode( $baseUrl ) . "&"
-		           . rawurlencode( "limit=" . $limit
-                   . "&mode=" . $mode
-		           . "&oauth_consumer_key=" . rawurlencode( $consumerKey )
-                   . "&oauth_nonce=" . rawurlencode( $nonce )
-                   . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
-                   . "&oauth_timestamp=" . $oauthTimestamp
-                   . "&oauth_version=" . $oauthVersion
-                   . "&offset=" . $offset
-                   . "&sipa=1"
-                   . "&terms=" . rawurlencode( $terms ) );
+					. rawurlencode( "limit=" . $limit
+					. "&mode=" . $mode
+					. "&oauth_consumer_key=" . rawurlencode( $consumerKey )
+					. "&oauth_nonce=" . rawurlencode( $nonce )
+					. "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
+					. "&oauth_timestamp=" . $oauthTimestamp
+					. "&oauth_version=" . $oauthVersion
+					. "&offset=" . $offset
+					//. "&sipa=" . $sipa_value
+					. "&terms=" . rawurlencode( $terms ) );
 
 		$sigKey   = $consumerSecret . "&";
 		$oauthSig = base64_encode( hash_hmac( "sha1", $sigBase, $sigKey, true ) );
 
 		// Generate full request URL
 		$requestUrl = $baseUrl . "?"
-		              . "&limit=" . $limit
-		              . "&mode=" . rawurlencode( $mode )
-		              . "&oauth_consumer_key=" . rawurlencode( $consumerKey )
-		              . "&oauth_nonce=" . rawurlencode( $nonce )
-		              . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
-		              . "&oauth_timestamp=" . rawurlencode( $oauthTimestamp )
-		              . "&oauth_version=" . rawurlencode( $oauthVersion )
-		              . "&oauth_signature=" . rawurlencode( $oauthSig )
-		              . "&offset=" . $offset
-		              . "&sipa=1"
-		              . "&terms=" . rawurlencode( $terms );
+					. "&limit=" . $limit
+					. "&mode=" . rawurlencode( $mode )
+					. "&oauth_consumer_key=" . rawurlencode( $consumerKey )
+					. "&oauth_nonce=" . rawurlencode( $nonce )
+					. "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
+					. "&oauth_timestamp=" . rawurlencode( $oauthTimestamp )
+					. "&oauth_version=" . rawurlencode( $oauthVersion )
+					. "&oauth_signature=" . rawurlencode( $oauthSig )
+					. "&offset=" . $offset
+					//. "&sipa=" . $sipa_value
+					. "&terms=" . rawurlencode( $terms );
 
 		// Make call
 		$response = wp_remote_get( $requestUrl, array(
@@ -220,12 +230,50 @@ class Image_Crate_Api {
 
 		$response_body = json_decode(wp_remote_retrieve_body( $response ), true);
 
-		// todo: fix array error catching for secondary array_map param
 		$images = array_map( function ( $index ) {
 			return $index[0];
 		}, $response_body['results']['item'] );
 
 		return $images;
+	}
+
+	private function build_query_params() {
+
+	}
+
+	/**
+	 * Process query values for USA Today Images
+	 *
+	 * Parse query values and reconstruct them in a format that usa today images can understand.
+	 * Surrounding each term with () allows grouping and more specific searching within the USA Today API.
+	 *
+	 * @param $phrase
+	 *
+	 * @return string
+	 */
+	public function search_negotiator( $phrase ) {
+			$search_phrase = [];
+
+		if ( isset( $phrase ) ) {
+			$search_phrase[] = $phrase;
+		}
+
+		if ( isset( $this->vertical ) ) {
+			array_unshift( $search_phrase, $this->vertical );
+		}
+
+		$search_phrase = array_map( function ( $item ) {
+			if ( 'false' == $item || false == $item || 'ENTERTAINMENT' == $this->vertical ) {
+			    return false;
+			}
+
+			return sprintf( '(%s)', trim( $item ) );
+		}, $search_phrase );
+
+		// Strip out any false array values
+		$search_phrase = array_filter( $search_phrase );
+
+		return implode( $search_phrase, '' );
 	}
 
 	/**
@@ -387,5 +435,19 @@ class Image_Crate_Api {
 	 */
 	public function send_to_editor( $html ) {
 		return $this->set_image_path( $html );
+	}
+
+	/**
+	 * Set vertical chosen from the front end.
+	 *
+	 * @return string|boolean
+	 */
+	private function determine_vertical() {
+		$vertical = false;
+		if ( isset( $_REQUEST['query']['vertical'] ) ) {
+			$vertical = $_REQUEST['query']['vertical'];
+		}
+
+		return $vertical;
 	}
 }

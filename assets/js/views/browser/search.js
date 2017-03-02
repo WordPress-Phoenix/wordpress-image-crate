@@ -15,14 +15,20 @@ var ImageCrateSearch = wp.media.View.extend({
 
     events: {
         'input': 'search',
-        'keyup': 'search',
+        'keyup': 'search'
+    },
+
+    initialize: function() {
+        if ( this.model.get( 'search' ) === undefined ) {
+            this.model.set( 'search', imagecrate.default_search );
+        }
     },
 
     /**
      * @returns {wp.media.view.Search} Returns itself to allow chaining
      */
     render: function () {
-        this.el.value = this.model.escape('search');
+        this.el.value = this.model.get( 'search' ) === undefined ? imagecrate.default_search : this.model.escape( 'search' );
         return this;
     },
 
@@ -31,7 +37,7 @@ var ImageCrateSearch = wp.media.View.extend({
     },
 
     /**
-     * There's a bug in core where searches aren't debounced in the media library.
+     * There's a bug in core where searches aren't de-bounced in the media library.
      * Normally, not a problem, but with external api calls or tons of image/users, ajax
      * calls could effect server performance. This fixes that for now.
      */

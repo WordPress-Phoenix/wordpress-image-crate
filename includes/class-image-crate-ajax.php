@@ -38,15 +38,17 @@ class Image_Crate_Ajax {
 	 * Get images and send them to the media modal.
 	 */
 	public function get() {
-
 		check_ajax_referer('image_crate');
 
-		$search_term = isset( $_REQUEST['query']['search'] ) ? $_REQUEST['query']['search'] : $this->api->get_default_query();
+		$search_term = isset( $_REQUEST['query']['search'] ) ? $_REQUEST['query']['search'] : false;
 		$page = isset( $_REQUEST['query']['paged'] ) ? $_REQUEST['query']['paged'] : 1;
 		$per_page = isset( $_POST['query']['posts_per_page'] ) ? absint( $_POST['query']['posts_per_page'] ) : 40;
+
+		// todo: this needs to be abstracted to api file
+		$vertical = isset( $_REQUEST['query']['vertical'] ) ? $_REQUEST['query']['vertical'] : 'All Sports';
 		$page = ( $page - 1 ) * $per_page;
 
-		if ( false == $search_term ) {
+		if ( false == $search_term && 'All Sports' == $vertical ) {
 			wp_send_json_error();
 		}
 
