@@ -1,3 +1,7 @@
+#### 1.1.0
+* Add USA Today SIPA (entertainment) images
+* Add ability to filter results by vertical
+
 #### 1.0.0
 * Alter search mode type for better query results
 
