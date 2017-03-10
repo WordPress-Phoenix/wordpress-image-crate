@@ -54,18 +54,24 @@ _.extend( wp.media.view.MediaFrame.prototype, {
                                 }
                             }).done(function (attachment) {
 
+                                // Swap back to insert state to manipulate collection.
+                                controller.setState('insert');
+
+                                // Image may exist in the library, so we move it to the front of the line
                                 var browse = wp.media.frame.content.mode('browse');
+
+                                // might not need this
                                 browse.get('gallery').collection.add(attachment);
                                 browse.get('selection').collection.add(attachment);
+
+                                browse.get('insert').collection.remove(attachment);
+                                browse.get('insert').collection.unshift(attachment);
 
                                 // This will trigger all mutation observer
                                 wp.Uploader.queue.add(attachment);
                                 wp.Uploader.queue.remove(attachment);
 
-                                // reset back to insert mode for adding post to editor
-                                controller.setState('insert');
-
-                                browse.get('gallery').$('li:first .thumbnail').click();
+                                browse.get('insert').$('li:first .thumbnail').click();
                             });
                         }
                     }

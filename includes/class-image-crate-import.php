@@ -176,9 +176,18 @@ final class Image_Crate_Import {
 
 		global $wpdb;
 		$attachment_id = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_name='%s';", $post_name ) );
-		$attachment_id = $attachment_id[0];
 
-		if ( empty( $attachment_id ) ) {
+		if ( ! empty( $attachment_id[0] ) ) {
+			$date          = date( 'Y-m-d h:i:s' );
+			$update        = [
+				'ID'                => $attachment_id[0],
+				'post_date'         => $date,
+				'post_date_gmt'     => get_gmt_from_date( $date, $format = 'Y-m-d H:i:s' ),
+				'post_modified'     => $date,
+				'post_modified_gmt' => get_gmt_from_date( $date, $format = 'Y-m-d H:i:s' ),
+			];
+			$attachment_id = wp_update_post( $update );
+		} else {
 			$attachment_id = 0;
 		}
 
