@@ -57,6 +57,11 @@ class Image_Crate_Api {
 	 */
 	public $request = [];
 
+	/**
+	 * Query Parameter to load USAT specific entertainment images
+	 *
+	 * @var string
+	 */
 	public $sipa;
 
 	/**
@@ -361,35 +366,28 @@ class Image_Crate_Api {
 	}
 
 	/**
-	 * Set up image path to point to new getty image location
+	 * Set up image path to point to custom image directory
 	 *
 	 * On the admin side, WordPress filters the output of the url string used to display the
 	 * image. That is altered here.
 	 *
 	 * @param   string|array $image_path Default image source
 	 *
-	 * @return  string|array Updated image src to include 'getty-images'
+	 * @return  string|array Updated image src to reference custom directory
 	 */
 	public function set_image_path( $image_path ) {
-		// Make sure image path url is a string
-		if ( is_array( $image_path ) ) {
-			$image_path_url = $image_path[0];
-		} else {
-			$image_path_url = $image_path;
-		}
+		$image_path_url = is_array( $image_path ) ? $image_path[0] : $image_path;
 
-		// Check for old multisite directory structure
-		if ( ! stristr( $image_path_url, '/files/' . $this->directory . '/' ) ) {
-			$search_str  = '/\/sites\/\d*\/' . $this->directory . '\//';
-			$replace_str = '/' . $this->directory . '/';
-		} else {
+		if ( stristr( $image_path_url, $this->directory ) ) {
+
 			$search_str  = '/\/files\/' . $this->directory . '\//';
 			$replace_str = '/wp-content/uploads/' . $this->directory . '/';
-		}
 
-		if ( is_array( $image_path ) ) {
-			$image_path[0] = preg_replace( $search_str, $replace_str, $image_path[0] );
-		} else {
+			if ( stristr( $image_path_url, '/blogs.dir/' ) ) {
+				$search_str  = '/\/blogs.dir\/\d*\/files\/sites\/\d*\/' . $this->directory . '\//';
+				$replace_str = '/uploads/' . $this->directory . '/';
+			}
+
 			$image_path = preg_replace( $search_str, $replace_str, $image_path );
 		}
 
@@ -412,7 +410,7 @@ class Image_Crate_Api {
 	}
 
 	/**
-	 * Update srcset urls to point to getty images global folder location
+	 * Update srcset urls to point to custom image directory
 	 *
 	 * @param   array $sources One or more arrays of source data to include in the 'srcset'.
 	 *
@@ -434,7 +432,7 @@ class Image_Crate_Api {
 	 *
 	 * @param   string $html Image markup sent to the editor
 	 *
-	 * @return  string|array Updated markup with 'getty-images' in src
+	 * @return  string|array Updated markup with to reference custom directory
 	 */
 	public function send_to_editor( $html ) {
 		return $this->set_image_path( $html );
