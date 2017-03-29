@@ -57,7 +57,7 @@ class Image_Crate_Scripts {
 		}
 
 		$suffix = SCRIPT_DEBUG ? '' : '.min';
-		wp_register_script( 'image-crate', IC_URL . "/assets/js/image-crate-admin{$suffix}.js", array('media-views'), '0.1.0', true );
+		wp_register_script( 'image-crate', IC_URL . "/assets/js/image-crate-admin.js", array('media-views'), '0.1.0', true );
 
 		wp_localize_script(
 			'image-crate',
