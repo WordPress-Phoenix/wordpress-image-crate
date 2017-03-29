@@ -1,3 +1,6 @@
+#### 1.1.1
+* Fixes downloading issues with previously downloaded images
+
 #### 1.1.0
 * Add USA Today SIPA (entertainment) images
 * Add ability to filter results by vertical
