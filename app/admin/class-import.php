@@ -1,19 +1,20 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
+namespace ImageCrate\Admin;
+
 
 /**
- * Image_Crate_Api Class
+ * Import Class
  *
- * Handle returned data for image source
+ * Handle returned data for image source.
  *
  * @version  0.1.1
  * @package  WP_Image_Crate
  * @author   justintucker
  */
-final class Image_Crate_Import {
+final class Import {
+
+	public $directory;
 
 	/**
 	 * Import image from an url

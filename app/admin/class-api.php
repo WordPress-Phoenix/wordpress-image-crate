@@ -1,19 +1,18 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
+namespace ImageCrate\Admin;
+
 
 /**
- * Image_Crate_Api Class
+ * Api Class
  *
- * Handle returned data for image source
+ * Handle returned data for image source.
  *
  * @version  0.1.1
  * @package  WP_Image_Crate
  * @author   justintucker
  */
-class Image_Crate_Api {
+class Api {
 
 	/**
 	 * Key for image source endpoint
@@ -67,9 +66,8 @@ class Image_Crate_Api {
 	/**
 	 * Setup image source calls and filters
 	 *
-	 * @param $plugin Image_Crate
 	 */
-	public function __construct( $plugin ) {
+	public function __construct() {
 		$this->key = USAT_API_KEY;
 		$this->secret = USAT_API_SECRET;
 		$this->api_url = "http://www.usatodaysportsimages.com/api/searchAPI/";
@@ -80,9 +78,7 @@ class Image_Crate_Api {
 		add_filter( 'wp_calculate_image_srcset', array( $this, 'update_scrset_attr' ), 10, 1 );
 		add_filter( 'image_send_to_editor', array( $this, 'send_to_editor' ), 10, 1 );
 		add_filter( 'image_get_intermediate_size', array( $this, 'set_image_editor_thumb_url' ), 10, 1 );
-		add_filter( 'image_crate_controller_title', array( $this, 'filter_controller_title') );
-		add_action( 'admin_init', array( $this, 'register_fields' ) );
-		add_filter( 'plugin_action_links_'. $plugin->plugin_name , array( $this, 'add_action_links' ) );
+		add_filter( 'w', array( $this, 'filter_controller_title') );
 	}
 
 	/**
@@ -95,27 +91,6 @@ class Image_Crate_Api {
 	public function filter_controller_title( $title ) {
 		$title['page_title'] = 'USA Today Images';
 		return $title;
-	}
-
-	/**
-	 * Register default field.
-	 */
-	public function register_fields () {
-		register_setting( 'general', 'image_crate_default_search', 'esc_attr' );
-		add_settings_field(
-			'image_crate_default_search_term',
-			'<label for="image_crate_default_search_term">' . __( 'Image Crate Default Term', 'image_crate_default_search' ) . '</label>',
-			array( $this, 'fields_html' ),
-			'general'
-		);
-	}
-
-	/**
-	 * Output form field markup
-	 */
-	public function fields_html() {
-		$value = get_option( 'image_crate_default_search', '' );
-		echo '<input type="text" id="image_crate_default_search_term" name="image_crate_default_search" value="' . esc_attr( $value ) . '" />';
 	}
 
 	/**
@@ -147,19 +122,6 @@ class Image_Crate_Api {
 		}
 
 		return $term;
-	}
-
-	/**
-	 * Add settings link to plugin list page
-	 *
-	 * @param $links Current plugin links
-	 *
-	 * @return array Plugin menu data
-	 */
-	public function add_action_links( $links ) {
-		$links[] = '<a href="' . admin_url( 'options-general.php#image_crate_default_search_term' ) . '">Settings</a>';
-
-		return $links;
 	}
 
 	/**
