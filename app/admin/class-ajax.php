@@ -1,19 +1,18 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
+namespace ImageCrate\Admin;
+
 
 /**
- * Image_Crate_Ajax Class
+ * Ajax Class
  *
- * AJAX Event Handler.
+ * Handles ajax calls for getting image data and downloading individual images.
  *
  * @version  0.1.1
- * @package  WP_Image_Crate
+ * @package  Image_Crate
  * @author   justintucker
  */
-class Image_Crate_Ajax {
+class Ajax {
 
 	/**
 	 * Holds api object for making data calls.
@@ -66,7 +65,7 @@ class Image_Crate_Ajax {
 		$filename = sanitize_file_name( $_POST['filename'] );
 		$download_url = esc_url_raw( $_POST['download_uri'] );
 
-		$import = new Image_Crate_Import();
+		$import = new Import();
 		$dir = $this->api->directory;
 		$image_id = $import->image( $download_url, $filename, $dir );
 

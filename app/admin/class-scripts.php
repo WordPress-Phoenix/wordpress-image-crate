@@ -1,27 +1,26 @@
 <?php
 
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+namespace ImageCrate\Admin;
+
 
 /**
- * Image_Crate_Scripts Class
+ * Scripts Class
+ *
+ * Enqueues backbone scripts that make the magic happen. Provides template adjustments for the media modal.
  *
  * @version  0.1.1
  * @package  WP_Image_Crate
  * @author   justintucker
  */
-class Image_Crate_Scripts {
-
+class Scripts {
 	/**
 	 * Image_Crate_Scripts constructor.
 	 */
-	public function __construct() {
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), PHP_INT_MAX );
+	public function setup() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), PHP_INT_MAX );
-		add_action( 'admin_print_styles', array( $this, 'alter_attachment_thumb_display'), PHP_INT_MAX);
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), PHP_INT_MAX );
 		add_action( 'print_media_templates', array( $this, 'no_results_template') );
+		add_action( 'admin_print_styles', array( $this, 'alter_attachment_thumb_display'), PHP_INT_MAX);
 	}
 
 	/**
@@ -57,13 +56,13 @@ class Image_Crate_Scripts {
 		}
 
 		$suffix = SCRIPT_DEBUG ? '' : '.min';
-		wp_register_script( 'image-crate', IC_URL . "/assets/js/image-crate-admin.js", array('media-views'), '0.1.0', true );
+		wp_register_script( 'image-crate', plugins_url('/wordpress-image-crate/app/assets/js/image-crate-admin' . $suffix . '.js'), array('media-views'), '0.1.0', true );
 
 		wp_localize_script(
 			'image-crate',
 			'imagecrate', apply_filters( 'image_crate_controller_title', array(
 				'page_title'     => __( 'Image Crate', 'image-crate' ),
-				'default_search' => Image_Crate_Api::get_default_query(),
+				'default_search' => Api::get_default_query(),
 				'nonce'          => wp_create_nonce( 'image_crate' )
 			) )
 		);
