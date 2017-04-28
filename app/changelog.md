@@ -1,3 +1,6 @@
+#### 2.0.0
+* Migrates plugin to new abstract plugin base
+
 #### 1.1.1
 * Fixes downloading issues with previously downloaded images
 

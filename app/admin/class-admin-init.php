@@ -8,7 +8,7 @@ namespace ImageCrate\Admin;
  *
  * Loads setting settings and scripts.
  *
- * @version  0.1.1
+ * @version  2.0.0
  * @package  Image_Crate
  * @author   justintucker
  */

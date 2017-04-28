@@ -8,7 +8,7 @@ namespace ImageCrate\Admin;
  *
  * Handles ajax calls for getting image data and downloading individual images.
  *
- * @version  0.1.1
+ * @version  2.0.0
  * @package  Image_Crate
  * @author   justintucker
  */

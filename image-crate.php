@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/WordPress-Phoenix/wordpress-image-crate
  * Description: Add image providers to the WordPress media modal.
  * Author: justintucker
- * Version: 1.1.1
+ * Version: 2.0.0
  * Author URI: http://github.com/justintucker
  * License: GPL V2
  * Text Domain: image-crate

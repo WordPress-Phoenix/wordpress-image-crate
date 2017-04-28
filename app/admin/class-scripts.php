@@ -8,7 +8,7 @@ namespace ImageCrate\Admin;
  *
  * Enqueues backbone scripts that make the magic happen. Provides template adjustments for the media modal.
  *
- * @version  0.1.1
+ * @version  2.0.0
  * @package  WP_Image_Crate
  * @author   justintucker
  */

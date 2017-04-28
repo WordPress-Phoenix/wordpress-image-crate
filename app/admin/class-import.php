@@ -8,7 +8,7 @@ namespace ImageCrate\Admin;
  *
  * Handle returned data for image source.
  *
- * @version  0.1.1
+ * @version  2.0.0
  * @package  WP_Image_Crate
  * @author   justintucker
  */
