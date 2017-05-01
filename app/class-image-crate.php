@@ -4,8 +4,7 @@ namespace ImageCrate;
 
 
 use WPAZ_Plugin_Base\V_2_0\Abstract_Plugin;
-use ImageCrate\Admin\Admin_Init;
-use ImageCrate\Admin\Scripts;
+use ImageCrate\Admin\Admin;
 use ImageCrate\Admin\Api;
 use ImageCrate\Admin\Ajax;
 
@@ -50,8 +49,7 @@ class Init extends Abstract_Plugin {
 	 */
 	public function authenticated_init() {
 		if ( is_user_logged_in() ) {
-			Admin_Init::run();
-			(new Scripts())->setup();
+			Admin::init();
 		}
 	}
 
