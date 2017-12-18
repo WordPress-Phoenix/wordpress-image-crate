@@ -79,7 +79,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
             }));
         },
 
-        loadUSAT: function () {
+        loadGetty: function () {
             var state = this.state(),
                 collection = state.get('image_crate_photos'),
                 selection = state.get('selection');
@@ -121,7 +121,7 @@ wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
 
     this.on('toolbar:create:image-crate-toolbar', this.image_crate.createToolbar, this);
 
-    this.on('content:render:usatoday', this.image_crate.loadUSAT, this);
+    this.on('content:render:usatoday', this.image_crate.loadGetty, this);
 };
 
 wp.media.view.MediaFrame.Post.prototype.createStates = function () {

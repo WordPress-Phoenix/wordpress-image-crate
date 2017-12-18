@@ -6,7 +6,8 @@
  */
 var ImageCrateSearch = require('./search.js'),
     NoResults = require('./no-results.js'),
-    VerticalsFilter = require('./verticals-filter.js'),
+    TypeFilter = require('./type-filter.js'),
+	SortFilter	= require('./sort-filters.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize,
     StockPhotosBrowser;
 
@@ -29,18 +30,31 @@ StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
     },
 
     createToolBar: function() {
-        this.toolbar.set('VerticalsFilterLabel', new wp.media.view.Label({
-            value: 'Verticals Label',
+        this.toolbar.set('TypeFilterLabel', new wp.media.view.Label({
+            value: 'Type Filter Label',
             attributes: {
-                'for': 'media-attachment-vertical-filters'
+                'for': 'media-attachment-type-filter'
             },
             priority: -75
         }).render());
-        this.toolbar.set('VerticalsFilter', new VerticalsFilter({
+        this.toolbar.set('TypeFilter', new TypeFilter({
             controller: this.controller,
             model: this.collection.props,
             priority: -75
         }).render());
+
+		this.toolbar.set('SortFilterLabel', new wp.media.view.Label({
+			value: 'Sort By',
+			attributes: {
+				'for': 'media-attachment-sort-filters'
+			},
+			priority: -50
+		}).render());
+		this.toolbar.set('SortFilter', new SortFilter({
+			controller: this.controller,
+			model: this.collection.props,
+			priority: -50
+		}).render());
 
         this.toolbar.set('search', new ImageCrateSearch({
             controller: this.controller,

@@ -68,8 +68,8 @@ class Api {
 	 *
 	 */
 	public function __construct() {
-		$this->key = USAT_API_KEY;
-		$this->secret = USAT_API_SECRET;
+		$this->key = '';
+		$this->secret = '';
 		$this->api_url = "http://www.usatodaysportsimages.com/api/searchAPI/";
 		$this->directory = 'usat-images';
 
@@ -105,21 +105,21 @@ class Api {
 		$term = get_option( 'image_crate_default_search', false );
 
 		// fallback to api details
-		if ( empty( $term ) ) {
-			$current_site_details = $fs_vip->modules->site_settings->get_details();
-			$location = ! empty( $current_site_details['location'] ) ? $current_site_details['location'] : '';
-			$topic = ! empty( $current_site_details['topic'] ) ? $current_site_details['topic'] : '';
-
-			// format term based on data set
-			if ( $location == '' && $topic != '' ) {
-				$term = $topic;
-			} elseif( $location != '' && $topic != '' ) {
-				$term = sprintf('%s %s', $location, $topic );
-			}
-
-			// remove all from any term
-			$term = str_replace( 'All', '', $term);
-		}
+//		if ( empty( $term ) ) {
+//			$current_site_details = $fs_vip->modules->site_settings->get_details();
+//			$location = ! empty( $current_site_details['location'] ) ? $current_site_details['location'] : '';
+//			$topic = ! empty( $current_site_details['topic'] ) ? $current_site_details['topic'] : '';
+//
+//			// format term based on data set
+//			if ( $location == '' && $topic != '' ) {
+//				$term = $topic;
+//			} elseif( $location != '' && $topic != '' ) {
+//				$term = sprintf('%s %s', $location, $topic );
+//			}
+//
+//			// remove all from any term
+//			$term = str_replace( 'All', '', $term);
+//		}
 
 		return $term;
 	}

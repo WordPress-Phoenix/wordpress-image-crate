@@ -6,13 +6,37 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit72075da53358459b722b11d9f9a5bc6b
 {
+    public static $prefixLengthsPsr4 = array (
+        'C' => 
+        array (
+            'Composer\\Installers\\' => 20,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'Composer\\Installers\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers',
+        ),
+    );
+
     public static $classMap = array (
-        'WPAZ_Plugin_Base\\V_2_0\\Abstract_Plugin' => __DIR__ . '/..' . '/wordpress-phoenix/abstract-plugin-base/src/abstract_plugin.php',
+        'WPAZ_Plugin_Base\\V_2_5\\Abstract_Plugin' => __DIR__ . '/..' . '/wordpress-phoenix/abstract-plugin-base/src/abstract-plugin.php',
+        'WPOP\\V_2_8\\checkbox' => __DIR__ . '/..' . '/wordpress-phoenix/wordpress-options-builder-class/wordpress-phoenix-options-panel.php',
+        'WPOP\\V_2_8\\container' => __DIR__ . '/..' . '/wordpress-phoenix/wordpress-options-builder-class/wordpress-phoenix-options-panel.php',
+        'WPOP\\V_2_8\\include_markup' => __DIR__ . '/..' . '/wordpress-phoenix/wordpress-options-builder-class/wordpress-phoenix-options-panel.php',
+        'WPOP\\V_2_8\\include_partial' => __DIR__ . '/..' . '/wordpress-phoenix/wordpress-options-builder-class/wordpress-phoenix-options-panel.php',
+        'WPOP\\V_2_8\\media' => __DIR__ . '/..' . '/wordpress-phoenix/wordpress-options-builder-class/wordpress-phoenix-options-panel.php',
+        'WPOP\\V_2_8\\page' => __DIR__ . '/..' . '/wordpress-phoenix/wordpress-options-builder-class/wordpress-phoenix-options-panel.php',
+        'WPOP\\V_2_8\\radio_buttons' => __DIR__ . '/..' . '/wordpress-phoenix/wordpress-options-builder-class/wordpress-phoenix-options-panel.php',
+        'WPOP\\V_2_8\\toggle_switch' => __DIR__ . '/..' . '/wordpress-phoenix/wordpress-options-builder-class/wordpress-phoenix-options-panel.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInit72075da53358459b722b11d9f9a5bc6b::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit72075da53358459b722b11d9f9a5bc6b::$prefixDirsPsr4;
             $loader->classMap = ComposerStaticInit72075da53358459b722b11d9f9a5bc6b::$classMap;
 
         }, null, ClassLoader::class);

@@ -116,7 +116,7 @@ _.extend( wp.media.view.MediaFrame.prototype, {
             }));
         },
 
-        loadUSAT: function () {
+        loadGetty: function () {
             var state = this.state(),
                 collection = state.get('image_crate_photos'),
                 selection = state.get('selection');
@@ -158,7 +158,7 @@ wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
 
     this.on('toolbar:create:image-crate-toolbar', this.image_crate.createToolbar, this);
 
-    this.on('content:render:usatoday', this.image_crate.loadUSAT, this);
+    this.on('content:render:usatoday', this.image_crate.loadGetty, this);
 };
 
 wp.media.view.MediaFrame.Post.prototype.createStates = function () {
@@ -248,7 +248,17 @@ var StockPhotosQuery = wp.media.model.Query.extend({
                 // Clone the args so manipulation is non-destructive.
                 args = _.clone(this.args);
 
-                // Determine which page to query.
+                console.log( 'the args yo' );
+                console.dir( args );
+
+				console.log( 'the model yo' );
+				console.dir( model );
+
+				console.log( 'the options yo' );
+				console.dir( options );
+
+
+				// Determine which page to query.
                 if (-1 !== args.posts_per_page) {
                     args.paged = Math.round(this.length / args.posts_per_page) + 1;
                 }
@@ -409,7 +419,8 @@ module.exports = StockPhotoThumb;
  */
 var ImageCrateSearch = require('./search.js'),
     NoResults = require('./no-results.js'),
-    VerticalsFilter = require('./verticals-filter.js'),
+    TypeFilter = require('./type-filter.js'),
+	SortFilter	= require('./sort-filters.js'),
     coreAttachmentsInitialize  = wp.media.view.AttachmentsBrowser.prototype.initialize,
     StockPhotosBrowser;
 
@@ -432,18 +443,31 @@ StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
     },
 
     createToolBar: function() {
-        this.toolbar.set('VerticalsFilterLabel', new wp.media.view.Label({
-            value: 'Verticals Label',
+        this.toolbar.set('TypeFilterLabel', new wp.media.view.Label({
+            value: 'Type Filter Label',
             attributes: {
-                'for': 'media-attachment-vertical-filters'
+                'for': 'media-attachment-type-filter'
             },
             priority: -75
         }).render());
-        this.toolbar.set('VerticalsFilter', new VerticalsFilter({
+        this.toolbar.set('TypeFilter', new TypeFilter({
             controller: this.controller,
             model: this.collection.props,
             priority: -75
         }).render());
+
+		this.toolbar.set('SortFilterLabel', new wp.media.view.Label({
+			value: 'Sort By',
+			attributes: {
+				'for': 'media-attachment-sort-filters'
+			},
+			priority: -50
+		}).render());
+		this.toolbar.set('SortFilter', new SortFilter({
+			controller: this.controller,
+			model: this.collection.props,
+			priority: -50
+		}).render());
 
         this.toolbar.set('search', new ImageCrateSearch({
             controller: this.controller,
@@ -465,7 +489,7 @@ StockPhotosBrowser = wp.media.view.AttachmentsBrowser.extend({
 });
 
 module.exports = StockPhotosBrowser;
-},{"./no-results.js":7,"./search.js":8,"./verticals-filter.js":9}],7:[function(require,module,exports){
+},{"./no-results.js":7,"./search.js":8,"./sort-filters.js":9,"./type-filter.js":10}],7:[function(require,module,exports){
 /**
  * wp.media.view.NoResults
  *
@@ -516,7 +540,7 @@ var ImageCrateSearch = wp.media.View.extend({
 
     attributes: {
         type: 'search',
-        placeholder: 'Search Images'
+        placeholder: 'Search Getty Images'
     },
 
     events: {
@@ -553,7 +577,7 @@ var ImageCrateSearch = wp.media.View.extend({
         } else {
             this.model.unset('search');
         }
-    }, 500)
+    }, 400 )
 
 });
 
@@ -564,35 +588,29 @@ module.exports = ImageCrateSearch;
  *
  * @augments wp.media.view.AttachmentFilters
  */
-var VerticalsFilter = wp.media.view.AttachmentFilters.extend( {
-    id: 'media-attachment-vertical-filters',
+var SortFilter = wp.media.view.AttachmentFilters.extend( {
+    id: 'media-attachment-sort-filters',
 
     createFilters: function () {
         var filters = {};
-        var verticals = [
-            { vertical: 'NFL', text: '- NFL' },
-            { vertical: 'NBA', text: '- NBA' },
-            { vertical: 'MLB', text: '- MLB' },
-            { vertical: 'NHL', text: '- NHL' },
-            { vertical: 'NCAA Basketball', text: '- NCAA: Basketball' },
-            { vertical: 'NCAA Football', text: '- NCAA: Football' },
-            { vertical: 'SOCCER', text: '- Soccer' },
-            { vertical: 'ENT', text: 'Entertainment '}
+        var sortTypes = [
+            { sort: 'most_popular', text: 'Most Popular' },
+            { sort: 'newest', text: 'Newest' }
         ];
 
-        _.each(verticals || {}, function ( value, index ) {
+        _.each(sortTypes || {}, function ( value, index ) {
             filters[ index ] = {
                 text: value.text,
                 props: {
-                    vertical: value.vertical
+                    sort: value.sort
                 }
             };
         });
 
         filters.all = {
-            text: 'All Sports',
+            text: 'Best Match',
             props: {
-                vertical: false
+                vertical: 'best_match'
             },
             priority: 10
         };
@@ -600,5 +618,41 @@ var VerticalsFilter = wp.media.view.AttachmentFilters.extend( {
     }
 });
 
-module.exports = VerticalsFilter;
+module.exports = SortFilter;
+},{}],10:[function(require,module,exports){
+/**
+ * wp.media.view.VerticalsFilter
+ *
+ * @augments wp.media.view.AttachmentFilters
+ */
+var TypeFilter = wp.media.view.AttachmentFilters.extend( {
+    id: 'media-attachment-type-filter',
+
+    createFilters: function () {
+        var filters = {};
+        var types = [
+            { type: 'adv', text: 'Advanced' }
+        ];
+
+        _.each(types || {}, function ( value, index ) {
+            filters[ index ] = {
+                text: value.text,
+                props: {
+					type: value.type
+                }
+            };
+        });
+
+        filters.all = {
+            text: 'Simple',
+            props: {
+				type: 'simple'
+            },
+            priority: 10
+        };
+        this.filters = filters;
+    }
+});
+
+module.exports = TypeFilter;
 },{}]},{},[2]);

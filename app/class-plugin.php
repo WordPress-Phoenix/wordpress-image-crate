@@ -3,12 +3,15 @@
 namespace ImageCrate;
 
 
-use WPAZ_Plugin_Base\V_2_0\Abstract_Plugin;
+use ImageCrate\Admin\Getty_Images_Search;
+use ImageCrate\Admin\Getty_Import_Image;
+use WPAZ_Plugin_Base\V_2_5\Abstract_Plugin;
 use ImageCrate\Admin\Admin;
+use ImageCrate\Admin\Settings;
 use ImageCrate\Admin\Api;
 use ImageCrate\Admin\Ajax;
 
-class Init extends Abstract_Plugin {
+class Plugin extends Abstract_Plugin {
 
 	/**
 	 * Use magic constant to tell abstract class current namespace as prefix for all other namespaces in the plugin.
@@ -50,6 +53,7 @@ class Init extends Abstract_Plugin {
 	public function authenticated_init() {
 		if ( is_user_logged_in() ) {
 			Admin::init();
+			new Settings( $this->installed_dir, $this->installed_url );
 		}
 	}
 
@@ -63,8 +67,9 @@ class Init extends Abstract_Plugin {
 	public function init() {
 		do_action( get_called_class() . '_before_init' );
 
-		$provider = new Api();
-		new Ajax( $provider );
+		$getty_search = new Getty_Images_Search();
+		$getty_download = new Getty_Import_Image();
+		new Ajax( $getty_search, $getty_download );
 
 		do_action( get_called_class() . '_after_init' );
 	}

@@ -32,7 +32,17 @@ var StockPhotosQuery = wp.media.model.Query.extend({
                 // Clone the args so manipulation is non-destructive.
                 args = _.clone(this.args);
 
-                // Determine which page to query.
+                console.log( 'the args yo' );
+                console.dir( args );
+
+				console.log( 'the model yo' );
+				console.dir( model );
+
+				console.log( 'the options yo' );
+				console.dir( options );
+
+
+				// Determine which page to query.
                 if (-1 !== args.posts_per_page) {
                     args.paged = Math.round(this.length / args.posts_per_page) + 1;
                 }

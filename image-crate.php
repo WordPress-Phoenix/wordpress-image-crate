@@ -26,6 +26,16 @@ if ( ! function_exists( 'add_filter' ) ) {
 }
 
 // Create plugin instance on plugins_loaded action to maximize flexibility of wp hooks and filters system.
-require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/app/class-image-crate.php';
-add_action( 'plugins_loaded', array('ImageCrate\\Init', 'run') );
+//require_once __DIR__ . '/vendor/autoload.php';
+
+// manually include composer dependencies for safety
+if ( ! class_exists( 'WPOP\\V_2_8') ) {
+	require_once __DIR__ . '/vendor/wordpress-phoenix/wordpress-options-builder-class/wordpress-phoenix-options-panel.php';
+}
+if ( ! class_exists( 'WPAZ_Plugin_Base\\V_2_5\\Abstract_Plugin') ) {
+	require_once __DIR__ . '/vendor/wordpress-phoenix/abstract-plugin-base/src/abstract-plugin.php';
+}
+// locate plugin
+require_once __DIR__ . '/app/class-plugin.php';
+
+ImageCrate\Plugin::run( __FILE__ );

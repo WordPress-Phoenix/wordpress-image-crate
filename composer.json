@@ -1,5 +1,6 @@
 {
     "require": {
-        "WordPress-Phoenix/abstract-plugin-base": "^2.0"
+        "WordPress-Phoenix/abstract-plugin-base": "^2.5",
+        "WordPress-Phoenix/wordpress-options-builder-class": "^2.8"
     }
 }

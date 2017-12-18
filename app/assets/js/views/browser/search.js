@@ -10,7 +10,7 @@ var ImageCrateSearch = wp.media.View.extend({
 
     attributes: {
         type: 'search',
-        placeholder: 'Search Images'
+        placeholder: 'Search Getty Images'
     },
 
     events: {
@@ -47,7 +47,7 @@ var ImageCrateSearch = wp.media.View.extend({
         } else {
             this.model.unset('search');
         }
-    }, 500)
+    }, 400 )
 
 });
 
