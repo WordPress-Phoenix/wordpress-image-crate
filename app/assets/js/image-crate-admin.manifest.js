@@ -1,149 +1,147 @@
-
-var ImageCrateController = require('./controllers/image-crate-controller.js'),
-    StockPhotoThumb = require('./views/browser/image-crate-photo.js'),
-    StockPhotosModel = require('./models/image-crate-photo-model.js'),
-    StockPhotoBrowser = require('./views/browser/image-crate-photos.js'),
-    coreCreateStates = wp.media.view.MediaFrame.Post.prototype.createStates,
-    coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers;
+var ImageCrateController = require( './controllers/image-crate-controller.js' ),
+	StockPhotoThumb = require( './views/browser/image-crate-photo.js' ),
+	StockPhotosModel = require( './models/image-crate-photo-model.js' ),
+	StockPhotoBrowser = require( './views/browser/image-crate-photos.js' ),
+	coreCreateStates = wp.media.view.MediaFrame.Post.prototype.createStates,
+	coreBindHandlers = wp.media.view.MediaFrame.Select.prototype.bindHandlers;
 
 _.extend( wp.media.view.MediaFrame.prototype, {
-    image_crate: {
-        activate: function () {
-            // todo: goal to more image providers as tabs
-            var view = _.first(this.views.get('.media-frame-router')),
-                viewSettings = {};
+	image_crate: {
+		activate: function() {
+			// todo: goal to more image providers as tabs
+			var view = _.first( this.views.get( '.media-frame-router' ) ),
+				viewSettings = {};
 
-            viewSettings.usatoday = {
-                text: 'USA Today Images',
-                priority: 60
-            };
-            view.set(viewSettings);
+			viewSettings.getty = {
+				priority: 60
+			};
+			view.set( viewSettings );
 
-            this.content.mode('usatoday');
-        },
+			this.content.mode( 'getty' );
+		},
 
-        createToolbar: function (  ) {
-            var controller = this;
-            this.toolbar.set(new wp.media.view.Toolbar({
-                controller: this,
-                items: {
-                    insert: {
-                        style: 'primary',
-                        text: 'Download Image',
-                        priority: 80,
-                        // todo: fix bug where require selection only works if at least one image is in the library
-                        requires: {
-                            // library: true,
-                            selection: true
-                        },
+		createToolbar: function() {
+			var controller = this;
+			this.toolbar.set( new wp.media.view.Toolbar( {
+				controller: this,
+				items: {
+					insert: {
+						style: 'primary',
+						text: 'Download Image',
+						priority: 80,
+						// todo: fix bug where require selection only works if at least one image is in the library
+						requires: {
+							// library: true,
+							selection: true
+						},
 
-                        click: function () {
-                            var state = controller.state(),
-                                selection = state.get('selection');
+						click: function() {
+							var state = controller.state(),
+								selection = state.get( 'selection' );
 
-                            this.$el.attr('disabled', 'disabled')
-                                    .text('Downloading');
+							this.$el.attr( 'disabled', 'disabled' )
+								.text( 'Downloading' );
 
-                            wp.media.ajax({
-                                data: {
-                                    action: 'image_crate_download',
-                                    filename: selection.models[0].get('filename'),
-                                    id: selection.models[0].get('id'),
-                                    download_uri: selection.models[0].get('download_uri'),
-                                    _ajax_nonce: imagecrate.nonce
-                                }
-                            }).done(function (attachment) {
+							wp.media.ajax( {
+								data: {
+									action: 'image_crate_download',
+									filename: selection.models[0].get( 'filename' ),
+									id: selection.models[0].get( 'id' ),
+									download_uri: selection.models[0].get( 'download_uri' ),
+									_ajax_nonce: imageCrate.nonce
+								}
+							} ).done( function( attachment ) {
 
-                                // Swap back to insert state to manipulate collection.
-                                controller.setState('insert');
+								// Swap back to insert state to manipulate collection.
+								controller.setState( 'insert' );
 
-                                // Image may exist in the library, so we move it to the front of the line
-                                var browse = wp.media.frame.content.mode('browse');
+								// Image may exist in the library, so we move it to the front of the line
+								var browse = wp.media.frame.content.mode( 'browse' );
 
-                                // might not need this
-                                browse.get('gallery').collection.add(attachment);
-                                browse.get('selection').collection.add(attachment);
+								// might not need this
+								browse.get( 'gallery' ).collection.add( attachment );
+								browse.get( 'selection' ).collection.add( attachment );
 
-                                browse.get('insert').collection.remove(attachment);
-                                browse.get('insert').collection.unshift(attachment);
+								browse.get( 'insert' ).collection.remove( attachment );
+								browse.get( 'insert' ).collection.unshift( attachment );
 
-                                // This will trigger all mutation observer
-                                wp.Uploader.queue.add(attachment);
-                                wp.Uploader.queue.remove(attachment);
+								// This will trigger all mutation observer
+								wp.Uploader.queue.add( attachment );
+								wp.Uploader.queue.remove( attachment );
 
-                                browse.get('insert').$('li:first .thumbnail').click();
-                            });
-                        }
-                    }
-                }
-            }));
-        },
+								browse.get( 'insert' ).$( 'li:first .thumbnail' ).click();
+							} );
+						}
+					}
+				}
+			} ) );
+		},
 
-        loadGetty: function () {
-            var state = this.state(),
-                collection = state.get('image_crate_photos'),
-                selection = state.get('selection');
+		loadGetty: function() {
+			var state = this.state(),
+				collection = state.get( 'image_crate_photos' ),
+				selection = state.get( 'selection' );
 
-            if ( _.isUndefined( collection ) ) {
-                collection = new StockPhotosModel(
-                    null,
-                    {
-                        props: {
-                            query: true,
-                        }
-                    }
-                );
+			if ( _.isUndefined( collection ) ) {
+				collection = new StockPhotosModel(
+					null,
+					{
+						props: {
+							query: true
+						}
+					}
+				);
 
-                // Reference the state if needed later
-                state.set('image_crate_photos', collection);
-            }
+				// Reference the state if needed later
+				state.set( 'image_crate_photos', collection );
+			}
 
-            this.content.set(new StockPhotoBrowser({
-                className: 'image-crate attachments-browser',
-                controller: this,
-                collection: collection,
-                selection: selection,
-                model: state,
-                filters: false,
-                date: false,
-                AttachmentView: StockPhotoThumb
-            }));
-        },
-    }
-});
+			this.content.set( new StockPhotoBrowser( {
+				className: 'image-crate attachments-browser',
+				controller: this,
+				collection: collection,
+				selection: selection,
+				model: state,
+				filters: false,
+				date: false,
+				AttachmentView: StockPhotoThumb
+			} ) );
+		},
+	}
+} );
 
-wp.media.view.MediaFrame.Select.prototype.bindHandlers = function () {
-    coreBindHandlers.apply(this, arguments);
+wp.media.view.MediaFrame.Select.prototype.bindHandlers = function() {
+	coreBindHandlers.apply( this, arguments );
 
-    this.on('router:create:image-crate', this.createRouter, this);
-    this.on('router:activate:image-crate', this.image_crate.activate, this);
-    this.on('router:deactivate:image-crate', this.deactivate, this);
+	this.on( 'router:create:image-crate', this.createRouter, this );
+	this.on( 'router:activate:image-crate', this.image_crate.activate, this );
+	this.on( 'router:deactivate:image-crate', this.deactivate, this );
 
-    this.on('toolbar:create:image-crate-toolbar', this.image_crate.createToolbar, this);
+	this.on( 'toolbar:create:image-crate-toolbar', this.image_crate.createToolbar, this );
 
-    this.on('content:render:usatoday', this.image_crate.loadGetty, this);
+	this.on( 'content:render:getty', this.image_crate.loadGetty, this );
 };
 
-wp.media.view.MediaFrame.Post.prototype.createStates = function () {
-    coreCreateStates.apply(this, arguments);
-    this.states.add(new ImageCrateController);
+wp.media.view.MediaFrame.Post.prototype.createStates = function() {
+	coreCreateStates.apply( this, arguments );
+	this.states.add( new ImageCrateController );
 };
 
 /**
  * Temporary fix until bug saving caption data is fixed
  */
-jQuery(function ($) {
-    $(document).on( 'click', '.thumbnail', function () {
-        var caption = $('[data-setting=caption]').find('textarea'),
-            desc = $('[data-setting=description]').find('textarea');
+jQuery( function( $ ) {
+	$( document ).on( 'click', '.thumbnail', function() {
+		var caption = $( '[data-setting=caption]' ).find( 'textarea' ),
+			desc = $( '[data-setting=description]' ).find( 'textarea' );
 
-        /**
-         * If the a caption is empty, populate with the description and trigger
-         * change event to save model data.
-         */
-        if ( ! caption.val() ) {
-            caption.val( desc.val() );
-            caption.change();
-        }
-    })
-});
+		/**
+		 * If the a caption is empty, populate with the description and trigger
+		 * change event to save model data.
+		 */
+		if ( !caption.val() ) {
+			caption.val( desc.val() );
+			caption.change();
+		}
+	} )
+} );

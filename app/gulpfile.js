@@ -10,7 +10,7 @@ gulp.task('packup', function () {
     return browserify('assets/js/image-crate-admin.manifest.js')
         .bundle()
         .pipe(source('image-crate-admin.js'))
-        .pipe(gulp.dest('assets/js'));
+        .pipe(gulp.dest('assets/js/dist'));
 });
 
 // make compressed version of our app file
@@ -20,7 +20,7 @@ gulp.task('compress', ['packup'], function (cb) {
             gulp.src('assets/js/image-crate-admin.js'),
             uglify(),
             rename({suffix: '.min'}),
-            gulp.dest('assets/js')
+            gulp.dest('assets/js/dist')
         ],
         cb
     );
@@ -32,6 +32,6 @@ gulp.task('default', ['build']);
 
 // watcher setup
 gulp.task('watch', ['build'], function () {
-    // gulp.watch('src/js/app.manifest.js', ['packup', 'compress']);
+    gulp.watch('src/js/app.manifest.js', ['packup', 'compress']);
     gulp.watch('assets/js/**/*.js', ['build']);
 });

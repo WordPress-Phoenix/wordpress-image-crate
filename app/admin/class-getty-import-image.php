@@ -87,9 +87,17 @@ final class Getty_Import_Image {
 	}
 
 	static function get_fullsize_delivery_url( $getty_download_endpoint_url ) {
-		$url = $getty_download_endpoint_url . '?auto_download=false';
-		error_log( 'download url: ' . var_export( $url, true ) );
-		$response = wp_remote_post( $url, array( 'headers' => Getty_Auth_Token::get_headers_auth_array() ) );
+		$user = wp_get_current_user();
+		$dl_txt = 'Downloaded with WordPress Image Crate by ';
+		$response = wp_remote_post(
+			$getty_download_endpoint_url . '?auto_download=false',
+			array(
+				'headers' => Getty_Auth_Token::get_headers_auth_array(),
+				'body' => array(
+					'download_notes' => $dl_txt . $user->display_name . ' (' . $user->ID . ') at ' . current_time( 'mysql')
+				)
+			)
+		);
 
 		if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
 			error_log( 'successful fullsize url retrieval...' );

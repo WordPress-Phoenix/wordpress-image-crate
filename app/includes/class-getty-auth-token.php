@@ -56,11 +56,12 @@ class Getty_Auth_Token {
 		return $response_data->access_token;
 	}
 
-	public static function get_headers_auth_array() {
-		return [
-			'Api-Key'       => Getty::get_api_key(),
-			'Authorization' => 'Bearer ' . self::get_auth_token(),
-		];
+	public static function get_headers_auth_array( $headers = array() ) {
+		return wp_parse_args( [
+				'Api-Key'       => Getty::get_api_key(),
+				'Authorization' => 'Bearer ' . self::get_auth_token(),
+			], $headers
+		);
 	}
 
 	public static function post_to_getty_api( $timeout = 5 ) {

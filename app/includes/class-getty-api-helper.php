@@ -8,7 +8,6 @@ class Getty_API_Helper {
 	public static $api_root = 'https://api.gettyimages.com';
 	public static $route_auth = 'oauth2/token';
 	public static $route_search = '/v3/search/images';
-	public static $route_single = 'v3/image/';
 	public static $cache_key = 'oauth-token';
 	public static $cache_group = 'ic-getty-images';
 	public static $cache_timeout = ( 30 * MINUTE_IN_SECONDS - 45 );

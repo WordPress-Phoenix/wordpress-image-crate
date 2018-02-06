@@ -26,7 +26,7 @@ var StockPhotosQuery = wp.media.model.Query.extend( {
 				options.context = this;
 				options.data = _.extend( options.data || {}, {
 					action: 'image_crate_get',
-					_ajax_nonce: imagecrate.nonce
+					_ajax_nonce: imageCrate.nonce
 				} );
 
 				// Clone the args so manipulation is non-destructive.
@@ -34,9 +34,6 @@ var StockPhotosQuery = wp.media.model.Query.extend( {
 
 				console.log( 'the args yo' );
 				console.dir( args );
-
-				console.log( 'the model yo' );
-				console.dir( model );
 
 				console.log( 'the options yo' );
 				console.dir( options );
@@ -74,6 +71,8 @@ var StockPhotosQuery = wp.media.model.Query.extend( {
 			 * @returns {Query}
 			 */
 			return function( props, options ) {
+				console.log( 'them props yo' );
+				console.log( props );
 				var someprops = props;
 				var Query = StockPhotosQuery,
 					args = {},
@@ -112,8 +111,7 @@ var StockPhotosQuery = wp.media.model.Query.extend( {
 						props: props,
 						args: args
 					} ) );
-					console.log( 'was no query here it at' );
-					console.log( query );
+
 					queries.push( query );
 				}
 				console.log( 'final return here it at' );

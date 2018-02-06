@@ -8,7 +8,7 @@
 var ImageCrateController = wp.media.controller.Library.extend( {
 	defaults: _.defaults( {
 		id: 'image-crate',
-		title: imagecrate.page_title,
+		title: imageCrate.page_title,
 		multiple: false,
 		menu: 'default',
 		router: 'image-crate',
@@ -20,15 +20,17 @@ var ImageCrateController = wp.media.controller.Library.extend( {
 		describe: false,
 		contentUserSetting: true,
 		syncSelection: false,
-		priority: 800,
+		priority: 8000,
 		isImageCrate: true
 	}, wp.media.controller.Library.prototype.defaults ),
 
 	initialize: function() {
+
 		if ( !this.get( 'library' ) ) {
-			this.set( 'library', wp.media.query( { imagecrate: true } ) );
+			this.set( 'library', wp.media.query( { imageCrate: true } ) );
 		}
 		wp.media.controller.Library.prototype.initialize.apply( this, arguments );
+
 	}
 } );
 

@@ -41,9 +41,9 @@ class Admin {
 		$suffix = SCRIPT_DEBUG ? '' : '.min';
 		wp_register_script(
 			'image-crate',
-			plugins_url( '/wordpress-image-crate/app/assets/js/image-crate-admin' . $suffix . '.js' ),
+			plugins_url( '/wordpress-image-crate/app/assets/js/dist/image-crate-admin' . $suffix . '.js' ),
 			array( 'media-views' ),
-			rand( 0, 10000000 ),
+			mt_rand( 5, 5000000000000 ),
 			true
 		);
 
@@ -51,9 +51,9 @@ class Admin {
 
 		wp_localize_script(
 			'image-crate',
-			'imagecrate', apply_filters( 'image_crate_controller_title', array(
+			'imageCrate', apply_filters( 'image_crate_controller_title', array(
 				'page_title'     => __( 'Getty', 'image-crate' ),
-				'default_search' => Api::get_default_query(),
+				'default_search' => '', // TODO: get default search query
 				'nonce'          => wp_create_nonce( 'image_crate' )
 			) )
 		);
@@ -64,15 +64,19 @@ class Admin {
 	 * Append custom to display no results
 	 */
 	public static function no_results_template() {
+		$getty_logo = plugins_url( 'wordpress-image-crate/app/assets/getty-logo.svg' );
 		?>
 		<script type="text/html" id="tmpl-image-crate-no-results">
 			<# var messageClass = data.message ? 'has-upload-message' : 'no-upload-message'; #>
 			<div class="uploader-inline-content {{ messageClass }}">
+				<img src="<?php echo esc_url_raw( $getty_logo ); ?>" style="max-width:280px;height:auto;"/><br /><br />
 				<# if ( data.message ) { #>
 				<h2 class="upload-message">{{ data.message }}</h2>
 				<# } #>
 				<div class="upload-ui">
-					<h2 class="upload-instructions drop-instructions"><?php _e( 'Please search for a different term.' ); ?></h2>
+					<h2 class="upload-instructions drop-instructions"><?php _e( 'Please adjust your search parameters.' ); ?></h2>
+					<br />
+					<a class="button button-secondary button-hero" href="#">Downloaded Getty Images in Library</a>
 				</div>
 			</div>
 		</script>
@@ -97,6 +101,10 @@ class Admin {
 			.image-crate .attachment-details label[data-setting=url],
 			.image-crate .attachment-details label[data-setting=alt] {
 				display: none;
+			}
+
+			#media-attachment-sort-filters {
+				min-width:90px;
 			}
 		</style>
 		<?php

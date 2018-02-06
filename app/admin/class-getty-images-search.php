@@ -65,17 +65,17 @@ class Getty_Images_Search {
 	 * @param string $phrase   Search phrase to make the call
 	 * @param string $page     Offset to return a new 'page'
 	 * @param string $per_page Amount to show per page
+	 * @param string $sort     Sort-type to sent to Getty API
 	 *
 	 * @return array|bool
 	 */
-	public function fetch( $phrase, $page, $per_page ) {
+	public function fetch( $phrase, $page, $per_page, $sort ) {
 
 		$search_args = array(
 			'phrase'        => $phrase,
 			'page'          => $page,
-//			'page_size'     => $per_page,
-			'page_size'     => '5',
-			'sort_order'    => 'best_match',
+			'page_size'     => $per_page,
+			'sort_order'    => $sort,
 			'product_types' => 'premiumaccess',
 			'file_types'    => 'jpg',
 			'fields'        => implode( ',', [

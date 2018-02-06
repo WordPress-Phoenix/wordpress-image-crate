@@ -67,8 +67,9 @@ class Plugin extends Abstract_Plugin {
 	public function init() {
 		do_action( get_called_class() . '_before_init' );
 
-		$getty_search = new Getty_Images_Search();
+		$getty_search   = new Getty_Images_Search();
 		$getty_download = new Getty_Import_Image();
+
 		new Ajax( $getty_search, $getty_download );
 
 		do_action( get_called_class() . '_after_init' );
