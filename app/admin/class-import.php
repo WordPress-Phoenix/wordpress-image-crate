@@ -26,7 +26,7 @@ final class Import {
 	 */
 	public function image( $download_url, $filename, $custom_directory ) {
 		if ( $custom_directory ) {
-		    $this->directory = $custom_directory;
+			$this->directory = $custom_directory;
 		}
 
 		$file_array = [];
@@ -35,8 +35,8 @@ final class Import {
 		$id_exists = $this->check_attachment( $post_name );
 
 		// filename will determine if download will occur
-		if ( $id_exists > 0  ) {
-		    return $id_exists;
+		if ( $id_exists > 0 ) {
+			return $id_exists;
 		}
 
 		// place the images in a custom directory
@@ -52,6 +52,7 @@ final class Import {
 
 		if ( ! $matches ) {
 			unlink( $file_array['tmp_name'] );
+
 			return false;
 		}
 
@@ -61,14 +62,14 @@ final class Import {
 			require_once ABSPATH . 'wp-admin/includes/media.php';
 		}
 
-		$api_image   = $file_array['name'];
+		$api_image = $file_array['name'];
 
-		$image_type = pathinfo( $api_image );
-		$file_name  = basename( $api_image, '.' . $image_type['extension'] );
+		$image_type         = pathinfo( $api_image );
+		$file_name          = basename( $api_image, '.' . $image_type['extension'] );
 		$file_array['name'] = str_replace( $file_name, $post_name, $api_image );
 
 		// Do the validation and storage stuff
-		$id = media_handle_sideload( $file_array, 0, null, ['post_name' => $filename ] );
+		$id = media_handle_sideload( $file_array, 0, null, [ 'post_name' => $filename ] );
 
 		$this->delete_file( $file_array['tmp_name'] );
 
@@ -104,12 +105,12 @@ final class Import {
 		//generate signature
 		$sigBase = "GET&" . rawurlencode( $baseUrl ) . "&"
 		           . rawurlencode( "imageID=" . $id
-		           . "&oauth_consumer_key=" . rawurlencode( $consumerKey )
-                   . "&oauth_nonce=" . rawurlencode( $nonce )
-                   . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
-                   . "&oauth_timestamp=" . $oauthTimestamp
-                   . "&oauth_version=" . $oauthVersion
-                    );
+		                           . "&oauth_consumer_key=" . rawurlencode( $consumerKey )
+		                           . "&oauth_nonce=" . rawurlencode( $nonce )
+		                           . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
+		                           . "&oauth_timestamp=" . $oauthTimestamp
+		                           . "&oauth_version=" . $oauthVersion
+		           );
 
 		$sigKey   = $consumerSecret . "&";
 		$oauthSig = base64_encode( hash_hmac( "sha1", $sigBase, $sigKey, true ) );

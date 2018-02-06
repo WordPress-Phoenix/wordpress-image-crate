@@ -28,24 +28,28 @@ final class Getty_Import_Image {
 	 * @return bool|int|object
 	 */
 	public function image( $download_url, $filename, $custom_directory ) {
-		if ( $custom_directory ) {
-			$this->directory = $custom_directory;
-		}
+		$this->directory = 'getty';
 
 		$file_array = [];
-
 		$post_name = strtolower( $filename );
-		$id_exists = $this->check_attachment( $post_name );
 
-		// filename will determine if download will occur
-		if ( $id_exists > 0  ) {
+		// bail if
+		if ( ! empty( $this->check_attachment_exists( $post_name ) )  ) {
 			return $id_exists;
 		}
 
 		// place the images in a custom directory
 		add_filter( 'upload_dir', array( &$this, 'set_upload_dir' ) );
 
+		error_log( 'begin api call for fullsize url...' );
+		$download_url = self::get_fullsize_delivery_url( $download_url );
+
+		error_log( 'done, here\'s what I got: ' . var_export( $download_url, true ) );
+
 		$file_array['tmp_name'] = $this->download( $download_url );
+
+		error_log( 'ran download' );
+		error_log( var_export( $file_array, true ) );
 
 		if ( ! $file_array['tmp_name'] ) {
 			return false;
@@ -70,39 +74,53 @@ final class Getty_Import_Image {
 		$file_name  = basename( $api_image, '.' . $image_type['extension'] );
 		$file_array['name'] = str_replace( $file_name, $post_name, $api_image );
 
+		error_log( '$file_array' );
+		error_log( var_export( $file_array, true ) );
+
 		// Do the validation and storage stuff
 		$id = media_handle_sideload( $file_array, 0, null, ['post_name' => $filename ] );
 
+		error_log( 'deleting temp file...' );
 		$this->delete_file( $file_array['tmp_name'] );
 
 		return is_wp_error( $id ) ? false : $id;
 	}
 
+	static function get_fullsize_delivery_url( $getty_download_endpoint_url ) {
+		$url = $getty_download_endpoint_url . '?auto_download=false';
+		error_log( 'download url: ' . var_export( $url, true ) );
+		$response = wp_remote_post( $url, array( 'headers' => Getty_Auth_Token::get_headers_auth_array() ) );
+
+		if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
+			error_log( 'successful fullsize url retrieval...' );
+			$data = wp_remote_retrieve_body( $response );
+			if ( ( is_array( $data ) || is_array( $data = json_decode( $data, true ) ) && isset( $data['uri'] ) ) ) {
+				return $data['uri'];
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Download a file by its URL
 	 *
-	 * @param $url
+	 * @param $getty_api_url
 	 *
 	 * @return bool|string
 	 * @internal param string $id
 	 *
 	 */
-	private function download( $url ) {
+	private function download( $getty_api_url ) {
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
 
-		preg_match( '/\?.*imageID=(\d+).*/', $url, $matches );
-		$query   = $matches[0];
-		$id      = $matches[1];
-		$baseUrl = str_replace( $query, '', $url );
-
-		$consumerKey         = Getty::get_api_key();
-		$consumerToken       = Getty_Auth_Token::get_auth_token();
-
-
-
-		$file = download_url( $requestUrl );
+		if ( function_exists( 'wpcom_vip_download_image' ) ) {
+			$file = wpcom_vip_download_image( $getty_api_url );
+		} else {
+			$file = download_url( $getty_api_url , 15 );
+		}
 
 		if ( is_wp_error( $file ) ) {
 			return false;
@@ -147,14 +165,20 @@ final class Getty_Import_Image {
 	 *
 	 * @return int Post attachment id
 	 */
-	public function check_attachment( $post_name, $call_type = 'remote' ) {
+	public function check_attachment_exists( $post_name, $call_type = 'remote' ) {
 		// Switch to another blog to check post existence.
 		if ( $call_type == 'remote' && is_multisite() ) {
 			switch_to_blog( get_current_blog_id() );
 		}
 
 		global $wpdb;
-		$attachment_id = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_name='%s';", $post_name ) );
+
+		$attachment_id = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT ID FROM $wpdb->posts WHERE post_name='%s';",
+				$post_name
+			)
+		);
 
 		if ( ! empty( $attachment_id[0] ) ) {
 			$date          = date( 'Y-m-d h:i:s' );

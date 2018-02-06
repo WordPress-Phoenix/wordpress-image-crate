@@ -36,12 +36,14 @@ class Getty_Images_Search {
 	public function __construct() {
 		$this->directory = 'getty';
 
+		// process image paths for saving on server
 		add_filter( 'wp_prepare_attachment_for_js', array( $this, 'update_media_modal_file_refs' ), 99, 1 );
+
 		add_filter( 'wp_get_attachment_image_src', array( $this, 'set_image_path' ) );
 		add_filter( 'wp_calculate_image_srcset', array( $this, 'update_scrset_attr' ), 10, 1 );
 		add_filter( 'image_send_to_editor', array( $this, 'send_to_editor' ), 10, 1 );
 		add_filter( 'image_get_intermediate_size', array( $this, 'set_image_editor_thumb_url' ), 10, 1 );
-		add_filter( 'w', array( $this, 'filter_controller_title') );
+		add_filter( 'w', array( $this, 'filter_controller_title' ) );
 	}
 
 	/**
@@ -53,14 +55,15 @@ class Getty_Images_Search {
 	 */
 	public function filter_controller_title( $title ) {
 		$title['page_title'] = 'Getty Images';
+
 		return $title;
 	}
 
 	/**
 	 * Request image data from source
 	 *
-	 * @param string $phrase Search phrase to make the call
-	 * @param string $page Offset to return a new 'page'
+	 * @param string $phrase   Search phrase to make the call
+	 * @param string $page     Offset to return a new 'page'
 	 * @param string $per_page Amount to show per page
 	 *
 	 * @return array|bool
@@ -70,17 +73,19 @@ class Getty_Images_Search {
 		$search_args = array(
 			'phrase'        => $phrase,
 			'page'          => $page,
-			'page_size'     => $per_page,
+//			'page_size'     => $per_page,
+			'page_size'     => '5',
 			'sort_order'    => 'best_match',
-			'product_types' => 'editorialsubscription,premiumaccess',
+			'product_types' => 'premiumaccess',
 			'file_types'    => 'jpg',
 			'fields'        => implode( ',', [
 					'id',
 					'largest_downloads',
-					'max_dimensions',
 					'orientation',
 					'preview',
 					'thumb',
+					'date_created',
+					'caption',
 					'title',
 				]
 			),
@@ -104,22 +109,18 @@ class Getty_Images_Search {
 		$search_response = wp_remote_get(
 			Getty::$api_root . Getty::$route_search . '?' . http_build_query( $search_args ),
 			array(
-				'timeout' => 15,
+				'timeout' => 10,
 				'headers' => Getty_Auth_Token::get_headers_auth_array(),
 			)
 		);
-
-
-		error_log( 'the search response' );
-		error_log( var_export( $search_response, true ) );
 
 		if ( is_wp_error( $search_response ) ) {
 			return false;
 		}
 
-		$response_body = json_decode( wp_remote_retrieve_body( $search_response ), true);
+		$response_body = json_decode( wp_remote_retrieve_body( $search_response ), true );
 
-		if ( ! is_null( $response_body ) ) {
+		if ( ! is_null( $response_body ) && is_array( $response_body ) ) {
 			return $response_body['images'];
 		}
 
@@ -145,35 +146,34 @@ class Getty_Images_Search {
 	 * @return array Formatted data backbone collections
 	 */
 	private function prepare_attachment_for_js( $attachment ) {
+		error_log( 'first attachment...' );
+		error_log( var_export( $attachment, true ) );
+
 		$thumb = wp_parse_url( $attachment['sizes']['thumb']['url'] );
 
 		return array(
-			'id' => $attachment['id'],
-			'title' => htmlspecialchars( $attachment['title'] ),
-			'filename' => htmlspecialchars( $attachment['id'] . ' ' . sanitize_title( $attachment['title'] ) ),
-			'caption' => htmlspecialchars( $attachment['caption'] ),
-			'description' => htmlspecialchars( $attachment['caption'] ),
-			'type' => 'image',
-			'sizes' => array(
+			'id'           => $attachment['id'],
+			'title'        => htmlspecialchars( $attachment['title'] ),
+			'filename'     => htmlspecialchars( $attachment['id'] . '-' . sanitize_title( $attachment['title'] ) ),
+			'caption'      => htmlspecialchars( $attachment['caption'] ),
+			'description'  => htmlspecialchars( $attachment['caption'] ),
+			'type'         => 'image',
+			'sizes'        => array(
+				'large'     => array(
+					'url'    => $attachment['display_sizes'][0]['uri'],
+					'width'  => 320,
+					'height' => 240,
+				),
 				'thumbnail' => array(
-					'url' => $attachment['thumbUrl'],
-					'width' => $attachment['width'],
-					'height' => $attachment['height'],
+					'url'    => $attachment['display_sizes'][1]['uri'],
+					'width'  => 160,
+					'height' => 160,
 				),
-				'full' => array(
-					'url' => $attachment['fullUrl'],
-					'width'  => $attachment['width'],
-					'height' => $attachment['height'],
-				),
-				'large'   => array(
-					'url' => $attachment['previewUrl'],
-					'width'  => $attachment['width'],
-					'height' => $attachment['height'],
-				),
+
 			),
-			'download_uri' => $download_url,
-			'max_width' => $attachment['width'],
-			'max_height' => $attachment['height'],
+			'download_uri' => $attachment['largest_downloads'][0]['uri'],
+//			'max_width'    => $attachment['width'],
+//			'max_height'   => $attachment['height'],
 		);
 	}
 

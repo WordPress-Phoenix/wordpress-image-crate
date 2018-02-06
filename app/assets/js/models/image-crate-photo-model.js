@@ -6,22 +6,22 @@
  * @class
  * @augments wp.media.model.Attachments
  */
-var StockPhotosQuery = require('./image-crate-photos-query');
+var StockPhotosQuery = require( './image-crate-photos-query' );
 
-var StockPhotos = wp.media.model.Attachments.extend({
+var StockPhotos = wp.media.model.Attachments.extend( {
 
-    initialize: function (models, options) {
-        wp.media.model.Attachments.prototype.initialize.call(this, models, options);
-    },
-    _requery: function (refresh) {
-        var props;
+	initialize: function( models, options ) {
+		wp.media.model.Attachments.prototype.initialize.call( this, models, options );
+	},
+	_requery: function( refresh ) {
+		var props;
 
-        if ( this.props.get('query') ) {
-            props = this.props.toJSON();
-            props.cache = ( true !== refresh );
-            this.mirror( StockPhotosQuery.get( props ) );
-        }
-    }
-});
+		if ( this.props.get( 'query' ) ) {
+			props = this.props.toJSON();
+			props.cache = (true !== refresh);
+			this.mirror( StockPhotosQuery.get( props ) );
+		}
+	}
+} );
 
 module.exports = StockPhotos;

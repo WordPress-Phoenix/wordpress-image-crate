@@ -21,14 +21,17 @@ class Admin {
 		add_action( 'wp_enqueue_media', array( get_called_class(), 'enqueue_scripts' ) );
 		add_action( 'print_media_templates', array( get_called_class(), 'no_results_template' ) );
 		add_action( 'admin_print_styles', array( get_called_class(), 'alter_attachment_thumb_display' ) );
-		add_filter( 'plugin_action_links_wordpress-image-crate/image-crate.php', array( get_called_class(), 'add_action_links' ) );
+		add_filter( 'plugin_action_links_wordpress-image-crate/image-crate.php', array(
+			get_called_class(),
+			'add_action_links'
+		) );
 	}
 
 	/**
 	 * Enqueue custom media modal scripts
 	 */
 	public static function enqueue_scripts() {
-		if ( ! wp_script_is( 'media-views', 'enqueued' ) ) {
+		if ( wp_doing_ajax() || ! wp_script_is( 'media-views', 'enqueued' ) ) {
 			if ( ! is_customize_preview() ) {
 				return;
 			}
@@ -40,7 +43,7 @@ class Admin {
 			'image-crate',
 			plugins_url( '/wordpress-image-crate/app/assets/js/image-crate-admin' . $suffix . '.js' ),
 			array( 'media-views' ),
-			rand(0,10000000),
+			rand( 0, 10000000 ),
 			true
 		);
 
@@ -64,15 +67,14 @@ class Admin {
 		?>
 		<script type="text/html" id="tmpl-image-crate-no-results">
 			<# var messageClass = data.message ? 'has-upload-message' : 'no-upload-message'; #>
-				<div class="uploader-inline-content {{ messageClass }}">
-					<# if ( data.message ) { #>
-						<h2 class="upload-message">{{ data.message }}</h2>
-						<# } #>
-
-							<div class="upload-ui">
-								<h2 class="upload-instructions drop-instructions"><?php _e( 'Please search for a different term.' ); ?></h2>
-							</div>
+			<div class="uploader-inline-content {{ messageClass }}">
+				<# if ( data.message ) { #>
+				<h2 class="upload-message">{{ data.message }}</h2>
+				<# } #>
+				<div class="upload-ui">
+					<h2 class="upload-instructions drop-instructions"><?php _e( 'Please search for a different term.' ); ?></h2>
 				</div>
+			</div>
 		</script>
 		<?php
 	}

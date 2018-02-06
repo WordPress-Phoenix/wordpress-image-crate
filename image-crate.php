@@ -29,10 +29,10 @@ if ( ! function_exists( 'add_filter' ) ) {
 //require_once __DIR__ . '/vendor/autoload.php';
 
 // manually include composer dependencies for safety
-if ( ! class_exists( 'WPOP\\V_2_8') ) {
+if ( ! class_exists( 'WPOP\\V_3_1\\Panel' ) ) {
 	require_once __DIR__ . '/vendor/wordpress-phoenix/wordpress-options-builder-class/wordpress-phoenix-options-panel.php';
 }
-if ( ! class_exists( 'WPAZ_Plugin_Base\\V_2_5\\Abstract_Plugin') ) {
+if ( ! class_exists( 'WPAZ_Plugin_Base\\V_2_5\\Abstract_Plugin' ) ) {
 	require_once __DIR__ . '/vendor/wordpress-phoenix/abstract-plugin-base/src/abstract-plugin.php';
 }
 // locate plugin

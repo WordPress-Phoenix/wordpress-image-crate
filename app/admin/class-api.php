@@ -95,6 +95,7 @@ class Api {
 
 	/**
 	 * Set default query
+	 * TODO: set default query
 	 *
 	 * @return string
 	 */

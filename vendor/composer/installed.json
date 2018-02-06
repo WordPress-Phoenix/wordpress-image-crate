@@ -1,64 +1,17 @@
 [
     {
-        "name": "wordpress-phoenix/abstract-plugin-base",
-        "version": "2.5.2",
-        "version_normalized": "2.5.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/WordPress-Phoenix/abstract-plugin-base.git",
-            "reference": "ef26dc0946da61ca48b3601ed98c2b0969b534ba"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/WordPress-Phoenix/abstract-plugin-base/zipball/ef26dc0946da61ca48b3601ed98c2b0969b534ba",
-            "reference": "ef26dc0946da61ca48b3601ed98c2b0969b534ba",
-            "shasum": ""
-        },
-        "time": "2017-09-01T03:35:01+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": {
-                "classmap": [
-                    "src/abstract-plugin.php"
-                ]
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "GPL-v3"
-        ],
-        "authors": [
-            {
-                "name": "Seth Carstens",
-                "email": "seth.carstens@gmail.com",
-                "homepage": "http://github.com/scarstens",
-                "role": "Developer"
-            }
-        ],
-        "description": "PHP class to extend when building a WordPress plugin allowing you to follow smart plugin setup standards.",
-        "homepage": "https://github.com/WordPress-Phoenix/abstract-plugin-base",
-        "keywords": [
-            "abstract",
-            "boilerplate",
-            "plugin",
-            "standardize",
-            "wordpress"
-        ]
-    },
-    {
         "name": "composer/installers",
-        "version": "v1.4.0",
-        "version_normalized": "1.4.0.0",
+        "version": "v1.5.0",
+        "version_normalized": "1.5.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/composer/installers.git",
-            "reference": "9ce17fb70e9a38dd8acff0636a29f5cf4d575c1b"
+            "reference": "049797d727261bf27f2690430d935067710049c2"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/composer/installers/zipball/9ce17fb70e9a38dd8acff0636a29f5cf4d575c1b",
-            "reference": "9ce17fb70e9a38dd8acff0636a29f5cf4d575c1b",
+            "url": "https://api.github.com/repos/composer/installers/zipball/049797d727261bf27f2690430d935067710049c2",
+            "reference": "049797d727261bf27f2690430d935067710049c2",
             "shasum": ""
         },
         "require": {
@@ -70,9 +23,9 @@
         },
         "require-dev": {
             "composer/composer": "1.0.*@dev",
-            "phpunit/phpunit": "4.1.*"
+            "phpunit/phpunit": "^4.8.36"
         },
-        "time": "2017-08-09T07:53:48+00:00",
+        "time": "2017-12-29T09:13:20+00:00",
         "type": "composer-plugin",
         "extra": {
             "class": "Composer\\Installers\\Plugin",
@@ -143,15 +96,18 @@
             "lavalite",
             "lithium",
             "magento",
+            "majima",
             "mako",
             "mediawiki",
             "modulework",
+            "modx",
             "moodle",
             "osclass",
             "phpbb",
             "piwik",
             "ppi",
             "puppet",
+            "pxcms",
             "reindex",
             "roundcube",
             "shopware",
@@ -166,24 +122,71 @@
         ]
     },
     {
-        "name": "wordpress-phoenix/wordpress-options-builder-class",
-        "version": "2.8.0",
-        "version_normalized": "2.8.0.0",
+        "name": "wordpress-phoenix/abstract-plugin-base",
+        "version": "2.5.3",
+        "version_normalized": "2.5.3.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/WordPress-Phoenix/wordpress-options-builder-class.git",
-            "reference": "14ae4804f5a8a2554335967667741474aa939ef2"
+            "url": "https://github.com/WordPress-Phoenix/abstract-plugin-base.git",
+            "reference": "51bfbc4df16953dda08d312494892e4de32e74ea"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/WordPress-Phoenix/wordpress-options-builder-class/zipball/14ae4804f5a8a2554335967667741474aa939ef2",
-            "reference": "14ae4804f5a8a2554335967667741474aa939ef2",
+            "url": "https://api.github.com/repos/WordPress-Phoenix/abstract-plugin-base/zipball/51bfbc4df16953dda08d312494892e4de32e74ea",
+            "reference": "51bfbc4df16953dda08d312494892e4de32e74ea",
+            "shasum": ""
+        },
+        "time": "2018-01-18T01:02:41+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": {
+                "classmap": [
+                    "src/abstract-plugin.php"
+                ]
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-v3"
+        ],
+        "authors": [
+            {
+                "name": "Seth Carstens",
+                "email": "seth.carstens@gmail.com",
+                "homepage": "http://github.com/scarstens",
+                "role": "Developer"
+            }
+        ],
+        "description": "PHP class to extend when building a WordPress plugin allowing you to follow smart plugin setup standards.",
+        "homepage": "https://github.com/WordPress-Phoenix/abstract-plugin-base",
+        "keywords": [
+            "abstract",
+            "boilerplate",
+            "plugin",
+            "standardize",
+            "wordpress"
+        ]
+    },
+    {
+        "name": "wordpress-phoenix/wordpress-options-builder-class",
+        "version": "3.1.1",
+        "version_normalized": "3.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/WordPress-Phoenix/wordpress-options-builder-class.git",
+            "reference": "bd03206e3b764c241d64ddc8d2b2763364170650"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/WordPress-Phoenix/wordpress-options-builder-class/zipball/bd03206e3b764c241d64ddc8d2b2763364170650",
+            "reference": "bd03206e3b764c241d64ddc8d2b2763364170650",
             "shasum": ""
         },
         "require": {
             "composer/installers": "~1.0"
         },
-        "time": "2017-12-12T05:26:23+00:00",
+        "time": "2018-02-06T01:36:30+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -193,7 +196,7 @@
         },
         "notification-url": "https://packagist.org/downloads/",
         "license": [
-            "GPL-v3"
+            "GPL-3.0-or-later"
         ],
         "authors": [
             {

@@ -55,11 +55,7 @@ class Ajax {
 			wp_send_json_success( [] );
 		}
 
-		$images = $this->getty_search->prepare_attachments( $images );
-
-		$images = array_filter( $images );
-
-		return wp_send_json_success( $images );
+		return wp_send_json_success( array_filter( $this->getty_search->prepare_attachments( $images ) ) );
 	}
 
 	/**
@@ -71,7 +67,7 @@ class Ajax {
 		$filename = sanitize_file_name( $_POST['filename'] );
 		$download_url = esc_url_raw( $_POST['download_uri'] );
 
-		$dir = $this->api->directory;
+		$dir = $this->getty_downloader->directory;
 		$image_id = $this->getty_downloader->image( $download_url, $filename, $dir );
 
 		if ( ! $image_id ) {

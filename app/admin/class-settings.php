@@ -2,109 +2,74 @@
 
 namespace ImageCrate\Admin;
 
-use WPOP\V_2_8 as Opts;
+use WPOP\V_3_1 as Opts;
 
 class Settings {
 	public $installed_dir;
 	public $installed_url;
-	public $provider_settings;
+	public $plugin_settings;
 	public $option_prefix = 'ic_';
 
 	function __construct( $dir, $url ) {
 		$this->installed_dir = $dir;
 		$this->installed_url = $url;
-		$this->setup_provider_options();
+		$this->setup_imagecrate_options();
 	}
 
-	function setup_provider_options() {
-
-		$pre_ = $this->option_prefix;
-		$provider_settings = new Opts\page( [
-			'parent_id'  => 'settings.php',
-			'id'         => 'image-provider-settings',
-			'page_title' => 'Image Crate Provider Settings' .
-			                ' <small style="font-size:0.66rem;"><code>wordpress-image-crate</code></small>',
-			'menu_title' => 'Image Providers',
-			'dashicon'     => 'dashicons-images-alt',
-			'network_page' => true
-		] );
-
-		$this->provider_settings = ( $provider_settings );
-
-		// setup sections
-		$this->provider_settings->add_part(
-			$general = new Opts\section(
-				'general', array(
-					'title'    => 'General',
-					'dashicon' => 'dashicons-admin-generic',
-				)
-			)
-		);
-		$this->provider_settings->add_part(
-			$getty_images = new Opts\section(
-				'brand-config', array(
-					'title'    => 'Getty Images',
-					'dashicon' => 'dashicons-cloud',
-				)
-			)
+	function setup_imagecrate_options() {
+		$sections = array(
+			'services' => $this->services_section(),
+			'getty'    => $this->getty_section(),
 		);
 
-		/**
-		 * Getty Configuration Fields
-		 */
-		ob_start(); ?>
-			<style type="text/css">
-				#getty-notes {  padding: 2rem;  }
-				#getty-notes a {  color: #fff;  text-decoration: none;  }
-				#getty-notes a:hover {  color: #00A7E1;  }
-			</style>
-			<div id="getty-notes" class="wp-ui-primary">
-				<strong style="font-size:1.5rem;">Getty Images Developer API</strong>
-				<p style="font-size:1rem;">Use Getty Images in the WordPress Media Modal (coming soon to the Media
-					Library) to insert Getty Images into WordPress using Getty API credentials. Uses Oauth2 to
-					create access tokens that expire every 30 minutes, and then the <code>/search/images</code> and
-					<code>/images/:id</code> endpoints to sideload images into the WordPress Media Library.
-				</p>
-				<h4><span class="dashicons dashicons-media-code"></span> Getty API Documentation for Reference</h4>
-				<ul style="padding:0 2rem;list-style-type:square;">
-					<li><a href="http://developers.gettyimages.com/api/docs/v3/search/images/get/">Search Getty Images</a></li>
-					<li><a href="http://developers.gettyimages.com/api/docs/v3/search/images/get/">Get Single Image</a></li>
-					<li><a href="http://developers.gettyimages.com/api/docs/v3/images/id/similar/get/">Get Related Images by Getty Image UID</a></li>
-					<li><a href="http://developers.gettyimages.com/api/docs/v3/oauth2.html#client-credentials-flow">Oauth2 Token Authorization: Using Getty Client Credentials Flow</a></li>
-				</ul><br>
-				<span class="dashicons dashicons-lock"></span> <code>Credentials stored with 256-bit encryption.</code>
-			</div>
-
-		<?php
-		$getty_images->add_part(
-			$brand_url_staging = new Opts\include_markup(
-				$pre_ . 'getty_into_panel', array(), ob_get_clean()
-			)
-		);
-		$getty_images->add_part(
-			$brand_url_staging = new Opts\toggle_switch(
-				$pre_ . 'getty_enabled', array(
-					'label' => 'Enable Service',
-					'value' => 'on'
-				)
-			)
-		);
-		$getty_images->add_part(
-			$brand_url_staging = new Opts\text(
-				$pre_ . 'getty_api_key', array(
-					'label' => 'API Key',
-				)
-			)
-		);
-		$getty_images->add_part(
-			$brand_url_staging = new Opts\text(
-				$pre_ . 'getty_api_secret', array(
-					'label' => 'Secret Key',
-				)
-			)
+		$this->plugin_settings = new Opts\page(
+			$this->image_crate_panel_config(),
+			$sections
 		);
 
-		$this->provider_settings->initialize_panel();
+		// initialize_panel() is a function in the opt panel Container class
+		$this->plugin_settings->initialize_panel();
+	}
+
+	function image_crate_panel_config() {
+		return array(
+			'id'             => 'wp-image-crate-options',
+			'parent_page_id' => is_multisite() ? 'settings.php' : 'options-general.php',
+			'api'            => is_multisite() ? 'network' : 'site',
+			'page_title'     => 'WordPress Image Crate',
+			'menu_title'     => 'Image Crate',
+			'dashicon'       => 'dashicons-portfolio'
+		);
+	}
+
+	function services_section() {
+		return array(
+			'label'    => 'Services',
+			'dashicon' => 'dashicons-networking',
+			'parts'    => array(
+				$this->option_prefix . 'enable_getty_images' => array(
+					'label' => 'Enable Getty Images',
+					'part'  => 'toggle_switch',
+				),
+			)
+		);
+	}
+
+	function getty_section() {
+		return array(
+			'label'    => 'Getty',
+			'dashicon' => 'dashicons-admin-network',
+			'parts'    => array(
+				$this->option_prefix . 'getty_api_key'    => array(
+					'label' => 'Getty API Key',
+					'part'  => 'password',
+				),
+				$this->option_prefix . 'getty_api_secret' => array(
+					'label' => 'Getty API Secret Key',
+					'part'  => 'password',
+				),
+			)
+		);
 	}
 
 }

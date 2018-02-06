@@ -45,6 +45,8 @@ var StockPhotoThumb = wp.media.view.Attachment.extend({
         }
 
         this.views.detach();
+        console.log( 'pasing templ the opts...');
+        console.log( options );
         this.$el.html(this.template(options));
 
         this.$el.toggleClass('uploading', options.uploading);
