@@ -8,7 +8,7 @@ namespace ImageCrate\Admin;
  *
  * Enqueues backbone scripts that make the magic happen. Provides template adjustments for the media modal.
  *
- * @version  2.0.0
+ * @version  3.0.0
  * @package  WP_Image_Crate
  * @author   justintucker
  */
@@ -16,17 +16,16 @@ class Scripts {
 	/**
 	 * Image_Crate_Scripts constructor.
 	 */
-	public function setup() {
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), PHP_INT_MAX );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), PHP_INT_MAX );
-		add_action( 'print_media_templates', array( $this, 'no_results_template') );
-		add_action( 'admin_print_styles', array( $this, 'alter_attachment_thumb_display'), PHP_INT_MAX);
+	public static function setup() {
+		add_action( 'wp_enqueue_scripts', array( get_called_class() , 'enqueue_scripts' ), PHP_INT_MAX );
+		add_action( 'admin_enqueue_scripts', array( get_called_class() , 'enqueue_scripts' ), PHP_INT_MAX );
+		add_action( 'admin_print_styles', array( get_called_class() , 'alter_attachment_thumb_display'), PHP_INT_MAX);
 	}
 
 	/**
 	 * Adjust thumbnail preview size in display modal.
 	 */
-	public function alter_attachment_thumb_display () {
+	public static function alter_attachment_thumb_display () {
 		?>
 		<style>
 			.image-crate .attachment-details .thumbnail,
@@ -48,7 +47,7 @@ class Scripts {
 	/**
 	 * Enqueue custom media modal scripts
 	 */
-	public function enqueue_scripts() {
+	public static function enqueue_scripts() {
 		if ( ! wp_script_is( 'media-views', 'enqueued' ) ) {
 			if ( ! is_customize_preview() ) {
 				return;
@@ -56,37 +55,32 @@ class Scripts {
 		}
 
 		$suffix = SCRIPT_DEBUG ? '' : '.min';
-		wp_register_script( 'image-crate', plugins_url('/wordpress-image-crate/app/assets/js/image-crate-admin' . $suffix . '.js'), array('media-views'), '0.1.0', true );
+		wp_register_script(
+			'image-crate',
+			plugins_url('/wordpress-image-crate/app/assets/js/image-crate' . $suffix . '.js'),
+			array('media-views'),
+			IMAGE_CRATE_VERSION,
+			true
+		);
+
+		wp_register_style(
+			'image-crate',
+			plugins_url('/wordpress-image-crate/app/assets/css/image-crate.css'),
+			[],
+			IMAGE_CRATE_VERSION
+		);
 
 		wp_localize_script(
 			'image-crate',
 			'imagecrate', apply_filters( 'image_crate_controller_title', array(
 				'page_title'     => __( 'Image Crate', 'image-crate' ),
-				'default_search' => Api::get_default_query(),
+				//'default_search' => Api::get_default_query(),
 				'nonce'          => wp_create_nonce( 'image_crate' )
 			) )
 		);
 
 		wp_enqueue_script( 'image-crate' );
+		wp_enqueue_style( 'image-crate' );
 	}
 
-	/**
-	 * Append custom to display no results
-	 */
-	public function no_results_template() {
-        ?>
-        <script type="text/html" id="tmpl-image-crate-no-results">
-            <# var messageClass = data.message ? 'has-upload-message' : 'no-upload-message'; #>
-            <div class="uploader-inline-content {{ messageClass }}">
-                <# if ( data.message ) { #>
-                    <h2 class="upload-message">{{ data.message }}</h2>
-                <# } #>
-
-                <div class="upload-ui">
-                    <h2 class="upload-instructions drop-instructions"><?php _e( 'Please search for a different term.' ); ?></h2>
-                </div>
-            </div>
-        </script>
-        <?php
-	}
 }

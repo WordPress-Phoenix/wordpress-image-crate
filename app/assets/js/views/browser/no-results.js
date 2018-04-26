@@ -1,36 +1,27 @@
-/**
- * wp.media.view.NoResults
- *
- * @augments wp.media.view.UploaderInline
- */
-var UploaderInline = wp.media.view.UploaderInline,
-    NoResults;
+var NoResults = wp.media.View.extend( {
+	tagName: 'div',
+	className: 'no-results-found',
 
-NoResults = UploaderInline.extend({
-    tagName: 'div',
-    className: 'image-crate-no-results uploader-inline',
-    template: wp.template('image-crate-no-results'),
+	/**
+	 * @returns {wp.media.view.Search} Returns itself to allow chaining
+	 */
+	render: function() {
 
-    ready: function () {
-        var $browser = this.options.$browser,
-            $placeholder;
+		jQuery( this.el ).empty();
 
-        if (this.controller.uploader) {
-            $placeholder = this.$('.browser');
+		jQuery( this.el ).append(
+			jQuery(
+				'<div class="uploader-inline image-crate-no-results">' +
+				'<div class="uploader-inline-content">' +
+				'<h2 class="upload-message">Sorry. No images found.</h2>' +
+				'</div>' +
+				'</div>'
+			)
+		)
 
-            // Check if we've already replaced the placeholder.
-            if ($placeholder[0] === $browser[0]) {
-                return;
-            }
+		return this;
+	}
 
-            $browser.detach().text($placeholder.text());
-            $browser[0].className = 'browser button button-hero';
-            $placeholder.replaceWith($browser.show());
-        }
-
-        this.refresh();
-        return this;
-    }
-});
+} );
 
 module.exports = NoResults;

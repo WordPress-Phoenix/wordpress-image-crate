@@ -1,0 +1,53 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+
+jobs:
+  deploy_staging:
+    working_directory: ~/project
+    docker:
+      - image: circleci/node:8.9
+    steps:
+      - checkout
+      - run:
+          name: Deployment
+          command: bash .circleci/deploy-staging.sh
+
+  deploy:
+    working_directory: ~/project
+    docker:
+      - image: circleci/node:8.9
+    steps:
+      - checkout
+      - run:
+          name: Deployment
+          command: bash .circleci/deploy.sh
+      - run:
+          name: Slack Notification
+          command: bash .circleci/slack.sh
+      - run:
+          name: New Relic Notification
+          command: bash .circleci/new-relic.sh
+
+workflows:
+  version: 2
+  release_staging:
+    jobs:
+      - deploy_staging:
+          filters:
+            branches:
+              only: /release(?:/.+)?$/
+  release:
+    jobs:
+      - deploy_staging:
+          filters:
+            branches:
+              ignore: /.*/
+      - deploy:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/

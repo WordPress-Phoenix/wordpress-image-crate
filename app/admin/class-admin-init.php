@@ -2,6 +2,7 @@
 
 namespace ImageCrate\Admin;
 
+use ImageCrate\Admin\Providers\Provider_Getty_Images;
 
 /**
  * Admin Class
@@ -18,8 +19,51 @@ class Admin_Init {
 	 * Run Hooks
 	 */
 	public static function run() {
+		Scripts::setup();
+		$usage_tracking = new Usage_Tracking();
+
 		add_action( 'admin_init', array( get_called_class(), 'register_fields' ) );
 		add_filter( 'plugin_action_links_wordpress-image-crate/image-crate.php', array( get_called_class(), 'add_action_links' ) );
+		add_action( 'wp_ajax_image_crate_get', array( get_called_class(), 'get' ) );
+		add_action( 'wp_ajax_image_crate_download', array( get_called_class(), 'download' ) );
+		add_action( 'save_post', [ $usage_tracking, 'track' ], 10, 2 );
+
+	}
+
+	public static function get() {
+		check_ajax_referer( 'image_crate' );
+
+		$query = $_REQUEST['query'];
+
+		// Build the provider FQCN.
+		$provider = $_REQUEST['query']['provider'];
+		$provider = str_replace( '-', ' ', $provider );
+		$provider = ucwords( $provider );
+		$provider = str_replace( ' ', '_', $provider );
+		$provider = '\ImageCrate\Admin\Providers\Provider_' . $provider;
+
+		$provider = new $provider;
+		$images = $provider->fetch( $query );
+
+		return wp_send_json_success( $images );
+	}
+
+	public static function download() {
+		check_ajax_referer( 'image_crate' );
+
+		$query = $_REQUEST['query'];
+
+		// This could be cleaner
+		$provider = $_REQUEST['query']['provider'];
+		$provider = str_replace( '-', ' ', $provider );
+		$provider = ucwords( $provider );
+		$provider = str_replace( ' ', '_', $provider );
+
+		$provider = '\ImageCrate\Admin\Providers\Provider_' . $provider;
+		$provider = new $provider;
+		$download = $provider->download( $query );
+
+		return wp_send_json_success( $download );
 	}
 
 	/**
@@ -56,4 +100,5 @@ class Admin_Init {
 		$value = get_option( 'image_crate_default_search', '' );
 		echo '<input type="text" id="image_crate_default_search_term" name="image_crate_default_search" value="' . esc_attr( $value ) . '" />';
 	}
+
 }

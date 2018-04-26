@@ -8,35 +8,63 @@ namespace ImageCrate\Admin;
  *
  * Handle returned data for image source.
  *
- * @version  2.0.0
+ * @version  3.0.0
  * @package  WP_Image_Crate
- * @author   justintucker
  */
 final class Import {
 
+	/**
+	 * @var string The directory to download image to.
+	 */
 	public $directory;
+
+	/**
+	 * @var Download_Tracking The tracking class.
+	 */
+	private $tracking;
+
+	/**
+	 * Import constructor.
+	 *
+	 * @param bool $tracked Whether image should be tracked
+	 *                      in main blog posts table.
+	 */
+	public function __construct( $tracked = false ) {
+
+		if ( $tracked ) {
+			$this->tracking = new Download_Tracking();
+		}
+
+	}
 
 	/**
 	 * Import image from an url
 	 *
-	 * @param $download_url
-	 * @param $filename
+	 * @param string     $download_url     Url to download image file.
+	 * @param string|int $remote_id        A unique id from external source used for the post_name.
+	 * @param string     $custom_directory Where to download the image to.
+	 * @param string     $provider         The image provider.
 	 *
 	 * @return bool|int|object
 	 */
-	public function image( $download_url, $filename, $custom_directory ) {
-		if ( $custom_directory ) {
-		    $this->directory = $custom_directory;
-		}
+	public function image( $download_url, $remote_id, $custom_directory, string $provider ) {
+
+		$this->directory = $custom_directory;
 
 		$file_array = [];
 
-		$post_name = strtolower( $filename );
+		$post_name = strtolower( $remote_id );
 		$id_exists = $this->check_attachment( $post_name );
 
 		// filename will determine if download will occur
-		if ( $id_exists > 0  ) {
-		    return $id_exists;
+		if ( $id_exists > 0 ) {
+			$media_post = get_post( $id_exists );
+
+			if ( $this->tracking ) {
+				$this->tracking->track_attachment( $media_post, $provider );
+			}
+
+			return $id_exists;
 		}
 
 		// place the images in a custom directory
@@ -52,6 +80,7 @@ final class Import {
 
 		if ( ! $matches ) {
 			unlink( $file_array['tmp_name'] );
+
 			return false;
 		}
 
@@ -61,18 +90,35 @@ final class Import {
 			require_once ABSPATH . 'wp-admin/includes/media.php';
 		}
 
-		$api_image   = $file_array['name'];
+		$api_image = $file_array['name'];
 
-		$image_type = pathinfo( $api_image );
-		$file_name  = basename( $api_image, '.' . $image_type['extension'] );
+		$image_type         = pathinfo( $api_image );
+		$file_name          = basename( $api_image, '.' . $image_type['extension'] );
 		$file_array['name'] = str_replace( $file_name, $post_name, $api_image );
 
+		add_filter( 'wp_insert_attachment_data', [ $this, 'save_image_caption' ] );
+
 		// Do the validation and storage stuff
-		$id = media_handle_sideload( $file_array, 0, null, ['post_name' => $filename ] );
+		$id = media_handle_sideload( $file_array, 0, null, [ 'post_name' => $remote_id ] );
+
+		remove_filter( 'wp_insert_attachment_data', [ $this, 'save_image_caption'] );
 
 		$this->delete_file( $file_array['tmp_name'] );
 
-		return is_wp_error( $id ) ? false : $id;
+		if ( is_wp_error( $id ) ) {
+			// TODO: New Relic and AJAX error
+			return false;
+		}
+
+		add_post_meta( $id, 'image_provider', $provider, true );
+
+		$media_post = get_post( $id );
+
+		if ( $this->tracking ) {
+			$this->tracking->track_attachment( $media_post, $provider );
+		}
+
+		return $media_post;
 	}
 
 	/**
@@ -89,42 +135,7 @@ final class Import {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
 
-		preg_match( '/\?.*imageID=(\d+).*/', $url, $matches );
-		$query   = $matches[0];
-		$id      = $matches[1];
-		$baseUrl = str_replace( $query, '', $url );
-
-		$consumerKey          = USAT_API_KEY;
-		$consumerSecret       = USAT_API_SECRET;
-		$oauthTimestamp       = time();
-		$nonce                = md5( mt_rand() );
-		$oauthSignatureMethod = "HMAC-SHA1";
-		$oauthVersion         = "1.0";
-
-		//generate signature
-		$sigBase = "GET&" . rawurlencode( $baseUrl ) . "&"
-		           . rawurlencode( "imageID=" . $id
-		           . "&oauth_consumer_key=" . rawurlencode( $consumerKey )
-                   . "&oauth_nonce=" . rawurlencode( $nonce )
-                   . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
-                   . "&oauth_timestamp=" . $oauthTimestamp
-                   . "&oauth_version=" . $oauthVersion
-                    );
-
-		$sigKey   = $consumerSecret . "&";
-		$oauthSig = base64_encode( hash_hmac( "sha1", $sigBase, $sigKey, true ) );
-
-		//generate full request URL
-		$requestUrl = $baseUrl . "?"
-		              . "imageID=" . $id
-		              . "&oauth_consumer_key=" . rawurlencode( $consumerKey )
-		              . "&oauth_nonce=" . rawurlencode( $nonce )
-		              . "&oauth_signature_method=" . rawurlencode( $oauthSignatureMethod )
-		              . "&oauth_timestamp=" . rawurlencode( $oauthTimestamp )
-		              . "&oauth_version=" . rawurlencode( $oauthVersion )
-		              . "&oauth_signature=" . rawurlencode( $oauthSig );
-
-		$file = download_url( $requestUrl );
+		$file = download_url( $url );
 
 		if ( is_wp_error( $file ) ) {
 			return false;
@@ -147,6 +158,34 @@ final class Import {
 
 		$file = $new_file;
 
+		$image_object = new \Imagick( $file );
+
+		try {
+			if ( $image_object ) {
+				$original_width  = $image_object->getImageWidth();
+				$original_height = $image_object->getImageHeight();
+
+				$landscape_width = 3200;
+				$portrait_width  = 1600;
+
+				$landscape = ( $original_width > $original_height );
+				if ( $landscape && $landscape_width < $original_width ) {
+					$image_object->scaleImage( $landscape_width, 0 );
+					$image_object->writeImage( $file );
+				} elseif ( $portrait_width < $original_width ) {
+					$image_object->scaleImage( $portrait_width, 0 );
+					$image_object->writeImage( $file );
+				}
+			}
+		} catch ( \Exception $e ) {
+			if ( function_exists( 'newrelic_notice_error' ) ) {
+				newrelic_notice_error( $e );
+			}
+			error_log( $e->getMessage() );
+		} finally {
+			unset( $image_object );
+		}
+
 		return $file;
 	}
 
@@ -162,49 +201,43 @@ final class Import {
 	}
 
 	/**
-	 * Check if attachment exists
+	 * Check if attachment exists on current site.
 	 *
-	 * @param        $post_name
-	 * @param string $call_type
+	 * If attachment exists, update it's timestamp so that
+	 * it appears at the beginning of the media library.
+	 *
+	 * @param string $post_name The is a unique ID provided by external service.
 	 *
 	 * @return int Post attachment id
 	 */
-	public function check_attachment( $post_name, $call_type = 'remote' ) {
-		// Switch to another blog to check post existence.
-		if ( $call_type == 'remote' && is_multisite() ) {
-			switch_to_blog( get_current_blog_id() );
-		}
+	public function check_attachment( $post_name ) {
 
 		global $wpdb;
 		$attachment_id = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_name='%s';", $post_name ) );
 
 		if ( ! empty( $attachment_id[0] ) ) {
-			$date          = date( 'Y-m-d h:i:s' );
-			$update        = [
+			$date   = date( 'Y-m-d h:i:s' );
+			$update = [
 				'ID'                => $attachment_id[0],
 				'post_date'         => $date,
 				'post_date_gmt'     => get_gmt_from_date( $date, $format = 'Y-m-d H:i:s' ),
 				'post_modified'     => $date,
 				'post_modified_gmt' => get_gmt_from_date( $date, $format = 'Y-m-d H:i:s' ),
 			];
-			$attachment_id = wp_update_post( $update );
-		} else {
-			$attachment_id = 0;
+
+			return wp_update_post( $update );
 		}
 
-		if ( $call_type == 'remote' && is_multisite() ) {
-			restore_current_blog();
-		}
+		return 0;
 
-		return $attachment_id;
 	}
 
 	/**
 	 * Temporarily change upload directory for downloading getty images
 	 *
-	 * @param   array $upload Filtered upload dir locations
+	 * @param array $upload Filtered upload dir locations
 	 *
-	 * @return  array Filtered upload dir locations
+	 * @return array Filtered upload dir locations
 	 */
 	public function set_upload_dir( $upload ) {
 		$upload['subdir']  = '/' . $this->directory . $upload['subdir'];
@@ -215,4 +248,18 @@ final class Import {
 
 		return $upload;
 	}
+
+	/**
+	 * Add an image caption to the attachment post.
+	 *
+	 * @param array $data The post data to be inserted as attachment
+	 *
+	 * @return array
+	 */
+	public function save_image_caption( $data ) {
+		$data['post_excerpt'] = ( $data['post_content'] ? $data['post_content'] : '' );
+
+		return $data;
+	}
+
 }

@@ -3,11 +3,8 @@
 namespace ImageCrate;
 
 
-use WPAZ_Plugin_Base\V_2_0\Abstract_Plugin;
+use WPAZ_Plugin_Base\V_2_5\Abstract_Plugin;
 use ImageCrate\Admin\Admin_Init;
-use ImageCrate\Admin\Scripts;
-use ImageCrate\Admin\Api;
-use ImageCrate\Admin\Ajax;
 
 class Init extends Abstract_Plugin {
 
@@ -50,23 +47,18 @@ class Init extends Abstract_Plugin {
 	 */
 	public function authenticated_init() {
 		if ( is_user_logged_in() ) {
-			Admin_Init::run();
-			(new Scripts())->setup();
+			(new Admin_Init)->run();
 		}
 	}
 
 	/**
 	 * Initialize the plugin - for public (front end)
-	 * todo: set up extensible image data providers
 	 *
 	 * @since   0.1
 	 * @return  void
 	 */
 	public function init() {
 		do_action( get_called_class() . '_before_init' );
-
-		$provider = new Api();
-		new Ajax( $provider );
 
 		do_action( get_called_class() . '_after_init' );
 	}
@@ -92,7 +84,7 @@ class Init extends Abstract_Plugin {
 	 * //* @return null
 	 */
 	protected function defines_and_globals() {
-		define( 'IMAGE_CRATE_VERSION', '1.1.1' );
+		define( 'IMAGE_CRATE_VERSION', '3.0.0' );
 		define( 'IMAGE_CRATE_NAME', plugin_basename( __FILE__ ) );
 		define( 'IMAGE_CRATE_URL', plugins_url( basename( __DIR__ ) ) );
 		define( 'IMAGE_CRATE_PATH', dirname( __FILE__ ) );

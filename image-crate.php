@@ -1,20 +1,20 @@
 <?php
 /**
  * Plugin Name: Image Crate
- * Plugin URI: https://github.com/WordPress-Phoenix/wordpress-image-crate
+ * Plugin URI: https://github.com/fansided/wordpress-image-crate
  * Description: Add image providers to the WordPress media modal.
- * Author: justintucker
- * Version: 2.0.0
- * Author URI: http://github.com/justintucker
+ * Author: FanSided
+ * Version: 3.0.0
+ * Author URI: http://github.com/fansided
  * License: GPL V2
  * Text Domain: image-crate
  *
- * GitHub Plugin URI: https://github.com/WordPress-Phoenix/wordpress-image-crate
+ * GitHub Plugin URI: https://github.com/fansided/wordpress-image-crate
  * GitHub Branch: master
  *
  * @package  WP_Image_Crate
  * @category plugin
- * @author   justintucker
+ * @author   fansided
  * @internal Plugin derived from https://github.com/WordPress-Phoenix/abstract-plugin-base
  */
 

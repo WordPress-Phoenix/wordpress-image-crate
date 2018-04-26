@@ -1,5 +1,5 @@
 {
     "require": {
-        "WordPress-Phoenix/abstract-plugin-base": "^2.0"
+        "WordPress-Phoenix/abstract-plugin-base": "^2.5"
     }
 }

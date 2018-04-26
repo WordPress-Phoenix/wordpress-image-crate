@@ -1,54 +1,51 @@
 /**
  * wp.media.view.ImageCrateSearch
  *
+ * imagecrate.default_search is rendered on the page by using wp_localize_script on image-crate.js.
+ *
  * @augments wp.media.view.Search
  */
-var ImageCrateSearch = wp.media.View.extend({
-    tagName: 'input',
-    className: 'search ic-search',
-    id: 'media-search-input',
+var ImageCrateSearch = wp.media.View.extend( {
+	tagName: 'form',
+	className: 'ic-search-form',
 
-    attributes: {
-        type: 'search',
-        placeholder: 'Search Images'
-    },
+	events: {
+		'submit': 'search'
+	},
 
-    events: {
-        'input': 'search',
-        'keyup': 'search'
-    },
+	initialize: function() {
 
-    initialize: function() {
-        if ( this.model.get( 'search' ) === undefined ) {
-            this.model.set( 'search', imagecrate.default_search );
-        }
-    },
+		if ( this.model.get( 'search' ) === undefined ) {
+			this.model.set( 'search', '' );
+		}
 
-    /**
-     * @returns {wp.media.view.Search} Returns itself to allow chaining
-     */
-    render: function () {
-        this.el.value = this.model.get( 'search' ) === undefined ? imagecrate.default_search : this.model.escape( 'search' );
-        return this;
-    },
+		this.model.on( 'change', this.render, this );
+	},
 
-    search: function (event) {
-        this.deBounceSearch(event);
-    },
+	/**
+	 * @returns {wp.media.view.Search} Returns itself to allow chaining
+	 */
+	render: function() {
+		jQuery( this.el ).empty()
 
-    /**
-     * There's a bug in core where searches aren't de-bounced in the media library.
-     * Normally, not a problem, but with external api calls or tons of image/users, ajax
-     * calls could effect server performance. This fixes that for now.
-     */
-    deBounceSearch: _.debounce(function (event) {
-        if (event.target.value) {
-            this.model.set('search', event.target.value);
-        } else {
-            this.model.unset('search');
-        }
-    }, 500)
+		jQuery( this.el ).append(
+			jQuery( '<input type="text" name="media-search-input" placeholder="Search images" value="' + this.model.escape( 'search' ) + '" />' )
+		)
 
-});
+		jQuery( this.el ).append(
+			jQuery( '<input type="submit" class="button button-primary" value="Search" />' )
+		)
+
+		return this;
+	},
+
+	search: function( event ) {
+		event.preventDefault();
+
+		this.model.set( 'search', event.target[0]['value'] )
+		this.model.set( 'searchActive', true )
+	}
+
+} );
 
 module.exports = ImageCrateSearch;

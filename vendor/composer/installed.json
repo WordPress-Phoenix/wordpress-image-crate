@@ -1,26 +1,26 @@
 [
     {
         "name": "wordpress-phoenix/abstract-plugin-base",
-        "version": "2.0.3",
-        "version_normalized": "2.0.3.0",
+        "version": "2.5.1",
+        "version_normalized": "2.5.1.0",
         "source": {
             "type": "git",
             "url": "https://github.com/WordPress-Phoenix/abstract-plugin-base.git",
-            "reference": "f0c7c61c41229900e64b3cda48048e5ebdaa5cae"
+            "reference": "bbf7c75b25944a2b6ae0b9dd5a6b4555a83bd329"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/WordPress-Phoenix/abstract-plugin-base/zipball/f0c7c61c41229900e64b3cda48048e5ebdaa5cae",
-            "reference": "f0c7c61c41229900e64b3cda48048e5ebdaa5cae",
+            "url": "https://api.github.com/repos/WordPress-Phoenix/abstract-plugin-base/zipball/bbf7c75b25944a2b6ae0b9dd5a6b4555a83bd329",
+            "reference": "bbf7c75b25944a2b6ae0b9dd5a6b4555a83bd329",
             "shasum": ""
         },
-        "time": "2017-02-28 23:18:56",
+        "time": "2017-07-28 03:22:52",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
             "classmap": {
                 "classmap": [
-                    "src/abstract_plugin.php"
+                    "src/abstract-plugin.php"
                 ]
             }
         },

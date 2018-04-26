@@ -4,7 +4,7 @@
  *
  * @author  Seth Carstens
  * @package abtract-plugin-base
- * @version 2.0.3
+ * @version 2.5.0
  * @license GPL 2.0 - please retain comments that express original build of this file by the author.
  */
 
@@ -12,7 +12,8 @@
  * Namespace with versions as a solution to composer vs WordPress plugins
  * Reference url https://wptavern.com/a-narrative-of-using-composer-in-a-wordpress-plugin
  */
-namespace WPAZ_Plugin_Base\V_2_0;
+
+namespace WPAZ_Plugin_Base\V_2_5;
 
 /**
  * Class Plugin_Base
@@ -24,6 +25,13 @@ abstract class Abstract_Plugin {
 	 * @var bool $debug
 	 */
 	public $debug;
+
+	/**
+	 * Used to hold an instance of the admin object related to the plugin.
+	 *
+	 * @var null|\stdClass|Abstract_Plugin $admin
+	 */
+	public $abstract_plugin_version = __NAMESPACE__;
 
 	/**
 	 * Used to hold an instance of the admin object related to the plugin.
@@ -56,7 +64,7 @@ abstract class Abstract_Plugin {
 	/**
 	 * Autoload type can be classmap or psr-4
 	 *
-	 * @var string $autoload_dir classmap or psr-4
+	 * @var string $autoload_dir classmap or psr-4 or false
 	 */
 	public static $autoload_type = 'classmap';
 
@@ -75,11 +83,18 @@ abstract class Abstract_Plugin {
 	public static $filename_prefix = 'class-';
 
 	/**
-	 * Plugins installed directory on the server
+	 * Plugins class object installed directory on the server
 	 *
 	 * @var string $installed_dir
 	 */
 	public $installed_dir;
+
+	/**
+	 * Plugin root directory on the server
+	 *
+	 * @var string $plugin_object_basedir
+	 */
+	public $plugin_basedir;
 
 	/**
 	 * Plugins URL for access to any static files or assets like css, js, or media
@@ -103,6 +118,42 @@ abstract class Abstract_Plugin {
 	public $network_url;
 
 	/**
+	 * When main plugin filename matches folder name this gets the value from get_plugin_data()
+	 *
+	 * @var array $plugin_data Array of meta data representing meta from main plugin file
+	 */
+	public $plugin_data = array();
+
+	/**
+	 * If plugin_data is built, this represents the version number defined the the main plugin file meta
+	 *
+	 * @var string $version
+	 */
+	public $version;
+
+	/**
+	 * Assumed path to main plugin file. Assumes your plugin folder and main plugin file are the same.
+	 *
+	 * @var string $plugin_file
+	 */
+	public $plugin_file;
+
+	/**
+	 * The slug or name stored in array WordPress uses to associate a "short path" for each plugin.
+	 * Example found in site_option('active_sitewide_plugins')
+	 *
+	 * @var string $wp_plugin_slug
+	 */
+	public $wp_plugin_slug;
+
+	/**
+	 * A true or false value indicating if the plugin has been activated network wide in multisite.
+	 *
+	 * @var bool $is_network_active
+	 */
+	public $is_network_active = false;
+
+	/**
 	 * Construct the plugin object.
 	 * Note that classes that extend this class should add there construction actions into onload()
 	 */
@@ -117,12 +168,9 @@ abstract class Abstract_Plugin {
 		// Define globals used by the plugin including bloginfo.
 		$this->defines_and_globals();
 
-		// Register auto-loading to include any files in the $autoload_dir.
-		spl_autoload_register( array( $this, 'autoload' ) );
-
-		// Enable any composer libraries if they exist.
-		if ( file_exists( $this->installed_dir . '/vendor/autoload.php' ) ) {
-			include_once( $this->installed_dir . '/vendor/autoload.php' );
+		// If enabled, register auto-loading to include any files in the $autoload_dir.
+		if ( ! empty( static::$autoload_type ) ) {
+			spl_autoload_register( array( $this, 'autoload' ) );
 		}
 
 		// Onload to do things during plugin construction.
@@ -142,7 +190,7 @@ abstract class Abstract_Plugin {
 	/**
 	 * Activated the plugin actions
 	 *
-	 * @return  void
+	 * @return void
 	 */
 	public static function activate() {
 	}
@@ -188,11 +236,29 @@ abstract class Abstract_Plugin {
 	 * Setup plugins global params.
 	 */
 	protected function configure_defaults() {
-		$this->modules        = new \stdClass();
-		$this->modules->count = 0;
-		$this->installed_dir  = dirname( static::$current_file );
-		$this->installed_url  = plugins_url( '/', static::$current_file );
+		$this->modules           = new \stdClass();
+		$this->modules->count    = 0;
+		$this->installed_dir     = dirname( static::$current_file, 1 );
+		$this->plugin_basedir    = dirname( static::$current_file, 2 );
+		$assumed_plugin_name     = basename( $this->plugin_basedir );
+		$this->plugin_file       = $this->plugin_basedir . '/' . $assumed_plugin_name . '.php';
+		$this->wp_plugin_slug    = $assumed_plugin_name . '/' . $assumed_plugin_name . '.php';
 
+		if ( is_callable( 'is_plugin_active_for_network' ) ) {
+			$this->is_network_active = is_plugin_active_for_network( $this->wp_plugin_slug );
+		}
+
+		if ( file_exists( $this->plugin_file ) ) {
+			$this->installed_url = plugins_url( '/', $this->plugin_file );
+			// Ensure get_plugin_data is available
+			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+			$this->plugin_data = get_plugin_data( $this->plugin_file, $markup = true, $translate = true );
+			if ( is_array( $this->plugin_data ) && isset( $this->plugin_data['Version'] ) ) {
+				$this->version = $this->plugin_data['Version'];
+			}
+		} else {
+			$this->installed_url = plugins_url( '/', static::$current_file );
+		}
 		// Setup network url and fallback in case siteurl is not defined.
 		if ( ! defined( 'WP_NETWORKURL' ) && is_multisite() ) {
 			define( 'WP_NETWORKURL', network_site_url() );
@@ -230,14 +296,14 @@ abstract class Abstract_Plugin {
 		/**
 		 * Convert path and filename into namespace and class
 		 */
-		$path_info     = str_ireplace( $installed_dir, '', $file );
-		$path_info     = pathinfo( $path_info );
-		$converted_dir = str_replace( '/', '\\', $path_info['dirname'] );
-		$converted_dir = ucwords( $converted_dir, '_\\' );
-		$filename_search        = array( static::$filename_prefix, '-' );
-		$filename_replace       = array( '', '_' );
-		$class         = str_ireplace( $filename_search, $filename_replace, $path_info['filename'] );
-		$class_name    = $namespace . $converted_dir . '\\' . ucwords( $class, '_' );
+		$path_info        = str_ireplace( $installed_dir, '', $file );
+		$path_info        = pathinfo( $path_info );
+		$converted_dir    = str_replace( '/', '\\', $path_info['dirname'] );
+		$converted_dir    = ucwords( $converted_dir, '_\\' );
+		$filename_search  = array( static::$filename_prefix, '-' );
+		$filename_replace = array( '', '_' );
+		$class            = str_ireplace( $filename_search, $filename_replace, $path_info['filename'] );
+		$class_name       = $namespace . $converted_dir . '\\' . ucwords( $class, '_' );
 
 		return $class_name;
 	}
@@ -247,7 +313,7 @@ abstract class Abstract_Plugin {
 	 *
 	 * @return bool|Abstract_Plugin|mixed $instance
 	 */
-	public function get() {
+	public static function get() {
 		global $wp_plugins;
 		$plugin_name = strtolower( get_called_class() );
 		if ( isset( $wp_plugins ) && isset( $wp_plugins->$plugin_name ) ) {
@@ -280,7 +346,7 @@ abstract class Abstract_Plugin {
 	/**
 	 * Initialize the plugin - for public (front end)
 	 * Example of building a module of the plugin into init
-	 * ```$this->modules->FS_Mail = new FS_Mail( $this, $this->installed_dir );```
+	 * ```$this->modules->FS_Mail = new FS_Mail( $this, $this->plugin_object_basedir );```
 	 *
 	 * @since   0.1
 	 * @return  void
@@ -341,13 +407,27 @@ abstract class Abstract_Plugin {
 	}
 
 	/**
-	 * Build and initialize the plugin.
+	 * Setup special hooks that don't run after plugins_loaded action
+	 *
+	 * @param $file
 	 */
-	public static function run() {
-		// Installation and un-installation hooks.
-		register_activation_hook( __FILE__, array( get_called_class(), 'activate' ) );
-		register_deactivation_hook( __FILE__, array( get_called_class(), 'deactivate' ) );
-		register_uninstall_hook( __FILE__, array( get_called_class(), 'uninstall' ) );
+	public static function run( $file ) {
+		// Logic required for WordPress VIP plugins to load during themes function file initialization.
+		if ( did_action( 'plugins_loaded' ) ) {
+			add_action( 'init', array( get_called_class(), 'load' ), 1 );
+		} else {
+			add_action( 'plugins_loaded', array( get_called_class(), 'load' ) );
+			// Installation and un-installation hooks.
+			register_activation_hook( $file, array( get_called_class(), 'activate' ) );
+			register_deactivation_hook( $file, array( get_called_class(), 'deactivate' ) );
+			register_uninstall_hook( $file, array( get_called_class(), 'uninstall' ) );
+		}
+	}
+
+	/**
+	 * Build and initialize the plugin - on plugins_loaded
+	 */
+	public static function load() {
 		self::set();
 	}
 

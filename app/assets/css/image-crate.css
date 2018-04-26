@@ -1,0 +1,34 @@
+.image-crate-spinner.spinner.is-active {
+	float: left;
+	margin-top: 20px;
+}
+
+.ic-search-form {
+	margin-top: 11px;
+}
+
+.ic-search-form input[type="text"] {
+	margin-right: 5px;
+}
+
+.image-crate .media-toolbar-secondary {
+	float: none;
+}
+
+.media-toolbar-secondary .ic-search-form {
+	display: inline-block;
+}
+
+.media-toolbar-secondary .ic-search-form.hidden {
+	display: none;
+}
+
+.image-crate.attachments-browser .spinner {
+	float: none;
+	margin-top: -4px;
+	margin-left: 10px;
+}
+
+.image-exchange.image-crate.attachments-browser .spinner {
+	margin-top: 8px;
+}

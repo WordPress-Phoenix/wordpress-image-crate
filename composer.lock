@@ -4,28 +4,28 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8e64e52dedea8f83d552bf5241e07de6",
-    "content-hash": "ac24d2cdc12c8e4493e112ac0f99d093",
+    "hash": "b764ffb96422294395972976903a6b96",
+    "content-hash": "755e08f70d2d50461a0b1dc420b3d7e2",
     "packages": [
         {
             "name": "wordpress-phoenix/abstract-plugin-base",
-            "version": "2.0.3",
+            "version": "2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress-Phoenix/abstract-plugin-base.git",
-                "reference": "f0c7c61c41229900e64b3cda48048e5ebdaa5cae"
+                "reference": "bbf7c75b25944a2b6ae0b9dd5a6b4555a83bd329"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress-Phoenix/abstract-plugin-base/zipball/f0c7c61c41229900e64b3cda48048e5ebdaa5cae",
-                "reference": "f0c7c61c41229900e64b3cda48048e5ebdaa5cae",
+                "url": "https://api.github.com/repos/WordPress-Phoenix/abstract-plugin-base/zipball/bbf7c75b25944a2b6ae0b9dd5a6b4555a83bd329",
+                "reference": "bbf7c75b25944a2b6ae0b9dd5a6b4555a83bd329",
                 "shasum": ""
             },
             "type": "library",
             "autoload": {
                 "classmap": {
                     "classmap": [
-                        "src/abstract_plugin.php"
+                        "src/abstract-plugin.php"
                     ]
                 }
             },
@@ -50,7 +50,7 @@
                 "standardize",
                 "wordpress"
             ],
-            "time": "2017-02-28 23:18:56"
+            "time": "2017-07-28 03:22:52"
         }
     ],
     "packages-dev": [],
