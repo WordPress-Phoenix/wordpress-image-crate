@@ -1,3 +1,18 @@
+#### 3.0.0
+Rewrite plugin and add Getty Images as a provider
+* Set up scaffolding for image providers
+* Add backbone controllers to media modal
+* Add content loading for state changes
+* Connect controller state changes to backend
+* Update plugin base
+* Remove need for duplicate provider loader
+* Add documentation for javascript files
+* Add a Getty image service
+* Enhance UI and UX
+* Track image usage
+* Update readme
+* Add CircleCI config and deploy
+
 #### 2.0.0
 * Migrates plugin to new abstract plugin base
 
