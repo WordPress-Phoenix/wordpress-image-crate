@@ -1,3 +1,6 @@
+#### 3.0.4
+* Add Getty access type option for Premium access
+
 #### 3.0.3
 * Only make Getty API request if search term is set. The request fails if search term is empty.
 
