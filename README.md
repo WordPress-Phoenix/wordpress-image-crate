@@ -18,3 +18,13 @@ content. This is stored on the master site as a attachment post with tracking in
 ### WordPress hooks
 * `save_post` - The Usage_Tracking class is hooked in here to track if an image is used in post content and update 
 it's attachment meta on the master site. 
+
+### Getty Images
+Getty images search by default in editorial mode. To search in premium mode, a option must be added to the site. WP 
+CLI can be used for this.
+
+#### Enabling premium access
+* `wp --url=http://fansided.com option update fs_option_getty_access_type Premium`
+
+#### Disabling premium access
+* `wp --url=http://fansided.com option update fs_option_getty_access_type Editorial`
