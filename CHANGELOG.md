@@ -1,3 +1,6 @@
+#### 3.0.3
+* Only make Getty API request if search term is set. The request fails if search term is empty.
+
 #### 3.0.2
 * Add additional image URL filters from VIP to fix broken image URLs in the media modal
 
