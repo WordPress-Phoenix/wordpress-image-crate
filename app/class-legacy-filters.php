@@ -15,6 +15,8 @@ class Legacy_Filters {
 		 */
 		add_filter( 'wp_get_attachment_image_src', [ $this, 'set_getty_image_path' ] );
 		add_filter( 'wp_calculate_image_srcset', [ $this, 'getty_update_scrset_attr' ], 10, 1 );
+		add_filter( 'image_send_to_editor', [ $this, 'getty_send_to_editor' ], 10, 1 );
+		add_filter( 'wp_prepare_attachment_for_js', [ $this, 'update_media_modal_file_refs' ], 99, 1 );
 
 	}
 
@@ -28,7 +30,7 @@ class Legacy_Filters {
 	 *
 	 * @return  string|array Updated image src to include 'getty-images'
 	 */
-	function set_getty_image_path( $image_path ) {
+	public function set_getty_image_path( $image_path ) {
 		// Make sure image path url is a string
 		if ( is_array( $image_path ) ) {
 			$image_path_url = $image_path[0];
@@ -61,7 +63,7 @@ class Legacy_Filters {
 	 *
 	 * @return  array Array with updated src in urls
 	 */
-	function getty_update_scrset_attr( $sources ) {
+	public function getty_update_scrset_attr( $sources ) {
 		foreach ( $sources as $key => $source ) {
 			if ( preg_match( '/getty-images/', $sources[ $key ]['url'] ) ) {
 				$sources[ $key ]['url'] = $this->set_getty_image_path( $source['url'] );
@@ -69,6 +71,41 @@ class Legacy_Filters {
 		}
 
 		return $sources;
+	}
+
+	/**
+	 * Set up image path to point to new getty image location
+	 *
+	 * @param   array   $response   array of prepared attachment data.
+	 *
+	 * @return  array              array of updated attachment data.
+	 */
+	public function update_media_modal_file_refs( $response ) {
+
+		if ( preg_match( '/getty-images/', $response['url'] ) ) {
+
+			$response['url'] = $this->set_getty_image_path( $response['url'] );
+
+			if ( isset( $response['sizes'] ) ) {
+
+				foreach ( $response['sizes'] as $key => $size ) {
+					$response['sizes'][ $key ]['url'] = $this->set_getty_image_path( $size['url'] );
+				}
+			}
+		}
+		return $response;
+	}
+
+	/**
+	 * Update post meta and image path when image is sent to the editor
+	 * from the media modal.
+	 *
+	 * @param   string          $html    Image markup sent to the editor
+	 *
+	 * @return  string|array             Updated markup with 'getty-images' in src
+	 */
+	public function getty_send_to_editor( $html ) {
+		return $this->set_getty_image_path( $html );
 	}
 
 }
