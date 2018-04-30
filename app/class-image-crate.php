@@ -60,6 +60,8 @@ class Init extends Abstract_Plugin {
 	public function init() {
 		do_action( get_called_class() . '_before_init' );
 
+		new Legacy_Filters();
+
 		do_action( get_called_class() . '_after_init' );
 	}
 
