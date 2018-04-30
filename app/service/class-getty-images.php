@@ -88,6 +88,8 @@ class Getty_Images {
 		               "&product_types={$this->access_type}" .
 		               "&fields=detail_set,largest_downloads,max_dimensions,date_submitted";
 
+		$request_url = str_replace( ' ', '%20', $request_url );
+
 		$response = wp_remote_get(
 			$request_url,
 			[
