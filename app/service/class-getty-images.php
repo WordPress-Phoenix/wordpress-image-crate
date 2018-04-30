@@ -64,14 +64,16 @@ class Getty_Images {
 	 */
 	public function fetch( $search_term = '', $page = 1, $posts_per_page = 40 ) {
 
+		$request_url = "{$this->api_url}/v3/search/images/editorial" .
+		               "?file_types=jpg" .
+		               "&page={$page}" .
+		               "&page_size={$posts_per_page}" .
+		               "&phrase={$search_term}" .
+		               "&sort_order=newest" .
+		               "&fields=detail_set,largest_downloads,max_dimensions,date_submitted";
+
 		$response = wp_remote_get(
-			"{$this->api_url}/v3/search/images/editorial" .
-			"?file_types=jpg" .
-			"&page={$page}" .
-			"&page_size={$posts_per_page}" .
-			"&phrase={$search_term}" .
-			"&sort_order=newest" .
-			"&fields=detail_set,largest_downloads,max_dimensions,date_submitted",
+			$request_url,
 			[
 				'timeout' => 10,
 				'headers' => array(
@@ -90,7 +92,9 @@ class Getty_Images {
 
 		try {
 			if ( $response_code != '200' ) {
-				throw new \Exception( "{$response_code} response from Getty API" );
+				throw new \Exception(
+					"{$response_code} response from Getty API - Request URL: {$request_url} - Response: {$response}"
+				);
 			}
 		} catch ( \Exception $e ) {
 			if ( function_exists( 'newrelic_notice_error' ) ) {
