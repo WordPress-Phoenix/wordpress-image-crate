@@ -1,3 +1,6 @@
+#### 3.0.2
+* Add additional image URL filters from VIP to fix broken image URLs in the media modal
+
 #### 3.0.1
 * Add legacy image URL filters from VIP
 
