@@ -64,6 +64,11 @@ class Getty_Images {
 	 */
 	public function fetch( $search_term = '', $page = 1, $posts_per_page = 40 ) {
 
+		// Only make an API request if a search term has been set.
+		if ( empty( $search_term ) ) {
+			return [];
+		}
+
 		$request_url = "{$this->api_url}/v3/search/images/editorial" .
 		               "?file_types=jpg" .
 		               "&page={$page}" .
