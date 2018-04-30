@@ -1,3 +1,7 @@
+#### 3.0.5
+Escape spaces in Getty images fetch URL
+* This was breaking the image search request with a multi word search term
+
 #### 3.0.4
 * Add Getty access type option for Premium access
 
