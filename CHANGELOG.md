@@ -1,3 +1,6 @@
+#### 3.0.1
+* Add legacy image URL filters from VIP
+
 #### 3.0.0
 Rewrite plugin and add Getty Images as a provider
 * Set up scaffolding for image providers
