@@ -1,3 +1,8 @@
+#### 3.0.6
+* Hot fix: check legacy tracking meta is an array
+
+[New Relic Error](https://rpm.newrelic.com/accounts/1358368/applications/19652122/filterable_errors#/show/4a46219e-5edc-11e8-ae1e-0242ac11000b_2329_4877/stack_trace?top_facet=transactionUiName&primary_facet=error.class&barchart=barchart)
+
 #### 3.0.5
 Escape spaces in Getty images fetch URL
 * This was breaking the image search request with a multi word search term

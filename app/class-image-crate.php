@@ -86,7 +86,7 @@ class Init extends Abstract_Plugin {
 	 * //* @return null
 	 */
 	protected function defines_and_globals() {
-		define( 'IMAGE_CRATE_VERSION', '3.0.5' );
+		define( 'IMAGE_CRATE_VERSION', '3.0.6' );
 		define( 'IMAGE_CRATE_NAME', plugin_basename( __FILE__ ) );
 		define( 'IMAGE_CRATE_URL', plugins_url( basename( __DIR__ ) ) );
 		define( 'IMAGE_CRATE_PATH', dirname( __FILE__ ) );
