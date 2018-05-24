@@ -169,6 +169,11 @@ class Download_Tracking {
 	private function increment_network_post_hit( $post_id ) {
 
 		$usage = get_post_meta( $post_id, "{$this->provider}_usage", true );
+
+		if ( ! is_array( $usage ) ) {
+			$usage = [];
+		}
+
 		$usage = $this->transform_legacy_getty_tracking( $usage );
 		
 		$usage['api_hit_amount'] = intval( $usage['api_hit_amount'] ) + 1;
