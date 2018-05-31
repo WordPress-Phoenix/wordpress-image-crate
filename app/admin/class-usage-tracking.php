@@ -150,7 +150,7 @@ class Usage_Tracking {
 			$this->increment_attachment_meta( $post_id, $image_occurrence );
 		}
 
-		switch_to_blog( $current_site_id );
+		restore_current_blog();
 
 	}
 

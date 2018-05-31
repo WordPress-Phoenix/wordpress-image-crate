@@ -123,7 +123,7 @@ class Download_Tracking {
 		add_post_meta( $post_id, "{$this->provider}_usage", $usage_count, true );
 		add_post_meta( $post_id, '_wp_attachment_metadata', $attachment_metadata, true );
 
-		switch_to_blog( $this->current_site_id );
+		restore_current_blog();
 
 		return $post_id;
 	}
@@ -150,7 +150,7 @@ class Download_Tracking {
 			$this->increment_network_post_hit( $attachment_id[0] );
 		}
 
-		switch_to_blog( $this->current_site_id );
+		restore_current_blog();
 
 		if ( ! empty( $attachment_id[0] ) ) {
 			return $attachment_id[0];
