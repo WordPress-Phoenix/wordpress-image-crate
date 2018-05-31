@@ -1,3 +1,9 @@
+#### 3.0.7
+https://tools.timeinc.net/jira/browse/FAN-1341
+
+* Hotfix: Use restore_to_blog to switch back to current blog for tracking instead of switch_to_blog
+* Fixes issue with Yoast SEO that checks if site has been switched when saving 
+
 #### 3.0.6
 * Hot fix: check legacy tracking meta is an array
 
