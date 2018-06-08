@@ -8,28 +8,29 @@ jobs:
   deploy_staging:
     working_directory: ~/project
     docker:
-      - image: circleci/node:8.9
+      - image: circleci/node:10.4
     steps:
       - checkout
+      - run: git submodule update --init --remote
       - run:
           name: Deployment
-          command: bash .circleci/deploy-staging.sh
-
+          command: bash .circleci/deploy-scripts/deploy_staging.sh
   deploy:
     working_directory: ~/project
     docker:
-      - image: circleci/node:8.9
+      - image: circleci/node:10.4
     steps:
       - checkout
+      - run: git submodule update --init --remote
       - run:
           name: Deployment
-          command: bash .circleci/deploy.sh
-      - run:
-          name: Slack Notification
-          command: bash .circleci/slack.sh
+          command: bash .circleci/deploy-scripts/deploy_production.sh
       - run:
           name: New Relic Notification
-          command: bash .circleci/new-relic.sh
+          command: bash .circleci/deploy-scripts/new_relic_notification.sh
+      - run:
+          name: Slack Notification
+          command: bash .circleci/deploy-scripts/slack_notification.sh
 
 workflows:
   version: 2
@@ -41,10 +42,6 @@ workflows:
               only: /release(?:/.+)?$/
   release:
     jobs:
-      - deploy_staging:
-          filters:
-            branches:
-              ignore: /.*/
       - deploy:
           filters:
             tags:

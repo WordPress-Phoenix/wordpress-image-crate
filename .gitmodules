@@ -1,0 +1,3 @@
+[submodule ".circleci/deploy-scripts"]
+	path = .circleci/deploy-scripts
+	url = https://github.com/fansided/deploy-scripts
