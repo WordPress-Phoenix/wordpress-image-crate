@@ -1,3 +1,6 @@
+#### 3.0.8
+* Update release process to Circle CI
+
 #### 3.0.7
 https://tools.timeinc.net/jira/browse/FAN-1341
 
