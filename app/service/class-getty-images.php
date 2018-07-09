@@ -163,10 +163,21 @@ class Getty_Images {
 	 * @return string
 	 */
 	public function download_single( $download_url ) {
+
+	    $request_url = $download_url .
+                       "?auto_download=false" .
+                       "&product_type={$this->access_type}";
+
+	    /*
+	     * This adds a product_id to requests for Premium images. This ID product_id is valid until 10/8/18 and will
+	     * need to be replaced before them.
+	     */
+	    if ( $this->access_type === 'premiumaccess' ) {
+            $request_url .= '&product_id=40932';
+        }
+
 		$response = wp_remote_post(
-			$download_url .
-			"?auto_download=false" .
-			"&product_type={$this->access_type}",
+            $request_url,
 			[
 				'timeout'       => 10,
 				'headers'       => [
