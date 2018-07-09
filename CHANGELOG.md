@@ -1,3 +1,9 @@
+#### 3.0.9
+Add a product_id to premium Getty image downloads
+
+* This is added due to change on contract
+* Will need to be update before 10/8/18
+
 #### 3.0.8
 * Update release process to Circle CI
 
