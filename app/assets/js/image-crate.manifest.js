@@ -14,7 +14,7 @@
 		var corePost = wp.media.view.MediaFrame.Post;
 
 		// Controllers
-		// imagecrate.ImageExchangeController = require('./controllers/image-exchange.js');
+		imagecrate.ImageExchangeController = require('./controllers/image-exchange.js');
 		imagecrate.GettyImagesController = require('./controllers/getty-images.js');
 
 		// Attachment Models
@@ -42,7 +42,7 @@
                  */
 				this.states.add([
 					new imagecrate.GettyImagesController
-					// new imagecrate.ImageExchangeController
+					new imagecrate.ImageExchangeController
 				]);
 			},
 

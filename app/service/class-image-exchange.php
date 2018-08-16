@@ -39,7 +39,7 @@ class Image_Exchange {
 
 	public function __construct() {
 
-		$this->api_url = 'http://images.fansided.test';
+		$this->api_url = 'https://images.fansided.com';
 
 	}
 

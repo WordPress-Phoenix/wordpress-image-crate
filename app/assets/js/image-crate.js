@@ -42,7 +42,51 @@ GettyImagesController = Library.extend( {
 } );
 
 module.exports = GettyImagesController;
-},{}],2:[function(require,module,exports){
+    },{}],2:[function(require,module,exports){
+        /**
+         * wp.media.controller.ImageExchangeController
+         *
+         * A state for downloading images from an external image source
+         *
+         * @augments wp.media.controller.Library
+         */
+        var Library = wp.media.controller.Library,
+            ImageExchangeController;
+
+        ImageExchangeController = Library.extend({
+
+            /**
+             * Extend the core defaults and add modify listener key values. These values are referenced when
+             * the controller is triggered.
+             */
+            defaults: _.defaults({
+                id: 'image-exchange',
+                title: 'Image Exchange',
+                priority: 320,
+                content: 'provider',
+                router: 'image-provider',
+                toolbar: 'image-provider',
+                button: 'Download FanSided Image',
+                searchable: false,
+                verticalFilter: true,
+                waitForSearch: false,
+
+                /**
+                 * Any data that needs to be passed from this controller via ajax, should be passed with this object.
+                 *
+                 * The provider key is parsed on the backend to determine which object to use. The chosen object is then used
+                 * to retrieve images from a external service.
+                 */
+                library: wp.media.query({ provider: 'image-exchange' })
+            }, Library.prototype.defaults ),
+
+            activate: function () {
+                this.set( 'mode', this.id );
+            }
+        });
+
+        module.exports = ImageExchangeController;
+    },{}],3:[function(require,module,exports){
 (function ($) {
 	$(function () {
 
@@ -59,7 +103,7 @@ module.exports = GettyImagesController;
 		var corePost = wp.media.view.MediaFrame.Post;
 
 		// Controllers
-		// imagecrate.ImageExchangeController = require('./controllers/image-exchange.js');
+		imagecrate.ImageExchangeController = require('./controllers/image-exchange.js');
 		imagecrate.GettyImagesController = require('./controllers/getty-images.js');
 
 		// Attachment Models
@@ -86,8 +130,8 @@ module.exports = GettyImagesController;
                  * Adding states adds menu items to the left menu on the media modal.
                  */
 				this.states.add([
-					new imagecrate.GettyImagesController
-					// new imagecrate.ImageExchangeController
+					new imagecrate.GettyImagesController,
+					new imagecrate.ImageExchangeController
 				]);
 			},
 
@@ -178,7 +222,7 @@ module.exports = GettyImagesController;
 	});
 })(jQuery);
 
-},{"./controllers/getty-images.js":1,"./models/attachments.js":3,"./views/browser/attachments.js":5,"./views/toolbars/provider.js":10}],3:[function(require,module,exports){
+},{"./controllers/getty-images.js":1,"./controllers/image-exchange.js":2,"./models/attachments.js":4,"./views/browser/attachments.js":6,"./views/toolbars/provider.js":11}],4:[function(require,module,exports){
 /**
  * wp.media.model.StockPhotosQuery
  *
@@ -209,7 +253,7 @@ var ProviderAttachments = wp.media.model.Attachments.extend({
 
 module.exports = ProviderAttachments;
 
-},{"./query":4}],4:[function(require,module,exports){
+},{"./query":5}],5:[function(require,module,exports){
 var Attachments = wp.media.model.Attachments;
 
 /**
@@ -395,7 +439,7 @@ var ProviderQuery = wp.media.model.Query.extend( {
 
 module.exports = ProviderQuery;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /**
  * wp.media.view.StockPhotosBrowser
  *
@@ -532,7 +576,7 @@ ProviderPhotosBrowser = wp.media.view.AttachmentsBrowser.extend( {
 } );
 
 module.exports = ProviderPhotosBrowser;
-},{"./no-results-search.js":6,"./no-results.js":7,"./search.js":8,"./verticals-filter.js":9}],6:[function(require,module,exports){
+},{"./no-results-search.js":7,"./no-results.js":8,"./search.js":9,"./verticals-filter.js":10}],7:[function(require,module,exports){
 var ImageCrateSearch = require( './search.js' );
 
 var NoResultsSearch = wp.media.View.extend( {
@@ -611,7 +655,7 @@ var NoResultsSearch = wp.media.View.extend( {
 } );
 
 module.exports = NoResultsSearch;
-},{"./search.js":8}],7:[function(require,module,exports){
+},{"./search.js":9}],8:[function(require,module,exports){
 var NoResults = wp.media.View.extend( {
 	tagName: 'div',
 	className: 'no-results-found',
@@ -639,7 +683,7 @@ var NoResults = wp.media.View.extend( {
 } );
 
 module.exports = NoResults;
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /**
  * wp.media.view.ImageCrateSearch
  *
@@ -691,7 +735,7 @@ var ImageCrateSearch = wp.media.View.extend( {
 } );
 
 module.exports = ImageCrateSearch;
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /**
  * wp.media.view.VerticalsFilter
  *
@@ -738,7 +782,7 @@ var VerticalsFilter = wp.media.view.AttachmentFilters.extend( {
 });
 
 module.exports = VerticalsFilter;
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /**
  * wp.media.controller.GettyImagesController
  *
@@ -806,4 +850,4 @@ var ProviderToolbar = function( view ) {
 };
 
 module.exports = ProviderToolbar;
-},{}]},{},[2]);
+},{}]},{},[3]);
