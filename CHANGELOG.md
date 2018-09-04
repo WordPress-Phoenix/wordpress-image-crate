@@ -1,3 +1,6 @@
+#### 3.1.1
+* Hotfix: Compiling Asset Error
+
 #### 3.1.0
 * New Feature: Image Exchange
     * Allow for users to pull images from the Images subdomain for use in articles on sites that they are contributing to.
