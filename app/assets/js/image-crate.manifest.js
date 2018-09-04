@@ -41,7 +41,7 @@
                  * Adding states adds menu items to the left menu on the media modal.
                  */
 				this.states.add([
-					new imagecrate.GettyImagesController
+					new imagecrate.GettyImagesController,
 					new imagecrate.ImageExchangeController
 				]);
 			},
