@@ -1,3 +1,8 @@
+#### 3.1.0
+* New Feature: Image Exchange
+    * Allow for users to pull images from the Images subdomain for use in articles on sites that they are contributing to.
+    * https://tools.timeinc.net/jira/browse/FAN-468
+
 #### 3.0.9
 Add a product_id to premium Getty image downloads
 
