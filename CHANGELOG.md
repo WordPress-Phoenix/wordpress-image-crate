@@ -1,3 +1,6 @@
+#### 3.1.2
+* Hotfix: Changing internal version number constant
+
 #### 3.1.1
 * Hotfix: Compiling Asset Error
 
