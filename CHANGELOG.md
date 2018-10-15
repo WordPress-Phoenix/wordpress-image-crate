@@ -1,3 +1,7 @@
+#### 3.1.3
+* Update Getty premium access key
+  * This key gets updated every 3 months per our contract with Getty
+  
 #### 3.1.2
 * Hotfix: Changing internal version number constant
 
