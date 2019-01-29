@@ -49,16 +49,18 @@ class Image_Exchange {
 	 * @param string $vertical      Vertical to filter images by
 	 * @param int    $page           The request page number
 	 * @param int    $posts_per_page The images per page
+	 * @param string $search         Search term
 	 *
 	 * @return array
 	 */
-	public function fetch( $vertical = 'all', $page = 1, $posts_per_page = 40 ) {
+	public function fetch( $vertical = 'all', $page = 1, $posts_per_page = 40, $search = '' ) {
 
 		$response = wp_remote_get(
 			"{$this->api_url}/wp-json/image-exchange/v1/images" .
 			"?vertical={$vertical}" .
 			"&paged={$page}" .
-			"&posts_per_page={$posts_per_page}",
+			"&posts_per_page={$posts_per_page}" .
+            "&search={$search}",
 			[
 				'timeout'       => 60,
 				'wp-rest-cache' => 'exclude',

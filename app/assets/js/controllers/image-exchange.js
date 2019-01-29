@@ -22,7 +22,7 @@ ImageExchangeController = Library.extend({
         router: 'image-provider',
         toolbar: 'image-provider',
         button: 'Download FanSided Image',
-        searchable: false,
+        searchable: true,
         verticalFilter: true,
         waitForSearch: false,
 

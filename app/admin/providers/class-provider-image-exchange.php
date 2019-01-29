@@ -49,8 +49,9 @@ class Provider_Image_Exchange extends Provider {
 		$vertical       = ( ! empty ( $query['vertical'] ) ? strtolower( $query['vertical'] ) : '' );
 		$paged          = ( ! empty ( $query['paged'] ) ? intval( $query['paged'] ) : 1 );
 		$posts_per_page = ( ! empty ( $query['posts_per_page'] ) ? intval( $query['posts_per_page'] ) : 40 );
+		$search         = ( ! empty ( $query['search'] ) ? strtolower( $query['search'] ) : '' );
 
-		$images = $this->service->fetch( $vertical, $paged, $posts_per_page );
+		$images = $this->service->fetch( $vertical, $paged, $posts_per_page, $search );
 
 		return $images;
 

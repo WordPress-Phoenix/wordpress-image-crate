@@ -67,7 +67,7 @@ ImageExchangeController = Library.extend({
         router: 'image-provider',
         toolbar: 'image-provider',
         button: 'Download FanSided Image',
-        searchable: false,
+        searchable: true,
         verticalFilter: true,
         waitForSearch: false,
 
@@ -465,36 +465,17 @@ ProviderPhotosBrowser = wp.media.view.AttachmentsBrowser.extend( {
 	},
 
 	updateContent: function() {
-		var view = this,
-			noItemsView;
-
-		noItemsView = view.uploader;
+		var view = this;
 
 		if ( !this.collection.length ) {
 			this.toolbar.get( 'spinner' ).show();
-			noItemsView.$el.addClass( 'hidden' );
-
-			if ( this.toolbar.get( 'search' ) ) {
-				this.toolbar.get( 'search' ).$el.addClass( 'hidden' );
-			}
 
 			this.dfd = this.collection.more().done( function() {
-				if ( !view.collection.length ) {
-					noItemsView.$el.removeClass( 'hidden' );
-				} else {
-					noItemsView.$el.addClass( 'hidden' );
-				}
 				view.toolbar.get( 'spinner' ).hide();
 			} );
 
 		} else {
-			noItemsView.$el.addClass( 'hidden' );
 			view.toolbar.get( 'spinner' ).hide();
-		}
-
-		if ( this.model.get( 'searchable' ) &&
-			this.collection.props.get( 'searchActive' ) ) {
-			this.toolbar.get( 'search' ).$el.removeClass( 'hidden' );
 		}
 	},
 
@@ -541,10 +522,6 @@ ProviderPhotosBrowser = wp.media.view.AttachmentsBrowser.extend( {
 		}
 
 		this.views.add( this.toolbar );
-
-		if ( this.model.get( 'searchable' ) && ! this.collection.length && ! model.get( 'searchActive' ) ) {
-			this.toolbar.get( 'search' ).$el.addClass( 'hidden' );
-		}
 	},
 
 	/**

@@ -32,3 +32,8 @@
 .image-exchange.image-crate.attachments-browser .spinner {
 	margin-top: 8px;
 }
+
+.image-exchange #media-attachment-vertical-filters {
+	margin-top: 0;
+    margin-right: 10px;
+}
