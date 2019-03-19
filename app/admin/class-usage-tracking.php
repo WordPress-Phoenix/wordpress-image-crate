@@ -221,6 +221,7 @@ class Usage_Tracking {
 		$attachment_id = $image_occurrence['attachment_id'];
 
 		$usage = get_post_meta( $attachment_id, "{$provider}_usage", true );
+		$usage = $usage === '' ? [] : $usage;
 		$usage = $this->transform_legacy_getty_tracking( $usage );
 
 		// attached_to_posts meta format: siteID_postID
