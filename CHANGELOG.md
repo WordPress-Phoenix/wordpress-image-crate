@@ -1,3 +1,6 @@
+#### 3.1.5
+* Hotfix: Fix type error for function argument
+
 #### 3.1.4
 https://tools.timeinc.net/jira/browse/FAN-1650
 * Add search to Image Exchange modal
