@@ -174,13 +174,17 @@ class Usage_Tracking {
 		$in_str_arr = array_fill( 0, count( $post_names ), '%s' );
 		$in_str     = implode( ',', $in_str_arr );
 
-		$attachment_results = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT ID, post_name FROM $wpdb->posts WHERE post_name IN ( $in_str );",
-				$post_names
-			),
-			ARRAY_A
-		);
+		if (empty($in_str)) {
+            $attachment_results = [];
+        } else {
+            $attachment_results = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT ID, post_name FROM $wpdb->posts WHERE post_name IN ( $in_str );",
+                    $post_names
+                ),
+                ARRAY_A
+            );
+        }
 
 		// Index attachments by post_name
 		$attachments = [];
