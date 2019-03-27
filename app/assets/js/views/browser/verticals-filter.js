@@ -10,17 +10,18 @@ var VerticalsFilter = wp.media.view.AttachmentFilters.extend( {
         var filters = {};
         var verticals = [
             { vertical: 'ENTERTAINMENT', text: 'ENTERTAINMENT' },
-			{ vertical: 'TRENDING TOPICS', text: 'TRENDING TOPICS' },
-			{ vertical: 'EXTRA', text: 'EXTRA' },
-			{ vertical: 'LOCAL', text: 'LOCAL' },
-			{ vertical: 'NFL', text: 'NFL' },
-			{ vertical: 'NBA', text: 'NBA' },
-			{ vertical: 'MLB', text: 'MLB' },
-			{ vertical: 'NHL', text: 'NHL' },
-			{ vertical: 'SOCCER', text: 'SOCCER' },
-			{ vertical: 'NCAABB', text: 'NCAABB' },
-			{ vertical: 'NCAAF', text: 'NCAAF' },
-			{ vertical: 'LIFESTYLE', text: 'LIFESTYLE' }
+            { vertical: 'TRENDING TOPICS', text: 'TRENDING TOPICS' },
+            { vertical: 'EXTRA', text: 'EXTRA' },
+            { vertical: 'LOCAL', text: 'LOCAL' },
+            { vertical: 'NFL', text: 'NFL' },
+            { vertical: 'NBA', text: 'NBA' },
+            { vertical: 'MLB', text: 'MLB' },
+            { vertical: 'NHL', text: 'NHL' },
+            { vertical: 'SOCCER', text: 'SOCCER' },
+            { vertical: 'NCAABB', text: 'NCAABB' },
+            { vertical: 'NCAAF', text: 'NCAAF' },
+            { vertical: 'LIFESTYLE', text: 'LIFESTYLE' },
+            { vertical: 'ESPORTS', text: 'ESPORTS' }
         ];
 
         _.each(verticals || {}, function ( value, index ) {
