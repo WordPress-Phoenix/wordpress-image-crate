@@ -1,3 +1,6 @@
+#### 3.1.6.1
+Add esports to list in js file
+
 #### 3.1.6
 Add esports to list of verticals (#7)
 
