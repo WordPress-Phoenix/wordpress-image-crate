@@ -735,7 +735,8 @@ var VerticalsFilter = wp.media.view.AttachmentFilters.extend( {
 			{ vertical: 'SOCCER', text: 'SOCCER' },
 			{ vertical: 'NCAABB', text: 'NCAABB' },
 			{ vertical: 'NCAAF', text: 'NCAAF' },
-			{ vertical: 'LIFESTYLE', text: 'LIFESTYLE' }
+			{ vertical: 'LIFESTYLE', text: 'LIFESTYLE' },
+			{ vertical: 'ESPORTS', text: 'ESPORTS'}
         ];
 
         _.each(verticals || {}, function ( value, index ) {
