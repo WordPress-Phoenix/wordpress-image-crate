@@ -1,3 +1,6 @@
+#### 3.1.6.2
+Hotfix: Update js version
+
 #### 3.1.6.1
 Add esports to list in js file
 
