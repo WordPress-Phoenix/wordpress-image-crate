@@ -1,3 +1,6 @@
+#### 3.1.6
+Add esports to list of verticals (#7)
+
 #### 3.1.5
 * Hotfix: Fix type error for function argument
 
