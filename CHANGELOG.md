@@ -1,3 +1,8 @@
+#### 3.1.7
+Hotfix: URLEncode Search Parameter being sent to Getty Images
+https://github.com/fansided/wordpress-image-crate/issues/6
+https://secure.helpscout.net/conversation/752462008/14742?folderId=2165943
+
 #### 3.1.6.2
 Hotfix: Update js version
 
