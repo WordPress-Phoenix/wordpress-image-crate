@@ -50,7 +50,7 @@ class Provider_Getty_Images extends Provider {
 	 */
 	public function fetch( $query ) {
 
-		$search_term    = ( ! empty ( $query['search'] ) ? $query['search'] : '' );
+		$search_term    = ( ! empty ( $query['search'] ) ? urlencode($query['search']) : '' );
 		$paged          = ( ! empty ( $query['paged'] ) ? intval( $query['paged'] ) : 1 );
 		$posts_per_page = ( ! empty ( $query['posts_per_page'] ) ? intval( $query['posts_per_page'] ) : 40 );
 
