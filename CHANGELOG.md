@@ -1,3 +1,8 @@
+#### 3.1.8
+https://github.com/fansided/backlog/issues/112
+
+- Manually pass the image caption on download and save it to the attachment meta. This means it doesn't have to depend in the image file have the caption set in meta
+
 #### 3.1.7
 Hotfix: URLEncode Search Parameter being sent to Getty Images
 https://github.com/fansided/wordpress-image-crate/issues/6
