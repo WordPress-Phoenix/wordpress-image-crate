@@ -40,14 +40,15 @@ final class Import {
 	/**
 	 * Import image from an url
 	 *
-	 * @param string     $download_url     Url to download image file.
-	 * @param string|int $remote_id        A unique id from external source used for the post_name.
-	 * @param string     $custom_directory Where to download the image to.
-	 * @param string     $provider         The image provider.
+	 * @param string      $download_url     Url to download image file.
+	 * @param string|int  $remote_id        A unique id from external source used for the post_name.
+	 * @param string      $custom_directory Where to download the image to.
+	 * @param string      $provider         The image provider.
+     * @param string|bool $caption          The image caption
 	 *
 	 * @return bool|int|object
 	 */
-	public function image( $download_url, $remote_id, $custom_directory, string $provider ) {
+	public function image( $download_url, $remote_id, $custom_directory, string $provider, $caption = false ) {
 
 		$this->directory = $custom_directory;
 
@@ -98,8 +99,14 @@ final class Import {
 
 		add_filter( 'wp_insert_attachment_data', [ $this, 'save_image_caption' ] );
 
+		$post_data = [ 'post_name' => $remote_id ];
+
+		if ($caption) {
+		    $post_data['post_content'] = $caption;
+        }
+
 		// Do the validation and storage stuff
-		$id = media_handle_sideload( $file_array, 0, null, [ 'post_name' => $remote_id ] );
+		$id = media_handle_sideload( $file_array, 0, null, $post_data );
 
 		remove_filter( 'wp_insert_attachment_data', [ $this, 'save_image_caption'] );
 

@@ -796,6 +796,7 @@ var ProviderToolbar = function( view ) {
 					action: 'image_crate_download',
 					query: {
 						download_url: selection.models[0].get( 'url' ),
+						caption: selection.models[0].get( 'caption' ),
 						provider: provider,
 						filename: selection.models[0].get( 'filename' ),
 						id: selection.models[0].get( 'id' )

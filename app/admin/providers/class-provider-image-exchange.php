@@ -67,12 +67,14 @@ class Provider_Image_Exchange extends Provider {
 		$import    = new Import( self::TRACKING );
 		$image_url = $query['download_url'];
 		$remote_id = 'ie_' . $query['id'];
+		$caption = $query['caption'];
 
 		$attachment = $import->image(
 			$image_url,
 			$remote_id,
 			self::CUSTOM_DIRECTORY,
-			self::PROVIDER
+			self::PROVIDER,
+            $caption
 		);
 
 		if ( ! $attachment ) {

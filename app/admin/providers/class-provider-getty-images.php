@@ -72,6 +72,7 @@ class Provider_Getty_Images extends Provider {
 		$import       = new Import( self::TRACKING );
 		$download_url = $query['download_url'];
 		$remote_id    = $query['id'];
+        $caption      = $query['caption'];
 
 		$image_url = $this->service->download_single( $download_url );
 
@@ -79,7 +80,8 @@ class Provider_Getty_Images extends Provider {
 			$image_url,
 			$remote_id,
 			self::CUSTOM_DIRECTORY,
-			self::PROVIDER
+			self::PROVIDER,
+            $caption
 		);
 
 		if ( ! $attachment ) {
