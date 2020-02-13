@@ -37,13 +37,6 @@ class Getty_Images {
 	 */
 	private $api_token;
 
-	/**
-	 * If site has premium access.
-	 *
-	 * @var string
-	 */
-	private $access_type;
-
 	public function __construct() {
 
 		if ( defined( 'GETTY_API_KEY' ) ) {
@@ -53,9 +46,6 @@ class Getty_Images {
 		if ( defined( 'GETTY_CLIENT_SECRET' ) ) {
 			$this->api_secret = GETTY_CLIENT_SECRET;
 		}
-
-		$premium_access    = get_option( 'fs_option_getty_access_type' );
-		$this->access_type = $premium_access === 'Premium' ? 'premiumaccess' : 'editorialsubscription';
 
 		$this->api_url = 'https://api.gettyimages.com';
 
@@ -85,7 +75,6 @@ class Getty_Images {
 		               "&page_size={$posts_per_page}" .
 		               "&phrase={$search_term}" .
 		               "&sort_order=newest" .
-		               "&product_types={$this->access_type}" .
 		               "&fields=detail_set,largest_downloads,max_dimensions,date_submitted";
 
 		$request_url = str_replace( ' ', '%20', $request_url );
@@ -165,16 +154,7 @@ class Getty_Images {
 	public function download_single( $download_url ) {
 
 	    $request_url = $download_url .
-                       "?auto_download=false" .
-                       "&product_type={$this->access_type}";
-
-	    /*
-	     * This adds a product_id to requests for Premium images. This ID product_id is valid until 1/8/19 and will
-	     * need to be replaced before them.
-	     */
-	    if ( $this->access_type === 'premiumaccess' ) {
-            $request_url .= '&product_id=46404';
-        }
+                       "?auto_download=false";
 
 		$response = wp_remote_post(
             $request_url,
