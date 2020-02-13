@@ -1,3 +1,7 @@
+#### 3.2.0
+* Remove access type from Getty Images
+  * Access type restrictions are no longer required under MM's Getty Images contract
+
 #### 3.1.8
 https://github.com/fansided/backlog/issues/112
 
