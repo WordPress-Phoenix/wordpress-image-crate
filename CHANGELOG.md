@@ -1,3 +1,6 @@
+#### 3.3.2
+* Update Imagn menu title
+
 #### 3.3.1
 * Adds legacy redirect to fix Imagn image path bug
 
