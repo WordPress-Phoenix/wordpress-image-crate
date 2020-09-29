@@ -105,7 +105,7 @@ ImagnController = Library.extend( {
 	 */
 	defaults: _.defaults( {
 		id: 'imagn',
-		title: 'Imagn Images',
+		title: 'Imagn Images (Use First)',
 		priority: 280,
 		content: 'provider',
 		router: 'image-provider',
