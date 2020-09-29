@@ -1,3 +1,6 @@
+#### 3.3.1
+* Adds legacy redirect to fix Imagn image path bug
+
 #### 3.3.0
 * Adds Imagn as image provider
 
