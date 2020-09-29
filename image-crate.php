@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/fansided/wordpress-image-crate
  * Description: Add image providers to the WordPress media modal.
  * Author: FanSided
- * Version: 3.2.0
+ * Version: 3.3.0
  * Author URI: http://github.com/fansided
  * License: GPL V2
  * Text Domain: image-crate

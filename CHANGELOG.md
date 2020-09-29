@@ -1,3 +1,6 @@
+#### 3.3.0
+* Adds Imagn as image provider
+
 #### 3.2.0
 * Remove access type from Getty Images
   * Access type restrictions are no longer required under MM's Getty Images contract
