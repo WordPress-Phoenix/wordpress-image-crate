@@ -16,6 +16,7 @@
 		// Controllers
 		imagecrate.ImageExchangeController = require('./controllers/image-exchange.js');
 		imagecrate.GettyImagesController = require('./controllers/getty-images.js');
+		imagecrate.ImagnController = require('./controllers/imagn.js');
 
 		// Attachment Models
         imagecrate.ProviderAttachments = require('./models/attachments.js');
@@ -42,7 +43,8 @@
                  */
 				this.states.add([
 					new imagecrate.GettyImagesController,
-					new imagecrate.ImageExchangeController
+					new imagecrate.ImageExchangeController,
+					new imagecrate.ImagnController,
 				]);
 			},
 

@@ -87,6 +87,50 @@ ImageExchangeController = Library.extend({
 
 module.exports = ImageExchangeController;
 },{}],3:[function(require,module,exports){
+/**
+ * wp.media.controller.ImagnController
+ *
+ * A state for downloading images from an external image source
+ *
+ * @augments wp.media.controller.Library
+ */
+var Library = wp.media.controller.Library,
+	ImagnController;
+
+ImagnController = Library.extend( {
+
+	/**
+	 * Extend the core defaults and add modify listener key values. These values are referenced when
+	 * the controller is triggered.
+	 */
+	defaults: _.defaults( {
+		id: 'imagn',
+		title: 'Imagn Images',
+		priority: 280,
+		content: 'provider',
+		router: 'image-provider',
+		toolbar: 'image-provider',
+		button: 'Download Imagn Image',
+		verticalFilter: false,
+		waitForSearch: true,
+
+		/**
+		 * Any data that needs to be passed from this controller via ajax, should be passed with this object.
+		 *
+		 * The provider key is parsed on the backend to determine which object to use. The chosen object is then used
+		 * to retrieve images from a external service.
+		 */
+		library: wp.media.query( { provider: 'imagn' } )
+
+	}, Library.prototype.defaults ),
+
+	activate: function() {
+		this.set( 'mode', this.id );
+	}
+} );
+
+module.exports = ImagnController;
+},{}],4:[function(require,module,exports){
 (function ($) {
 	$(function () {
 
@@ -105,6 +149,7 @@ module.exports = ImageExchangeController;
 		// Controllers
 		imagecrate.ImageExchangeController = require('./controllers/image-exchange.js');
 		imagecrate.GettyImagesController = require('./controllers/getty-images.js');
+		imagecrate.ImagnController = require('./controllers/imagn.js');
 
 		// Attachment Models
         imagecrate.ProviderAttachments = require('./models/attachments.js');
@@ -131,7 +176,8 @@ module.exports = ImageExchangeController;
                  */
 				this.states.add([
 					new imagecrate.GettyImagesController,
-					new imagecrate.ImageExchangeController
+					new imagecrate.ImageExchangeController,
+					new imagecrate.ImagnController,
 				]);
 			},
 
@@ -222,7 +268,7 @@ module.exports = ImageExchangeController;
 	});
 })(jQuery);
 
-},{"./controllers/getty-images.js":1,"./controllers/image-exchange.js":2,"./models/attachments.js":4,"./views/browser/attachments.js":6,"./views/toolbars/provider.js":11}],4:[function(require,module,exports){
+},{"./controllers/getty-images.js":1,"./controllers/image-exchange.js":2,"./controllers/imagn.js":3,"./models/attachments.js":5,"./views/browser/attachments.js":7,"./views/toolbars/provider.js":12}],5:[function(require,module,exports){
 /**
  * wp.media.model.StockPhotosQuery
  *
@@ -253,7 +299,7 @@ var ProviderAttachments = wp.media.model.Attachments.extend({
 
 module.exports = ProviderAttachments;
 
-},{"./query":5}],5:[function(require,module,exports){
+},{"./query":6}],6:[function(require,module,exports){
 var Attachments = wp.media.model.Attachments;
 
 /**
@@ -439,7 +485,7 @@ var ProviderQuery = wp.media.model.Query.extend( {
 
 module.exports = ProviderQuery;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /**
  * wp.media.view.StockPhotosBrowser
  *
@@ -553,7 +599,7 @@ ProviderPhotosBrowser = wp.media.view.AttachmentsBrowser.extend( {
 } );
 
 module.exports = ProviderPhotosBrowser;
-},{"./no-results-search.js":7,"./no-results.js":8,"./search.js":9,"./verticals-filter.js":10}],7:[function(require,module,exports){
+},{"./no-results-search.js":8,"./no-results.js":9,"./search.js":10,"./verticals-filter.js":11}],8:[function(require,module,exports){
 var ImageCrateSearch = require( './search.js' );
 
 var NoResultsSearch = wp.media.View.extend( {
@@ -632,7 +678,7 @@ var NoResultsSearch = wp.media.View.extend( {
 } );
 
 module.exports = NoResultsSearch;
-},{"./search.js":9}],8:[function(require,module,exports){
+},{"./search.js":10}],9:[function(require,module,exports){
 var NoResults = wp.media.View.extend( {
 	tagName: 'div',
 	className: 'no-results-found',
@@ -660,7 +706,7 @@ var NoResults = wp.media.View.extend( {
 } );
 
 module.exports = NoResults;
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /**
  * wp.media.view.ImageCrateSearch
  *
@@ -712,7 +758,7 @@ var ImageCrateSearch = wp.media.View.extend( {
 } );
 
 module.exports = ImageCrateSearch;
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /**
  * wp.media.view.VerticalsFilter
  *
@@ -725,18 +771,18 @@ var VerticalsFilter = wp.media.view.AttachmentFilters.extend( {
         var filters = {};
         var verticals = [
             { vertical: 'ENTERTAINMENT', text: 'ENTERTAINMENT' },
-			{ vertical: 'TRENDING TOPICS', text: 'TRENDING TOPICS' },
-			{ vertical: 'EXTRA', text: 'EXTRA' },
-			{ vertical: 'LOCAL', text: 'LOCAL' },
-			{ vertical: 'NFL', text: 'NFL' },
-			{ vertical: 'NBA', text: 'NBA' },
-			{ vertical: 'MLB', text: 'MLB' },
-			{ vertical: 'NHL', text: 'NHL' },
-			{ vertical: 'SOCCER', text: 'SOCCER' },
-			{ vertical: 'NCAABB', text: 'NCAABB' },
-			{ vertical: 'NCAAF', text: 'NCAAF' },
-			{ vertical: 'LIFESTYLE', text: 'LIFESTYLE' },
-			{ vertical: 'ESPORTS', text: 'ESPORTS'}
+            { vertical: 'TRENDING TOPICS', text: 'TRENDING TOPICS' },
+            { vertical: 'EXTRA', text: 'EXTRA' },
+            { vertical: 'LOCAL', text: 'LOCAL' },
+            { vertical: 'NFL', text: 'NFL' },
+            { vertical: 'NBA', text: 'NBA' },
+            { vertical: 'MLB', text: 'MLB' },
+            { vertical: 'NHL', text: 'NHL' },
+            { vertical: 'SOCCER', text: 'SOCCER' },
+            { vertical: 'NCAABB', text: 'NCAABB' },
+            { vertical: 'NCAAF', text: 'NCAAF' },
+            { vertical: 'LIFESTYLE', text: 'LIFESTYLE' },
+            { vertical: 'ESPORTS', text: 'ESPORTS' }
         ];
 
         _.each(verticals || {}, function ( value, index ) {
@@ -760,7 +806,7 @@ var VerticalsFilter = wp.media.view.AttachmentFilters.extend( {
 });
 
 module.exports = VerticalsFilter;
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /**
  * wp.media.controller.GettyImagesController
  *
@@ -829,4 +875,4 @@ var ProviderToolbar = function( view ) {
 };
 
 module.exports = ProviderToolbar;
-},{}]},{},[3]);
+},{}]},{},[4]);
