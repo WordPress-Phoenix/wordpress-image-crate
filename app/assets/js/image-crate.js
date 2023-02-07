@@ -511,6 +511,10 @@ ProviderPhotosBrowser = wp.media.view.AttachmentsBrowser.extend( {
 	},
 
 	updateContent: function() {
+		if (typeof this.collection.mirroring.args === "undefined") {
+			this.collection.mirroring.args = {};
+		}
+
 		var view = this;
 
 		if ( !this.collection.length ) {

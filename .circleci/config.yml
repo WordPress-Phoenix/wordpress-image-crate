@@ -5,6 +5,18 @@
 version: 2
 
 jobs:
+  deploy_dev:
+    working_directory: ~/project
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
+      - run: git submodule update --init --remote
+      - run:
+          name: Deployment
+          command: bash .circleci/deploy-scripts/deploy_develop.sh
   deploy_staging:
     working_directory: ~/project
     docker:
@@ -34,6 +46,12 @@ jobs:
 
 workflows:
   version: 2
+  release_dev:
+    jobs:
+      - deploy_dev:
+          filters:
+            branches:
+              only: /dev-release(?:/.+)?$/
   release_staging:
     jobs:
       - deploy_staging:

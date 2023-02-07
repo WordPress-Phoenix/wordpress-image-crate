@@ -37,7 +37,8 @@ class Scripts {
 			}
             /* cheap way to fields without replicating an entire js template*/
             .image-crate .attachment-details label[data-setting=url],
-            .image-crate .attachment-details label[data-setting=alt] {
+            .image-crate .attachment-details label[data-setting=alt],
+            .image-crate .media-attachments-filter-heading {
                 display: none;
             }
 		</style>
