@@ -1,3 +1,6 @@
+#### 3.3.3
+* Updates CSS selector used for hiding search field label, for wp6 compatibility 
+
 #### 3.3.2
 * Update Imagn menu title
 
