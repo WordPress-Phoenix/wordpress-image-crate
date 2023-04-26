@@ -20,6 +20,7 @@ class Legacy_Filters {
 		add_filter( 'image_send_to_editor', [ $this, 'getty_send_to_editor' ], 10, 1 );
 		add_filter( 'image_send_to_editor', [ $this, 'imagn_send_to_editor' ], 10, 1 );
 		add_filter( 'wp_prepare_attachment_for_js', [ $this, 'update_media_modal_file_refs' ], 99, 1 );
+        add_filter( 'media_library_infinite_scrolling', '__return_true' );
 
 	}
 
